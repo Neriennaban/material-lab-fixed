@@ -1,0 +1,302 @@
+{
+  "title": "Справочные данные материалов по Братковский_Шевченко_2017",
+  "source": "Братковский В.И., Шевченко В.Н. Материаловедение, 2017",
+
+  "fe_c_phases": {
+    "ferrite": {
+      "name_ru": "Феррит (α-Fe)",
+      "crystal_structure": "ОЦК",
+      "hardness_hb": {"min": 80, "max": 100, "typical": 90},
+      "tensile_strength_mpa": {"min": 250, "max": 300, "typical": 275},
+      "elongation_pct": {"min": 40, "max": 50, "typical": 45},
+      "young_modulus_gpa": 210,
+      "density_g_cm3": 7.87,
+      "magnetic": true,
+      "max_carbon_solubility_pct": 0.02,
+      "temperature_stability": {"min": 20, "max": 911}
+    },
+    "austenite": {
+      "name_ru": "Аустенит (γ-Fe)",
+      "crystal_structure": "ГЦК",
+      "hardness_hb": {"min": 150, "max": 200, "typical": 170},
+      "tensile_strength_mpa": {"min": 500, "max": 700, "typical": 600},
+      "elongation_pct": {"min": 30, "max": 40, "typical": 35},
+      "young_modulus_gpa": 200,
+      "density_g_cm3": 7.84,
+      "magnetic": false,
+      "max_carbon_solubility_pct": 2.14,
+      "temperature_stability": {"min": 727, "max": 1493}
+    },
+    "cementite": {
+      "name_ru": "Цементит (Fe₃C)",
+      "chemical_formula": "Fe3C",
+      "carbon_content_pct": 6.67,
+      "crystal_structure": "Ромбическая",
+      "hardness_hb": {"min": 750, "max": 850, "typical": 800},
+      "tensile_strength_mpa": {"min": 200, "max": 300, "typical": 250},
+      "elongation_pct": {"min": 0, "max": 1, "typical": 0},
+      "young_modulus_gpa": 180,
+      "density_g_cm3": 7.69,
+      "brittle": true
+    },
+    "pearlite": {
+      "name_ru": "Перлит",
+      "description": "Эвтектоидная смесь феррита и цементита",
+      "carbon_content_pct": 0.8,
+      "formation_temperature_c": 727,
+      "hardness_hb": {"min": 180, "max": 220, "typical": 200},
+      "tensile_strength_mpa": {"min": 800, "max": 900, "typical": 850},
+      "elongation_pct": {"min": 10, "max": 15, "typical": 12},
+      "lamellar_spacing_um": {"coarse": 0.6, "fine": 0.2},
+      "phases": {"ferrite": 0.88, "cementite": 0.12}
+    },
+    "martensite": {
+      "name_ru": "Мартенсит",
+      "description": "Пересыщенный твёрдый раствор углерода в α-Fe",
+      "crystal_structure": "ОЦТ (тетрагональная)",
+      "formation": "Бездиффузионное превращение при быстром охлаждении",
+      "hardness_hb": {"min": 600, "max": 700, "typical": 650},
+      "tensile_strength_mpa": {"min": 2000, "max": 2200, "typical": 2100},
+      "elongation_pct": {"min": 1, "max": 3, "typical": 2},
+      "young_modulus_gpa": 210,
+      "brittle": true,
+      "ms_temperature_formula": "Ms(°C) ≈ 539 - 423*C(%) - 30.4*Mn(%) - 12.1*Cr(%) - 17.7*Ni(%) - 7.5*Mo(%)"
+    },
+    "bainite": {
+      "name_ru": "Бейнит",
+      "description": "Игольчатая смесь феррита и цементита",
+      "formation_temperature_c": {"upper": {"min": 400, "max": 550}, "lower": {"min": 250, "max": 400}},
+      "hardness_hb": {"upper": {"min": 350, "max": 450}, "lower": {"min": 450, "max": 550}},
+      "tensile_strength_mpa": {"min": 1200, "max": 1600},
+      "elongation_pct": {"min": 5, "max": 15}
+    },
+    "ledeburite": {
+      "name_ru": "Ледебурит",
+      "description": "Эвтектическая смесь аустенита и цементита",
+      "carbon_content_pct": 4.3,
+      "formation_temperature_c": 1147,
+      "hardness_hb": {"min": 500, "max": 600, "typical": 550},
+      "phases_at_727C": {"pearlite": 0.52, "cementite": 0.48}
+    }
+  },
+
+  "critical_temperatures_fe_c": {
+    "A1": {"value": 727, "description": "Эвтектоидное превращение (P ↔ A)"},
+    "A3_pure_fe": {"value": 911, "description": "α-Fe ↔ γ-Fe для чистого железа"},
+    "A3_0_2C": {"value": 850, "description": "Для стали с 0.2% C"},
+    "A3_0_4C": {"value": 790, "description": "Для стали с 0.4% C"},
+    "A3_0_8C": {"value": 727, "description": "Для эвтектоидной стали"},
+    "Acm": {"value": 911, "description": "Линия растворимости цементита в аустените"},
+    "A4": {"value": 1392, "description": "γ-Fe ↔ δ-Fe"},
+    "melting_pure_fe": {"value": 1539, "description": "Плавление чистого железа"},
+    "eutectic": {"value": 1147, "description": "Эвтектическое превращение L ↔ A + Fe3C"}
+  },
+
+  "heat_treatment_temperatures": {
+    "quenching": {
+      "hypoeutectoid": {
+        "formula": "Ac3 + (30-50)°C",
+        "description": "Доэвтектоидные стали: полная аустенитизация"
+      },
+      "eutectoid": {
+        "formula": "Ac1 + (30-50)°C",
+        "value_range": {"min": 760, "max": 780}
+      },
+      "hypereutectoid": {
+        "formula": "Ac1 + (30-50)°C",
+        "description": "Заэвтектоидные стали: неполная аустенитизация"
+      }
+    },
+    "tempering": {
+      "low": {
+        "name_ru": "Низкий отпуск",
+        "temperature_range": {"min": 150, "max": 250},
+        "typical": 200,
+        "result": "Мартенсит отпуска (ε-карбид)",
+        "hardness_hb": {"min": 550, "max": 650},
+        "application": "Режущий инструмент, подшипники"
+      },
+      "medium": {
+        "name_ru": "Средний отпуск",
+        "temperature_range": {"min": 350, "max": 450},
+        "typical": 400,
+        "result": "Троостит отпуска",
+        "hardness_hb": {"min": 400, "max": 500},
+        "application": "Пружины, рессоры"
+      },
+      "high": {
+        "name_ru": "Высокий отпуск",
+        "temperature_range": {"min": 550, "max": 650},
+        "typical": 600,
+        "result": "Сорбит отпуска",
+        "hardness_hb": {"min": 250, "max": 350},
+        "application": "Конструкционные стали (улучшение)"
+      }
+    },
+    "normalizing": {
+      "formula": "Ac3 + (40-60)°C для доэвтектоидных",
+      "cooling": "На воздухе",
+      "result": "Мелкозернистый перлит + феррит"
+    },
+    "annealing": {
+      "full": {
+        "temperature": "Ac3 + (20-30)°C",
+        "cooling": "С печью (медленное)",
+        "result": "Крупнозернистый перлит + феррит"
+      },
+      "spheroidizing": {
+        "temperature": "Ac1 ± 10°C",
+        "time_hours": "4-8",
+        "result": "Зернистый цементит (сфероидизация)"
+      }
+    }
+  },
+
+  "steel_classification_by_carbon": {
+    "low_carbon": {
+      "name_ru": "Низкоуглеродистая",
+      "carbon_range": {"min": 0.02, "max": 0.25},
+      "typical_grades": ["Ст10", "Ст20", "15", "20"],
+      "microstructure": "Феррит + перлит (10-30%)",
+      "hardenability": "low",
+      "applications": "Цементуемые детали, сварные конструкции"
+    },
+    "medium_carbon": {
+      "name_ru": "Среднеуглеродистая",
+      "carbon_range": {"min": 0.25, "max": 0.60},
+      "typical_grades": ["Ст45", "40Х", "35", "50"],
+      "microstructure": "Феррит + перлит (40-60%)",
+      "hardenability": "medium",
+      "applications": "Валы, шестерни, оси (после улучшения)"
+    },
+    "high_carbon": {
+      "name_ru": "Высокоуглеродистая",
+      "carbon_range": {"min": 0.60, "max": 1.4},
+      "typical_grades": ["У7", "У8", "У10", "У12", "65Г"],
+      "microstructure": "Перлит + цементит",
+      "hardenability": "high",
+      "applications": "Инструмент, пружины, подшипники"
+    }
+  },
+
+  "mechanical_properties_by_carbon": {
+    "description": "Свойства нормализованной стали в зависимости от %C",
+    "data": [
+      {"carbon_pct": 0.1, "ferrite_pct": 87, "pearlite_pct": 13, "hb": 105, "uts_mpa": 320, "elongation_pct": 33},
+      {"carbon_pct": 0.2, "ferrite_pct": 75, "pearlite_pct": 25, "hb": 125, "uts_mpa": 420, "elongation_pct": 28},
+      {"carbon_pct": 0.4, "ferrite_pct": 50, "pearlite_pct": 50, "hb": 180, "uts_mpa": 620, "elongation_pct": 20},
+      {"carbon_pct": 0.6, "ferrite_pct": 25, "pearlite_pct": 75, "hb": 220, "uts_mpa": 780, "elongation_pct": 12},
+      {"carbon_pct": 0.8, "ferrite_pct": 0, "pearlite_pct": 100, "hb": 260, "uts_mpa": 900, "elongation_pct": 10},
+      {"carbon_pct": 1.0, "pearlite_pct": 94, "cementite_pct": 6, "hb": 280, "uts_mpa": 950, "elongation_pct": 8},
+      {"carbon_pct": 1.2, "pearlite_pct": 88, "cementite_pct": 12, "hb": 300, "uts_mpa": 1000, "elongation_pct": 6}
+    ]
+  },
+
+  "alloying_elements_effect": {
+    "Mn": {
+      "name_ru": "Марганец",
+      "effect": "Повышает прокаливаемость, связывает серу",
+      "typical_range_pct": {"min": 0.3, "max": 0.8}
+    },
+    "Si": {
+      "name_ru": "Кремний",
+      "effect": "Раскислитель, повышает упругость",
+      "typical_range_pct": {"min": 0.15, "max": 0.35}
+    },
+    "Cr": {
+      "name_ru": "Хром",
+      "effect": "Повышает твёрдость, коррозионную стойкость",
+      "typical_range_pct": {"min": 0.5, "max": 2.0}
+    },
+    "Ni": {
+      "name_ru": "Никель",
+      "effect": "Повышает вязкость, прокаливаемость",
+      "typical_range_pct": {"min": 0.5, "max": 3.0}
+    },
+    "Mo": {
+      "name_ru": "Молибден",
+      "effect": "Снижает отпускную хрупкость, повышает жаропрочность",
+      "typical_range_pct": {"min": 0.1, "max": 0.5}
+    },
+    "V": {
+      "name_ru": "Ванадий",
+      "effect": "Уточняет зерно, повышает твёрдость",
+      "typical_range_pct": {"min": 0.05, "max": 0.2}
+    }
+  },
+
+  "cast_iron": {
+    "grey": {
+      "name_ru": "Серый чугун",
+      "carbon_range": {"min": 2.5, "max": 4.0},
+      "silicon_pct": {"min": 1.0, "max": 3.0},
+      "graphite_form": "пластинчатая",
+      "hardness_hb": {"min": 150, "max": 250},
+      "tensile_strength_mpa": {"min": 150, "max": 350},
+      "applications": "Станины, блоки цилиндров"
+    },
+    "ductile": {
+      "name_ru": "Высокопрочный чугун",
+      "carbon_range": {"min": 3.0, "max": 4.0},
+      "magnesium_pct": {"min": 0.03, "max": 0.06},
+      "graphite_form": "шаровидная",
+      "hardness_hb": {"min": 150, "max": 300},
+      "tensile_strength_mpa": {"min": 400, "max": 900},
+      "elongation_pct": {"min": 2, "max": 20},
+      "applications": "Коленчатые валы, зубчатые колёса"
+    },
+    "white": {
+      "name_ru": "Белый чугун",
+      "carbon_range": {"min": 2.0, "max": 3.5},
+      "carbon_form": "цементит",
+      "hardness_hb": {"min": 450, "max": 600},
+      "brittle": true,
+      "applications": "Прокатные валки, шаровые мельницы"
+    }
+  },
+
+  "hall_petch_coefficients": {
+    "description": "Коэффициенты для формулы Холла-Петча: σ_y = σ_0 + k_y × d^(-1/2)",
+    "source": "Братковский_Шевченко_Материаловедение_2016",
+    "ferrite": {
+      "name_ru": "Феррит (α-Fe)",
+      "sigma_0_mpa": 50.0,
+      "k_y": 0.50,
+      "description": "Сопротивление решётки + коэффициент упрочнения зерном"
+    },
+    "austenite": {
+      "name_ru": "Аустенит (γ-Fe)",
+      "sigma_0_mpa": 70.0,
+      "k_y": 0.35,
+      "description": "ГЦК решётка, меньший эффект упрочнения"
+    },
+    "pearlite": {
+      "name_ru": "Перлит",
+      "sigma_0_mpa": 120.0,
+      "k_y": 0.80,
+      "description": "Эвтектоидная смесь, высокий коэффициент упрочнения"
+    }
+  },
+
+  "astm_e112_grain_size_table": {
+    "description": "Стандартная шкала размеров зерна ASTM E112",
+    "table": [
+      {"astm_number": 0, "grains_per_inch2": 1, "grains_per_mm2": 0.0016, "mean_diameter_um": 500},
+      {"astm_number": 1, "grains_per_inch2": 2, "grains_per_mm2": 0.0031, "mean_diameter_um": 350},
+      {"astm_number": 2, "grains_per_inch2": 4, "grains_per_mm2": 0.0062, "mean_diameter_um": 250},
+      {"astm_number": 3, "grains_per_inch2": 8, "grains_per_mm2": 0.0124, "mean_diameter_um": 180},
+      {"astm_number": 4, "grains_per_inch2": 16, "grains_per_mm2": 0.0248, "mean_diameter_um": 125},
+      {"astm_number": 5, "grains_per_inch2": 32, "grains_per_mm2": 0.0496, "mean_diameter_um": 90},
+      {"astm_number": 6, "grains_per_inch2": 64, "grains_per_mm2": 0.0992, "mean_diameter_um": 65},
+      {"astm_number": 7, "grains_per_inch2": 128, "grains_per_mm2": 0.1984, "mean_diameter_um": 45},
+      {"astm_number": 8, "grains_per_inch2": 256, "grains_per_mm2": 0.3968, "mean_diameter_um": 32},
+      {"astm_number": 9, "grains_per_inch2": 512, "grains_per_mm2": 0.7936, "mean_diameter_um": 22},
+      {"astm_number": 10, "grains_per_inch2": 1024, "grains_per_mm2": 1.5872, "mean_diameter_um": 16},
+      {"astm_number": 11, "grains_per_inch2": 2048, "grains_per_mm2": 3.1744, "mean_diameter_um": 11},
+      {"astm_number": 12, "grains_per_inch2": 4096, "grains_per_mm2": 6.3488, "mean_diameter_um": 5.5},
+      {"astm_number": 13, "grains_per_inch2": 8192, "grains_per_mm2": 12.6976, "mean_diameter_um": 2.8},
+      {"astm_number": 14, "grains_per_inch2": 16384, "grains_per_mm2": 25.3952, "mean_diameter_um": 1.4}
+    ],
+    "formula": "n = 2^(G-1), где n — зёрен на дюйм² при 100×, G — номер ASTM"
+  }
+}

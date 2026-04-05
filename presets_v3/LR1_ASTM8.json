@@ -1,0 +1,151 @@
+{
+  "sample_id": "LR1_ASTM8_textbook",
+  "composition_wt": {
+    "Fe": 99.55,
+    "C": 0.45
+  },
+  "system_hint": "fe-c",
+  "material_grade": "Учебный образец ЛР1",
+  "material_class_ru": "Доэвтектоидная сталь (0.45% C)",
+  "lab_work": "LR1_grain_size",
+  "target_astm_grain_size": 8,
+  "mean_grain_diameter_um": 32,
+  "prep_route": {
+    "roughness_target_um": 0.05,
+    "relief_mode": "hardness_coupled",
+    "contamination_level": 0.02,
+    "steps": [
+      {
+        "method": "grinding_800",
+        "duration_s": 90,
+        "abrasive_um": 18,
+        "load_n": 22,
+        "rpm": 180,
+        "coolant": "water"
+      },
+      {
+        "method": "polishing_3um",
+        "duration_s": 110,
+        "abrasive_um": 3,
+        "load_n": 14,
+        "rpm": 140,
+        "coolant": "alcohol"
+      },
+      {
+        "method": "polishing_1um",
+        "duration_s": 90,
+        "abrasive_um": 1,
+        "load_n": 10,
+        "rpm": 120,
+        "coolant": "alcohol"
+      }
+    ]
+  },
+  "etch_profile": {
+    "reagent": "nital_4",
+    "time_s": 10,
+    "temperature_c": 22,
+    "agitation": "active",
+    "overetch_factor": 1
+  },
+  "synthesis_profile": {
+    "profile_id": "textbook_steel_bw",
+    "phase_topology_mode": "auto",
+    "contrast_target": 1.12,
+    "boundary_sharpness": 1.2,
+    "artifact_level": 0.1,
+    "composition_sensitivity_mode": "educational",
+    "generation_mode": "edu_engineering",
+    "phase_emphasis_style": "contrast_texture",
+    "phase_fraction_tolerance_pct": 15,
+    "system_generator_mode": "system_auto",
+    "target_microstructure": "ferrite_pearlite_normalized",
+    "grain_size_mode": "fine",
+    "mean_grain_size_px": 64
+  },
+  "microscope_profile": {
+    "simulate_preview": false,
+    "magnification": 100,
+    "focus": 0.95,
+    "brightness": 1,
+    "contrast": 1.1
+  },
+  "seed": 8001,
+  "resolution": [2048, 2048],
+  "strict_validation": true,
+  "reference_profile_id": "steel_ref",
+  "phase_model": {
+    "engine": "explicit_rules_v3",
+    "phase_control_mode": "auto_with_override",
+    "manual_phase_fractions": {
+      "ferrite": 0.48,
+      "pearlite": 0.52
+    },
+    "manual_override_weight": 0.5,
+    "allow_custom_fallback": true,
+    "phase_balance_tolerance_pct": 15,
+    "grain_size_target": {
+      "astm_number": 8,
+      "mean_diameter_um": 32,
+      "tolerance_pct": 20
+    }
+  },
+  "thermal_program": {
+    "points": [
+      {
+        "time_s": 0.0,
+        "temperature_c": 20.0,
+        "label": "Start",
+        "locked": true
+      },
+      {
+        "time_s": 500.0,
+        "temperature_c": 840.0,
+        "label": "Аустенитизация (Ac3 + 50°C)",
+        "locked": false
+      },
+      {
+        "time_s": 900.0,
+        "temperature_c": 840.0,
+        "label": "Выдержка (очень мелкое зерно)",
+        "locked": false
+      },
+      {
+        "time_s": 1200.0,
+        "temperature_c": 20.0,
+        "label": "Охлаждение на воздухе (нормализация)",
+        "locked": false
+      }
+    ],
+    "quench": {
+      "medium_code": "air",
+      "quench_time_s": 300.0,
+      "bath_temperature_c": 20.0,
+      "sample_temperature_c": 840.0,
+      "custom_medium_name": "Воздух",
+      "custom_severity_factor": 0.3
+    },
+    "sampling_mode": "per_degree",
+    "degree_step_c": 1.0,
+    "max_frames": 320
+  },
+  "expected_properties": {
+    "hardness_hb": {"min": 180, "max": 220, "typical": 200},
+    "tensile_strength_mpa": {"min": 600, "max": 700, "typical": 650},
+    "yield_strength_mpa": {"min": 380, "max": 440, "typical": 410},
+    "elongation_pct": {"min": 16, "max": 22, "typical": 19},
+    "astm_grain_size": {"min": 7.5, "max": 8.5, "typical": 8},
+    "mean_grain_diameter_um": {"min": 27, "max": 37, "typical": 32},
+    "microstructure_description": "Феррит (48%) + перлит (52%) - очень мелкое зерно, ASTM 8"
+  },
+  "metadata": {
+    "source": "Лабораторная работа №1 - Определение размера зерна",
+    "display_name_ru": "ЛР1 ASTM 8, сталь 0,45% C",
+    "short_label_ru": "LR1 ASTM 8",
+    "group_ru": "Лабораторные работы / ЛР1 / ASTM E112",
+    "expected_properties_source": "lr1_astm_e112_teaching_profile",
+    "treatment": "Нормализация (короткая выдержка)",
+    "application": "Учебный образец для ЛР1, ASTM 8 (очень мелкое зерно ~32 мкм)",
+    "hall_petch_yield_strength_mpa": 410
+  }
+}

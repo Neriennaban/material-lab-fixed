@@ -1,0 +1,43 @@
+{
+  "name": "FeSi_1.4_400x_ultra",
+  "material": "Fe-Si electrical steel ultra",
+  "lab": "LR1",
+  "generator": "auto",
+  "image_size": [
+    2048,
+    2048
+  ],
+  "seed": 2101,
+  "composition": {
+    "Fe": 98.6,
+    "Si": 1.4
+  },
+  "generation": {
+    "mean_grain_size_px": 40,
+    "grain_size_jitter": 0.12,
+    "equiaxed": 1.08,
+    "elongation": 1.0,
+    "boundary_width_px": 2,
+    "boundary_contrast": 0.58,
+    "pore_fraction": 0.0005,
+    "inclusion_fraction": 0.001,
+    "auto_hint": {
+      "preferred_generator": "grains"
+    },
+    "cooling_mode": "auto"
+  },
+  "microscope": {
+    "magnification": 400,
+    "focus": 0.98,
+    "brightness": 1.01,
+    "contrast": 1.2,
+    "noise_sigma": 1.7,
+    "vignette_strength": 0.19,
+    "uneven_strength": 0.14,
+    "etch_uneven": 0.1
+  },
+  "metadata": {
+    "realism_profile": "ultra",
+    "scenario": "alloy preset"
+  }
+}

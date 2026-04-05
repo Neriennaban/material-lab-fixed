@@ -1,0 +1,11 @@
+.cache/
+.claude/
+.pytest_cache/
+.ruff_cache/
+.vscode/
+build/
+dist/
+tmp/
+__pycache__/
+**/__pycache__/
+*.pyc

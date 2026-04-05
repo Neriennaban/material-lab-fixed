@@ -1,0 +1,115 @@
+{
+  "sample_id": "AlSi_AL2_cast_v3",
+  "composition_wt": {
+    "Al": 88.0,
+    "Si": 12.0
+  },
+  "system_hint": "al-si",
+  "prep_route": {
+    "roughness_target_um": 0.08,
+    "relief_mode": "phase_coupled",
+    "contamination_level": 0.03,
+    "steps": [
+      {
+        "method": "grinding_600",
+        "duration_s": 70.0,
+        "abrasive_um": 25.0,
+        "load_n": 18.0,
+        "rpm": 150.0
+      },
+      {
+        "method": "polishing_3um",
+        "duration_s": 110.0,
+        "abrasive_um": 3.0,
+        "load_n": 12.0,
+        "rpm": 130.0
+      },
+      {
+        "method": "electropolish",
+        "duration_s": 35.0,
+        "load_n": 0.0,
+        "rpm": 0.0
+      }
+    ]
+  },
+  "etch_profile": {
+    "reagent": "keller",
+    "time_s": 10.0,
+    "temperature_c": 22.0,
+    "agitation": "active",
+    "overetch_factor": 1.0
+  },
+  "synthesis_profile": {
+    "profile_id": "textbook_alsi_bw",
+    "phase_topology_mode": "auto",
+    "contrast_target": 0.95,
+    "boundary_sharpness": 1.0,
+    "artifact_level": 0.22,
+    "generation_mode": "edu_engineering",
+    "phase_emphasis_style": "contrast_texture",
+    "phase_fraction_tolerance_pct": 20.0,
+    "composition_sensitivity_mode": "educational",
+    "system_generator_mode": "system_auto"
+  },
+  "microscope_profile": {
+    "simulate_preview": false,
+    "magnification": 400,
+    "focus": 0.94,
+    "brightness": 1.02,
+    "contrast": 1.08
+  },
+  "seed": 3104,
+  "resolution": [
+    2048,
+    2048
+  ],
+  "strict_validation": true,
+  "reference_profile_id": "al_cast_ref",
+  "phase_model": {
+    "engine": "explicit_rules_v3",
+    "phase_control_mode": "auto_with_override",
+    "manual_phase_fractions": {},
+    "manual_override_weight": 0.35,
+    "allow_custom_fallback": true,
+    "phase_balance_tolerance_pct": 20.0
+  },
+  "thermal_program": {
+    "points": [
+      {
+        "time_s": 0.0,
+        "temperature_c": 20.0,
+        "label": "Start",
+        "locked": true
+      },
+      {
+        "time_s": 324.0,
+        "temperature_c": 730.0,
+        "label": "Point 1",
+        "locked": false
+      },
+      {
+        "time_s": 1080.0,
+        "temperature_c": 730.0,
+        "label": "Point 2",
+        "locked": false
+      },
+      {
+        "time_s": 2052.0,
+        "temperature_c": 20.0,
+        "label": "Point 3",
+        "locked": false
+      }
+    ],
+    "quench": {
+      "medium_code": "water_20",
+      "quench_time_s": 35.0,
+      "bath_temperature_c": 20.0,
+      "sample_temperature_c": 840.0,
+      "custom_medium_name": "",
+      "custom_severity_factor": 1.0
+    },
+    "sampling_mode": "per_degree",
+    "degree_step_c": 1.0,
+    "max_frames": 320
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "name": "Phase_FeC_auto",
+  "material": "Fe-C phase diagram simulator",
+  "lab": "LR3/LR4",
+  "generator": "auto",
+  "image_size": [
+    2048,
+    2048
+  ],
+  "seed": 3001,
+  "composition": {
+    "Fe": 99.6,
+    "C": 0.4
+  },
+  "generation": {
+    "system": "fe-c",
+    "stage": "auto",
+    "temperature_c": 750.0,
+    "cooling_mode": "equilibrium",
+    "deformation_pct": 0.0,
+    "aging_hours": 8.0,
+    "aging_temperature_c": 180.0,
+    "auto_hint": {
+      "preferred_generator": "phase_map"
+    }
+  },
+  "microscope": {
+    "magnification": 400,
+    "focus": 0.96,
+    "brightness": 1.0,
+    "contrast": 1.15,
+    "noise_sigma": 1.9,
+    "vignette_strength": 0.16,
+    "uneven_strength": 0.11,
+    "etch_uneven": 0.08
+  },
+  "metadata": {
+    "scenario": "phase-stage",
+    "notes": "Change C and temperature to traverse Fe-C stages"
+  }
+}

@@ -1,0 +1,141 @@
+{
+  "sample_id": "Steel45_normalized_textbook",
+  "composition_wt": {
+    "Fe": 99.5,
+    "C": 0.45,
+    "Mn": 0.65,
+    "Si": 0.25
+  },
+  "system_hint": "fe-c",
+  "material_grade": "Ст45",
+  "material_class_ru": "Среднеуглеродистая конструкционная сталь",
+  "prep_route": {
+    "roughness_target_um": 0.05,
+    "relief_mode": "hardness_coupled",
+    "contamination_level": 0.02,
+    "steps": [
+      {
+        "method": "grinding_800",
+        "duration_s": 90,
+        "abrasive_um": 18,
+        "load_n": 22,
+        "rpm": 180,
+        "coolant": "water"
+      },
+      {
+        "method": "polishing_3um",
+        "duration_s": 110,
+        "abrasive_um": 3,
+        "load_n": 14,
+        "rpm": 140,
+        "coolant": "alcohol"
+      },
+      {
+        "method": "polishing_1um",
+        "duration_s": 90,
+        "abrasive_um": 1,
+        "load_n": 10,
+        "rpm": 120,
+        "coolant": "alcohol"
+      }
+    ]
+  },
+  "etch_profile": {
+    "reagent": "nital_4",
+    "time_s": 10,
+    "temperature_c": 22,
+    "agitation": "active",
+    "overetch_factor": 1
+  },
+  "synthesis_profile": {
+    "profile_id": "textbook_normalizing_bw",
+    "phase_topology_mode": "auto",
+    "contrast_target": 1.12,
+    "boundary_sharpness": 1.2,
+    "artifact_level": 0.15,
+    "composition_sensitivity_mode": "educational",
+    "generation_mode": "edu_engineering",
+    "phase_emphasis_style": "contrast_texture",
+    "phase_fraction_tolerance_pct": 15,
+    "system_generator_mode": "system_auto",
+    "target_microstructure": "ferrite_pearlite_normalized"
+  },
+  "microscope_profile": {
+    "simulate_preview": false,
+    "magnification": 400,
+    "focus": 0.95,
+    "brightness": 1,
+    "contrast": 1.1
+  },
+  "seed": 4501,
+  "resolution": [2048, 2048],
+  "strict_validation": true,
+  "reference_profile_id": "steel_ref",
+  "phase_model": {
+    "engine": "explicit_rules_v3",
+    "phase_control_mode": "auto_with_override",
+    "manual_phase_fractions": {
+      "ferrite": 0.48,
+      "pearlite": 0.52
+    },
+    "manual_override_weight": 0.5,
+    "allow_custom_fallback": true,
+    "phase_balance_tolerance_pct": 15
+  },
+  "thermal_program": {
+    "points": [
+      {
+        "time_s": 0.0,
+        "temperature_c": 20.0,
+        "label": "Start",
+        "locked": true
+      },
+      {
+        "time_s": 600.0,
+        "temperature_c": 840.0,
+        "label": "Аустенитизация (Ac3 + 50°C)",
+        "locked": false
+      },
+      {
+        "time_s": 1800.0,
+        "temperature_c": 840.0,
+        "label": "Выдержка",
+        "locked": false
+      },
+      {
+        "time_s": 2100.0,
+        "temperature_c": 20.0,
+        "label": "Охлаждение на воздухе (нормализация)",
+        "locked": false
+      }
+    ],
+    "quench": {
+      "medium_code": "air",
+      "quench_time_s": 300.0,
+      "bath_temperature_c": 20.0,
+      "sample_temperature_c": 840.0,
+      "custom_medium_name": "Воздух",
+      "custom_severity_factor": 0.3
+    },
+    "sampling_mode": "per_degree",
+    "degree_step_c": 1.0,
+    "max_frames": 320
+  },
+  "expected_properties": {
+    "hardness_hb": {"min": 180, "max": 220, "typical": 200},
+    "tensile_strength_mpa": {"min": 600, "max": 700, "typical": 650},
+    "yield_strength_mpa": {"min": 350, "max": 420, "typical": 380},
+    "elongation_pct": {"min": 16, "max": 22, "typical": 19},
+    "impact_toughness_j_cm2": {"min": 40, "max": 60, "typical": 50},
+    "microstructure_description": "Феррит (48%) + перлит (52%) - равноосные зёрна"
+  },
+  "metadata": {
+    "source": "Братковский_Шевченко_Материаловедение_2017",
+    "display_name_ru": "Ст45, нормализация",
+    "short_label_ru": "Ст45 норм.",
+    "group_ru": "Библиотека образцов / Учебник / Стали / Ст45",
+    "expected_properties_source": "bratkovskiy_shevchenko_2017_textbook",
+    "treatment": "Нормализация",
+    "application": "Валы, шестерни, втулки (после улучшения)"
+  }
+}

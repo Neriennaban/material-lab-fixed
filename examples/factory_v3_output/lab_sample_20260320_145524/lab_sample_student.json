@@ -1,0 +1,151 @@
+{
+  "sample_id": "Fe_C_hypoeutectoid_textbook",
+  "timestamp": "2026-03-20T14:55:40.202875",
+  "composition_wt": {
+    "Fe": 99.55,
+    "C": 0.45
+  },
+  "thermal_program": {
+    "points": [
+      {
+        "time_s": 0.0,
+        "temperature_c": 20.0,
+        "label": "Start",
+        "locked": true,
+        "transition_to_next": {
+          "model": "linear",
+          "curvature": 1.0,
+          "segment_medium_code": "inherit",
+          "segment_medium_factor": null,
+          "notes": ""
+        }
+      },
+      {
+        "time_s": 720.0,
+        "temperature_c": 780.0,
+        "label": "Point 1",
+        "locked": false,
+        "transition_to_next": {
+          "model": "linear",
+          "curvature": 1.0,
+          "segment_medium_code": "inherit",
+          "segment_medium_factor": null,
+          "notes": ""
+        }
+      },
+      {
+        "time_s": 2400.0,
+        "temperature_c": 780.0,
+        "label": "Point 2",
+        "locked": false,
+        "transition_to_next": {
+          "model": "linear",
+          "curvature": 1.0,
+          "segment_medium_code": "inherit",
+          "segment_medium_factor": null,
+          "notes": ""
+        }
+      },
+      {
+        "time_s": 4560.0,
+        "temperature_c": 20.0,
+        "label": "Point 3",
+        "locked": false,
+        "transition_to_next": {
+          "model": "linear",
+          "curvature": 1.0,
+          "segment_medium_code": "inherit",
+          "segment_medium_factor": null,
+          "notes": ""
+        }
+      }
+    ],
+    "quench": {
+      "medium_code": "water_20",
+      "quench_time_s": 35.0,
+      "bath_temperature_c": 20.0,
+      "sample_temperature_c": 840.0,
+      "custom_medium_name": "",
+      "custom_severity_factor": 1.0
+    },
+    "sampling_mode": "per_degree",
+    "degree_step_c": 1.0,
+    "max_frames": 320
+  },
+  "prep_route": {
+    "steps": [
+      {
+        "method": "grinding_800",
+        "duration_s": 90.0,
+        "abrasive_um": 18.0,
+        "load_n": 22.0,
+        "rpm": 180.0,
+        "coolant": "water",
+        "note": "",
+        "direction_deg": 0.0,
+        "load_profile": "constant",
+        "cloth_type": "standard",
+        "slurry_type": "diamond",
+        "lubricant_flow_ml_min": 0.0,
+        "cleaning_between_steps": false,
+        "oscillation_hz": 0.0,
+        "path_pattern": "linear"
+      },
+      {
+        "method": "polishing_3um",
+        "duration_s": 110.0,
+        "abrasive_um": 3.0,
+        "load_n": 14.0,
+        "rpm": 140.0,
+        "coolant": "alcohol",
+        "note": "",
+        "direction_deg": 0.0,
+        "load_profile": "constant",
+        "cloth_type": "standard",
+        "slurry_type": "diamond",
+        "lubricant_flow_ml_min": 0.0,
+        "cleaning_between_steps": false,
+        "oscillation_hz": 0.0,
+        "path_pattern": "linear"
+      },
+      {
+        "method": "polishing_1um",
+        "duration_s": 90.0,
+        "abrasive_um": 1.0,
+        "load_n": 10.0,
+        "rpm": 120.0,
+        "coolant": "alcohol",
+        "note": "",
+        "direction_deg": 0.0,
+        "load_profile": "constant",
+        "cloth_type": "standard",
+        "slurry_type": "diamond",
+        "lubricant_flow_ml_min": 0.0,
+        "cleaning_between_steps": false,
+        "oscillation_hz": 0.0,
+        "path_pattern": "linear"
+      }
+    ],
+    "roughness_target_um": 0.05,
+    "relief_mode": "hardness_coupled",
+    "contamination_level": 0.02
+  },
+  "etch_profile": {
+    "reagent": "nital_2",
+    "time_s": 8.0,
+    "temperature_c": 22.0,
+    "agitation": "active",
+    "overetch_factor": 1.0,
+    "concentration_value": 2.0,
+    "concentration_unit": "wt_pct",
+    "concentration_wt_pct": 2.0,
+    "concentration_mol_l": 0.31746031746031744
+  },
+  "seed": 4101,
+  "resolution": [
+    16384,
+    16384
+  ],
+  "image_sha256": "e250baf2af3f8aacf3223bd56420f6aadef573ccbb2b123be9407a1c3bcc72d0",
+  "digital_signature": "d5jFFQDuUC0skR24/m7KnieG6Q1fJvDWdsPc1mpBYFmW9rMGCVP4v7iTa1r5I8q3Ve0G+K2sykm6llX9VVMhBGeuII6ZC7TZ9gxanHdKNeGA7hKXFKEmJi7S0MV/l+GRmiYUYna2bjWqHI5zmaNuT2d8kvCHyqrHs/sx2L9Exsa9qd8+Alh7iLXDhn6g2GEI6Sb4cPfER5iadlwqfqAunJNyafP8ZuJ5BrFFNiXLu/WNFM9/2s/gobCABm2ADA8UAArn11sUEH9mF33BEh5Y9AaJNyH2PssvirSQC038CpETQZ2Ee0eu10uDF+q32ftbPzeWSfSPGo+VAxDYtHIZhA=="
+}

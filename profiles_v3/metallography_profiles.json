@@ -1,0 +1,77 @@
+{
+  "version": 1,
+  "profiles": {
+    "balanced_realism": {
+      "mean": 148.0,
+      "std": 46.0,
+      "p10": 78.0,
+      "p90": 218.0,
+      "dynamic_range": 140.0,
+      "gradient_mean": 12.5,
+      "entropy": 2.85
+    },
+    "steel_bright_field": {
+      "mean": 154.0,
+      "std": 52.0,
+      "p10": 70.0,
+      "p90": 228.0,
+      "dynamic_range": 158.0,
+      "gradient_mean": 14.4,
+      "entropy": 2.97
+    },
+    "al_cast_polish": {
+      "mean": 162.0,
+      "std": 38.0,
+      "p10": 102.0,
+      "p90": 222.0,
+      "dynamic_range": 120.0,
+      "gradient_mean": 9.3,
+      "entropy": 2.51
+    },
+    "si_etch_pit": {
+      "mean": 140.0,
+      "std": 44.0,
+      "p10": 76.0,
+      "p90": 210.0,
+      "dynamic_range": 134.0,
+      "gradient_mean": 13.9,
+      "entropy": 2.78
+    },
+    "textbook_steel_bw": {
+      "mean": 148.0,
+      "std": 58.0,
+      "p10": 58.0,
+      "p90": 228.0,
+      "dynamic_range": 170.0,
+      "gradient_mean": 15.6,
+      "entropy": 3.04
+    },
+    "textbook_alsi_bw": {
+      "mean": 156.0,
+      "std": 46.0,
+      "p10": 82.0,
+      "p90": 226.0,
+      "dynamic_range": 144.0,
+      "gradient_mean": 12.8,
+      "entropy": 2.86
+    },
+    "textbook_brass_bw": {
+      "mean": 152.0,
+      "std": 50.0,
+      "p10": 72.0,
+      "p90": 224.0,
+      "dynamic_range": 152.0,
+      "gradient_mean": 13.6,
+      "entropy": 2.92
+    },
+    "textbook_heat_treatment_bw": {
+      "mean": 142.0,
+      "std": 56.0,
+      "p10": 58.0,
+      "p90": 222.0,
+      "dynamic_range": 164.0,
+      "gradient_mean": 15.8,
+      "entropy": 3.02
+    }
+  }
+}

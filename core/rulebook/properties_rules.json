@@ -1,0 +1,109 @@
+{
+  "defaults": {
+    "hv_base": 120.0,
+    "uts_base_mpa": 420.0,
+    "ductility_base": "medium"
+  },
+  "systems": {
+    "fe-c": {
+      "hv_base": 170.0,
+      "uts_base_mpa": 620.0,
+      "hv_coeff": {
+        "dislocation_proxy": 75.0,
+        "precipitation_level": 45.0,
+        "grain_size_factor": -22.0,
+        "residual_stress": 15.0
+      },
+      "stage_adjust": {
+        "martensite": {"hv": 480.0, "uts": 1480.0, "ductility": "low"},
+        "tempered_low": {"hv": 380.0, "uts": 1280.0, "ductility": "low"},
+        "tempered_medium": {"hv": 280.0, "uts": 980.0, "ductility": "medium-low"},
+        "tempered_high": {"hv": 180.0, "uts": 680.0, "ductility": "medium"},
+        "bainite_upper": {"hv": 280.0, "uts": 980.0, "ductility": "medium"},
+        "bainite_lower": {"hv": 380.0, "uts": 1280.0, "ductility": "medium-low"},
+        "pearlite_coarse": {"hv": 180.0, "uts": 780.0, "ductility": "medium"},
+        "pearlite_fine": {"hv": 240.0, "uts": 920.0, "ductility": "medium"},
+        "ferrite": {"hv": -50.0, "uts": -120.0, "ductility": "high"},
+        "cementite_network": {"hv": 120.0, "uts": -50.0, "ductility": "low"}
+      },
+      "carbon_strength_contribution": {
+        "description": "Дополнительный вклад %C в прочность (нормализованное состояние)",
+        "per_carbon_pct": {"hv": 280.0, "uts_mpa": 950.0}
+      }
+    },
+    "al-cu-mg": {
+      "hv_base": 110.0,
+      "uts_base_mpa": 380.0,
+      "hv_coeff": {
+        "dislocation_proxy": 30.0,
+        "precipitation_level": 80.0,
+        "grain_size_factor": -18.0,
+        "residual_stress": 5.0
+      },
+      "stage_adjust": {
+        "solutionized": {"hv": -20.0, "uts": -40.0, "ductility": "high"},
+        "quenched": {"hv": -10.0, "uts": -20.0, "ductility": "high"},
+        "artificial_aged": {"hv": 45.0, "uts": 90.0, "ductility": "medium"},
+        "natural_aged": {"hv": 25.0, "uts": 50.0, "ductility": "medium-high"},
+        "overaged": {"hv": -12.0, "uts": -25.0, "ductility": "medium-high"}
+      }
+    },
+    "al-si": {
+      "hv_base": 95.0,
+      "uts_base_mpa": 300.0,
+      "hv_coeff": {
+        "dislocation_proxy": 28.0,
+        "precipitation_level": 22.0,
+        "grain_size_factor": -12.0,
+        "porosity_factor": -35.0
+      },
+      "stage_adjust": {
+        "eutectic": {"hv": 12.0, "uts": 22.0, "ductility": "medium-low"},
+        "aged": {"hv": 25.0, "uts": 45.0, "ductility": "medium"}
+      }
+    },
+    "cu-zn": {
+      "hv_base": 105.0,
+      "uts_base_mpa": 360.0,
+      "hv_coeff": {
+        "dislocation_proxy": 40.0,
+        "texture_strength": 22.0,
+        "grain_size_factor": -15.0
+      },
+      "stage_adjust": {
+        "cold_worked": {"hv": 50.0, "uts": 95.0, "ductility": "low"},
+        "alpha": {"hv": -8.0, "uts": -15.0, "ductility": "medium-high"}
+      }
+    },
+    "fe-si": {
+      "hv_base": 135.0,
+      "uts_base_mpa": 470.0,
+      "hv_coeff": {
+        "dislocation_proxy": 35.0,
+        "texture_strength": 20.0,
+        "grain_size_factor": -12.0
+      },
+      "stage_adjust": {
+        "cold_worked_ferrite": {"hv": 35.0, "uts": 70.0, "ductility": "low"},
+        "recrystallized_ferrite": {"hv": -18.0, "uts": -35.0, "ductility": "high"}
+      }
+    },
+    "custom-multicomponent": {
+      "hv_base": 120.0,
+      "uts_base_mpa": 420.0,
+      "hv_coeff": {
+        "dislocation_proxy": 35.0,
+        "precipitation_level": 25.0,
+        "grain_size_factor": -14.0
+      },
+      "stage_adjust": {}
+    }
+  },
+  "ductility_thresholds_hv": [
+    {"max_hv": 95.0, "label": "high"},
+    {"max_hv": 150.0, "label": "medium-high"},
+    {"max_hv": 220.0, "label": "medium"},
+    {"max_hv": 300.0, "label": "medium-low"},
+    {"max_hv": 1000.0, "label": "low"}
+  ]
+}

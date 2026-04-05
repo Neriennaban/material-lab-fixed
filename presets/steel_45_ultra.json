@@ -1,0 +1,40 @@
+{
+  "name": "Steel_0.45C_ultra",
+  "material": "Medium-carbon steel ultra",
+  "lab": "LR3",
+  "generator": "auto",
+  "image_size": [
+    2048,
+    2048
+  ],
+  "seed": 2106,
+  "composition": {
+    "Fe": 99.55,
+    "C": 0.45
+  },
+  "generation": {
+    "pearlite_fraction": 0.54,
+    "lamella_period_px": 6.2,
+    "colony_size_px": 108.0,
+    "ferrite_brightness": 182,
+    "cementite_brightness": 64,
+    "auto_hint": {
+      "preferred_generator": "pearlite"
+    },
+    "cooling_mode": "auto"
+  },
+  "microscope": {
+    "magnification": 400,
+    "focus": 0.97,
+    "brightness": 1.0,
+    "contrast": 1.18,
+    "noise_sigma": 1.7,
+    "vignette_strength": 0.18,
+    "uneven_strength": 0.12,
+    "etch_uneven": 0.11
+  },
+  "metadata": {
+    "realism_profile": "ultra",
+    "scenario": "alloy preset"
+  }
+}

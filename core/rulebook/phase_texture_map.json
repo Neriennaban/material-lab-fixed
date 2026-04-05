@@ -1,0 +1,43 @@
+{
+  "defaults": {
+    "LIQUID*": "liquid",
+    "*MART*": "martensite",
+    "*CARB*": "carbide",
+    "*PEARL*": "pearlite",
+    "*EUT*": "eutectic",
+    "*THETA*": "precipitate",
+    "*": "grains"
+  },
+  "systems": {
+    "fe-c": {
+      "LIQUID*": "liquid",
+      "BCC*": "grains",
+      "FCC*": "grains",
+      "GRAPHITE": "carbide",
+      "CEMENTITE*": "carbide"
+    },
+    "fe-si": {
+      "LIQUID*": "liquid",
+      "BCC*": "grains",
+      "FESI*": "intermetallic"
+    },
+    "al-si": {
+      "LIQUID*": "liquid",
+      "FCC_A1": "grains",
+      "SI*": "eutectic"
+    },
+    "cu-zn": {
+      "LIQUID*": "liquid",
+      "FCC_A1": "grains",
+      "BCC*": "grains"
+    },
+    "al-cu-mg": {
+      "LIQUID*": "liquid",
+      "FCC_A1": "grains",
+      "ALCU*": "precipitate",
+      "THETA*": "precipitate",
+      "QPHASE": "precipitate",
+      "SPHASE": "precipitate"
+    }
+  }
+}

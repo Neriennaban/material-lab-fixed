@@ -1,0 +1,135 @@
+{
+  "profile_id": "LR1_grain_size",
+  "name_ru": "Лабораторная работа №1 - Определение размера зерна",
+  "description": "Профиль для выполнения ЛР1 по определению размера зерна по ASTM E112",
+  "source": "Братковский_Шевченко_Материаловедение 2016 + ЛР1.pdf",
+
+  "microscope_settings": {
+    "magnification": 100,
+    "objective": "10x",
+    "eyepiece": "10x",
+    "total_magnification": 100,
+    "calibration": {
+      "um_per_px_100x": 1.0,
+      "px_per_um": 1.0,
+      "field_of_view_um": 2048,
+      "description": "При увеличении 100x: 1 пиксель = 1 мкм"
+    }
+  },
+
+  "measurement_settings": {
+    "method": "jeffries",
+    "standard": "ASTM_E112",
+    "grid_type": "gauge_circle",
+    "grid_diameter_mm": 79.8,
+    "grid_area_mm2": 5000,
+    "magnification_correction": 1.0,
+    "min_grains_count": 50,
+    "recommended_grains_count": 100,
+    "tolerance": {
+      "astm_tolerance": 0.5,
+      "description": "Точность определения: ±0.5 номера ASTM"
+    }
+  },
+
+  "image_requirements": {
+    "resolution": {
+      "width": 2048,
+      "height": 2048,
+      "format": "PNG",
+      "bit_depth": 8
+    },
+    "quality": {
+      "focus_threshold": 0.8,
+      "contrast_threshold": 1.1,
+      "brightness_range": {"min": 0.8, "max": 1.2},
+      "noise_sigma_max": 0.05
+    },
+    "artifacts": {
+      "allow_dust": false,
+      "allow_scratches": false,
+      "allow_etch_uneven": true,
+      "max_contamination": 0.02
+    }
+  },
+
+  "sample_requirements": {
+    "material_class": "fe-c",
+    "carbon_range": {"min": 0.2, "max": 0.8},
+    "microstructure": ["ferrite", "pearlite"],
+    "excluded_phases": ["martensite", "bainite", "cementite_network"],
+    "surface_quality": {
+      "roughness_max_um": 0.05,
+      "relief_max_um": 0.5
+    }
+  },
+
+  "etch_requirements": {
+    "reagent": "nital_4",
+    "concentration": "4% HNO3 в спирте",
+    "time_range": {"min": 5, "max": 15, "unit": "seconds"},
+    "temperature": {"min": 18, "max": 25, "unit": "celsius"},
+    "quality": {
+      "boundaries_visible": true,
+      "phase_contrast": "high",
+      "no_overetch": true
+    }
+  },
+
+  "report_requirements": {
+    "template": "docs/templates/LR1_report_template.md",
+    "sections": [
+      "title_page",
+      "goal",
+      "theory",
+      "methodology",
+      "results",
+      "calculations",
+      "conclusions",
+      "references"
+    ],
+    "figures": {
+      "min_micrographs": 1,
+      "scale_bar_required": true,
+      "magnification_label_required": true
+    },
+    "tables": {
+      "measurements_table": true,
+      "hall_petch_calculations": true
+    }
+  },
+
+  "grading_criteria": {
+    "total_points": 100,
+    "components": {
+      "theory": {"weight": 20, "description": "Формулы, определения"},
+      "micrographs": {"weight": 25, "description": "Качество фото"},
+      "measurements": {"weight": 25, "description": "Точность измерений"},
+      "calculations": {"weight": 20, "description": "Правильность расчётов"},
+      "conclusions": {"weight": 10, "description": "Анализ результатов"}
+    },
+    "scale": {
+      "excellent": {"min": 90, "max": 100, "grade": 5},
+      "good": {"min": 75, "max": 89, "grade": 4},
+      "satisfactory": {"min": 60, "max": 74, "grade": 3},
+      "unsatisfactory": {"min": 0, "max": 59, "grade": 2}
+    }
+  },
+
+  "reference_data": {
+    "hall_petch_coefficients": {
+      "ferrite": {"sigma_0_mpa": 50, "k_y": 0.50},
+      "pearlite": {"sigma_0_mpa": 120, "k_y": 0.80}
+    },
+    "astm_e112_table": {
+      "ASTM_5": {"grains_per_mm2": 0.05, "diameter_um": 90},
+      "ASTM_6": {"grains_per_mm2": 0.10, "diameter_um": 65},
+      "ASTM_7": {"grains_per_mm2": 0.20, "diameter_um": 45},
+      "ASTM_8": {"grains_per_mm2": 0.40, "diameter_um": 32}
+    },
+    "formulas": {
+      "hall_petch": "σ_y = σ_0 + k_y × d^(-1/2)",
+      "astm_e112": "G = 1 + log₂(n), где n — зёрен на дюйм² при 100×"
+    }
+  }
+}

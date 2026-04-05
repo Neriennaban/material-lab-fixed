@@ -1,0 +1,39 @@
+{
+  "name": "AlSi_AL2_eutectic_400x",
+  "material": "Cast aluminum alloy AL2 (Al-Si)",
+  "lab": "LR1",
+  "generator": "auto",
+  "image_size": [
+    2048,
+    2048
+  ],
+  "seed": 105,
+  "composition": {
+    "Al": 88.0,
+    "Si": 12.0
+  },
+  "generation": {
+    "si_phase_fraction": 0.34,
+    "eutectic_scale_px": 6.7,
+    "morphology": "needle",
+    "auto_hint": {
+      "preferred_generator": "eutectic"
+    },
+    "cooling_mode": "auto"
+  },
+  "microscope": {
+    "magnification": 400,
+    "focus": 0.95,
+    "brightness": 0.99,
+    "contrast": 1.17,
+    "noise_sigma": 2.4,
+    "vignette_strength": 0.17,
+    "uneven_strength": 0.12,
+    "etch_uneven": 0.1
+  },
+  "metadata": {
+    "scenario": "LR1 mandatory",
+    "structure": "Al-Si eutectic-like",
+    "realism_profile": "high"
+  }
+}

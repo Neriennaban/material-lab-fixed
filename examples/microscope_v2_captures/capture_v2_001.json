@@ -1,0 +1,125 @@
+{
+  "source_image": "C:\\Users\\Егор\\Downloads\\material_lab-Egor_branch_microscope_ruler_upgrade\\material_lab-Egor_branch_work\\examples\\factory_v3_output\\lab_sample_20260320_065922\\lab_sample.png",
+  "source_metadata": "",
+  "microscope_params": {
+    "magnification": 600,
+    "focus": 0.0,
+    "focus_distance_mm": 9.0,
+    "brightness": 1.0,
+    "contrast": 1.1,
+    "output_size": [
+      1024,
+      1024
+    ],
+    "noise_sigma": 7.72,
+    "vignette_strength": 0.3,
+    "uneven_strength": 0.08,
+    "add_dust": false,
+    "add_scratches": false,
+    "etch_uneven": 0.0
+  },
+  "view_meta": {
+    "crop_origin_px": [
+      6826,
+      6826
+    ],
+    "crop_size_px": [
+      2731,
+      2731
+    ],
+    "area_fraction_of_sample": 0.0277845598757267,
+    "focus_distance_mm": 9.0,
+    "focus_target_mm": 8.638346835560712,
+    "focus_error_mm": 0.3616531644392875,
+    "focus_quality": 0.0,
+    "um_per_px": 2.6669921875,
+    "focus_optics": {
+      "optical_magnification": 60.0,
+      "focal_length_mm": 2.6666666666666665,
+      "numerical_aperture": 0.85,
+      "image_distance_mm": 3.789473684210526,
+      "image_distance_target_mm": 3.8574724214946396,
+      "defocus_diameter_um": 1.3557772927634986,
+      "depth_of_field_um": 0.7612456747404845,
+      "focus_error_um": 361.65316443928754,
+      "defocus_radius_px_geom": 0.2541772149011026,
+      "defocus_radius_px_dof": 1.40620708707472,
+      "defocus_radius_px": 1.40620708707472,
+      "airy_radius_um": 0.3947058823529412,
+      "airy_radius_px": 0.14799663988627307,
+      "psf_support_px": 5.0
+    }
+  },
+  "route_summary": {},
+  "session_id": "c29c6a34-a9fb-4724-8451-97f68deba35f",
+  "capture_index": 1,
+  "reticle_enabled": true,
+  "scale_bar": {
+    "enabled": true,
+    "um_per_px": 2.6669921875,
+    "bar_um": 500.0,
+    "bar_nm": 500000.0,
+    "bar_px": 187.477
+  },
+  "controls_state": {
+    "objective": 600,
+    "focus_distance_mm": 9.0,
+    "stage_x": 0.5,
+    "stage_y": 0.5
+  },
+  "source_generator_version": "",
+  "prep_signature": {},
+  "etch_signature": {},
+  "quality_metrics": {},
+  "mask_rendering": {
+    "enabled": true,
+    "mask_count_total": 0
+  },
+  "available_masks": [],
+  "measurement_tool": {
+    "mode_enabled": false,
+    "current": {
+      "valid": false,
+      "finished": false,
+      "length_px": 0.0,
+      "length_um": 0.0,
+      "label": "0 нм"
+    },
+    "history": [],
+    "history_count": 0,
+    "average_length_um": 0.0,
+    "scale_source": "default.assumption",
+    "scale_audit": {
+      "ok": true,
+      "scale_ok": true,
+      "crop_ok": true,
+      "expected_um_per_px": 2.6669921875,
+      "actual_um_per_px": 2.6669921875,
+      "delta_um_per_px": 0.0,
+      "relative_error": 0.0,
+      "expected_crop_h_px": 2731,
+      "expected_crop_w_px": 2731,
+      "crop_delta_h_px": 0.0,
+      "crop_delta_w_px": 0.0,
+      "reference_magnification": 100,
+      "objective": 600
+    },
+    "rendered_on_capture": false
+  },
+  "scale_audit": {
+    "ok": true,
+    "scale_ok": true,
+    "crop_ok": true,
+    "expected_um_per_px": 2.6669921875,
+    "actual_um_per_px": 2.6669921875,
+    "delta_um_per_px": 0.0,
+    "relative_error": 0.0,
+    "expected_crop_h_px": 2731,
+    "expected_crop_w_px": 2731,
+    "crop_delta_h_px": 0.0,
+    "crop_delta_w_px": 0.0,
+    "reference_magnification": 100,
+    "objective": 600
+  },
+  "scale_source": "default.assumption"
+}

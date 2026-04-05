@@ -1,0 +1,40 @@
+{
+  "name": "Phase_AlCuMg_auto",
+  "material": "Al-Cu-Mg (duralumin) phase simulator",
+  "lab": "LR4",
+  "generator": "auto",
+  "image_size": [
+    2048,
+    2048
+  ],
+  "seed": 3301,
+  "composition": {
+    "Al": 93.0,
+    "Cu": 4.4,
+    "Mg": 1.5
+  },
+  "generation": {
+    "system": "al-cu-mg",
+    "stage": "auto",
+    "temperature_c": 20.0,
+    "cooling_mode": "aged",
+    "deformation_pct": 0.0,
+    "aging_hours": 10.0,
+    "aging_temperature_c": 190.0,
+    "auto_hint": {
+      "preferred_generator": "phase_map"
+    }
+  },
+  "microscope": {
+    "magnification": 400,
+    "focus": 0.96,
+    "brightness": 1.01,
+    "contrast": 1.14,
+    "noise_sigma": 2.0,
+    "vignette_strength": 0.15
+  },
+  "metadata": {
+    "scenario": "phase-stage",
+    "notes": "Use cooling/aging params for quenched-aged-overaged transitions"
+  }
+}

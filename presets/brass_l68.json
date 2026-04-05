@@ -1,0 +1,44 @@
+{
+  "name": "Brass_L68_200x",
+  "material": "Brass L68 (Cu-Zn)",
+  "lab": "LR1",
+  "generator": "auto",
+  "image_size": [
+    2048,
+    2048
+  ],
+  "seed": 104,
+  "composition": {
+    "Cu": 68.0,
+    "Zn": 32.0
+  },
+  "generation": {
+    "mean_grain_size_px": 54,
+    "grain_size_jitter": 0.22,
+    "equiaxed": 1.04,
+    "elongation": 1.0,
+    "boundary_width_px": 2,
+    "boundary_contrast": 0.56,
+    "pore_fraction": 0.0007,
+    "inclusion_fraction": 0.0013,
+    "auto_hint": {
+      "preferred_generator": "grains"
+    },
+    "cooling_mode": "auto"
+  },
+  "microscope": {
+    "magnification": 200,
+    "focus": 0.96,
+    "brightness": 1.02,
+    "contrast": 1.12,
+    "noise_sigma": 2.1,
+    "vignette_strength": 0.14,
+    "uneven_strength": 0.1,
+    "etch_uneven": 0.06
+  },
+  "metadata": {
+    "scenario": "LR1 mandatory",
+    "phase": "alpha solid solution",
+    "realism_profile": "high"
+  }
+}

@@ -1,0 +1,4 @@
+# Never commit private keys
+teacher_private_key.pem
+*.pem
+!public_key.pem

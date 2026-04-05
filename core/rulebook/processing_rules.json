@@ -1,0 +1,50 @@
+{
+  "global": {
+    "temperature_c": [-273.15, 2500.0],
+    "deformation_pct": [0.0, 95.0],
+    "aging_hours": [0.0, 500.0],
+    "aging_temperature_c": [0.0, 600.0],
+    "pressure_mpa": [0.0, 5000.0]
+  },
+  "systems": {
+    "fe-c": {
+      "temperature_c": [20.0, 1700.0],
+      "cooling_modes": ["equilibrium", "slow_cool", "normalized", "quenched", "tempered"],
+      "checks": [
+        {
+          "name": "tempering_window",
+          "if": {"cooling_mode": "tempered"},
+          "require": {"temperature_c": [120.0, 700.0]}
+        }
+      ]
+    },
+    "fe-si": {
+      "temperature_c": [20.0, 1700.0],
+      "cooling_modes": ["equilibrium", "slow_cool", "cold_worked", "normalized"]
+    },
+    "al-si": {
+      "temperature_c": [20.0, 900.0],
+      "cooling_modes": ["equilibrium", "slow_cool", "quenched", "aged"]
+    },
+    "cu-zn": {
+      "temperature_c": [20.0, 1100.0],
+      "cooling_modes": ["equilibrium", "slow_cool", "cold_worked"]
+    },
+    "al-cu-mg": {
+      "temperature_c": [20.0, 620.0],
+      "cooling_modes": ["solutionized", "quenched", "natural_aged", "aged", "overaged"],
+      "checks": [
+        {
+          "name": "aging_mode_requires_hours",
+          "if": {"cooling_mode_in": ["aged", "overaged", "natural_aged"]},
+          "require": {"aging_hours": [0.2, 500.0]}
+        }
+      ]
+    },
+    "custom-multicomponent": {
+      "temperature_c": [20.0, 2000.0],
+      "cooling_modes": ["equilibrium", "slow_cool", "quenched", "tempered", "aged", "cold_worked", "normalized"]
+    }
+  }
+}
+

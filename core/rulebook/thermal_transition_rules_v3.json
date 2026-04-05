@@ -1,0 +1,74 @@
+{
+  "fallback": {
+    "model": "linear",
+    "curvature": 1.0,
+    "curvature_min": 0.2,
+    "curvature_max": 8.0,
+    "rate_factor": 1.0
+  },
+  "medium_defaults": {
+    "inherit": {
+      "model": "linear",
+      "curvature": 1.0,
+      "curvature_min": 0.2,
+      "curvature_max": 8.0,
+      "rate_factor": 1.0
+    },
+    "brine_20_30": {
+      "model": "sigmoid",
+      "curvature": 2.4,
+      "curvature_min": 0.6,
+      "curvature_max": 6.0,
+      "rate_factor": 1.35
+    },
+    "water_20": {
+      "model": "sigmoid",
+      "curvature": 2.0,
+      "curvature_min": 0.5,
+      "curvature_max": 5.5,
+      "rate_factor": 1.2
+    },
+    "water_100": {
+      "model": "sigmoid",
+      "curvature": 1.5,
+      "curvature_min": 0.4,
+      "curvature_max": 4.5,
+      "rate_factor": 1.05
+    },
+    "oil_20_80": {
+      "model": "cosine",
+      "curvature": 1.1,
+      "curvature_min": 0.3,
+      "curvature_max": 3.0,
+      "rate_factor": 0.8
+    },
+    "polymer": {
+      "model": "cosine",
+      "curvature": 1.0,
+      "curvature_min": 0.3,
+      "curvature_max": 3.0,
+      "rate_factor": 0.9
+    },
+    "air": {
+      "model": "linear",
+      "curvature": 1.0,
+      "curvature_min": 0.2,
+      "curvature_max": 2.0,
+      "rate_factor": 0.65
+    },
+    "furnace": {
+      "model": "linear",
+      "curvature": 1.0,
+      "curvature_min": 0.2,
+      "curvature_max": 2.0,
+      "rate_factor": 0.35
+    },
+    "custom": {
+      "model": "power",
+      "curvature": 1.0,
+      "curvature_min": 0.2,
+      "curvature_max": 8.0,
+      "rate_factor": 1.0
+    }
+  }
+}

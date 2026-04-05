@@ -1,0 +1,41 @@
+{
+  "name": "Si_dislocations_200x",
+  "material": "Monocrystalline Si",
+  "lab": "LR1",
+  "generator": "auto",
+  "image_size": [
+    2048,
+    2048
+  ],
+  "seed": 106,
+  "composition": {
+    "Si": 99.999
+  },
+  "generation": {
+    "density_per_mm2": 180000.0,
+    "magnification": 200,
+    "pit_shape": "triangle",
+    "distribution": "cluster",
+    "pit_radius_px": [
+      1.7,
+      4.8
+    ],
+    "auto_hint": {
+      "preferred_generator": "dislocations"
+    },
+    "cooling_mode": "auto"
+  },
+  "microscope": {
+    "magnification": 200,
+    "focus": 0.96,
+    "brightness": 1.0,
+    "contrast": 1.05,
+    "noise_sigma": 1.8,
+    "vignette_strength": 0.1
+  },
+  "metadata": {
+    "scenario": "LR1 mandatory",
+    "orientation": "(111) pit-like dislocation etching",
+    "realism_profile": "high"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "package_version": "3.0.0",
+  "created_at": "2026-03-20T06:59:43.196440",
+  "files": {
+    "image": "lab_sample.png",
+    "student_data": "lab_sample_student.json",
+    "teacher_answers": "lab_sample_answers.enc",
+    "metadata": "lab_sample_metadata.json"
+  },
+  "security": {
+    "encryption": "RSA-2048 + AES-256-GCM",
+    "signature": "RSA-PSS with SHA256",
+    "image_hash_algorithm": "SHA256"
+  }
+}

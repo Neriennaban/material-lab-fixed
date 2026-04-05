@@ -1,0 +1,13 @@
+{
+  "profile_id": "steel_ref",
+  "descriptor": {
+    "mean": 152.4,
+    "std": 53.8,
+    "p10": 70.0,
+    "p90": 228.0,
+    "dynamic_range": 158.0,
+    "gradient_mean": 14.8,
+    "entropy": 2.96
+  },
+  "source_image": "built-in"
+}

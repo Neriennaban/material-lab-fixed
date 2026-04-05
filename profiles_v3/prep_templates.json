@@ -1,0 +1,339 @@
+﻿{
+    "version":  1,
+    "templates":  {
+                      "steel_bright_field":  {
+                                                 "roughness_target_um":  0.05,
+                                                 "relief_mode":  "hardness_coupled",
+                                                 "contamination_level":  0.02,
+                                                 "steps":  [
+                                                               {
+                                                                   "method":  "grinding_800",
+                                                                   "duration_s":  90.0,
+                                                                   "abrasive_um":  18.0,
+                                                                   "load_n":  22.0,
+                                                                   "rpm":  180.0,
+                                                                   "coolant":  "water",
+                                                                   "direction_deg":  0,
+                                                                   "load_profile":  "constant",
+                                                                   "cloth_type":  "standard",
+                                                                   "slurry_type":  "diamond",
+                                                                   "lubricant_flow_ml_min":  0,
+                                                                   "cleaning_between_steps":  false,
+                                                                   "oscillation_hz":  0,
+                                                                   "path_pattern":  "linear"
+                                                               },
+                                                               {
+                                                                   "method":  "polishing_3um",
+                                                                   "duration_s":  120.0,
+                                                                   "abrasive_um":  3.0,
+                                                                   "load_n":  14.0,
+                                                                   "rpm":  140.0,
+                                                                   "coolant":  "alcohol",
+                                                                   "direction_deg":  0,
+                                                                   "load_profile":  "constant",
+                                                                   "cloth_type":  "standard",
+                                                                   "slurry_type":  "diamond",
+                                                                   "lubricant_flow_ml_min":  0,
+                                                                   "cleaning_between_steps":  false,
+                                                                   "oscillation_hz":  0,
+                                                                   "path_pattern":  "linear"
+                                                               },
+                                                               {
+                                                                   "method":  "polishing_1um",
+                                                                   "duration_s":  90.0,
+                                                                   "abrasive_um":  1.0,
+                                                                   "load_n":  10.0,
+                                                                   "rpm":  120.0,
+                                                                   "coolant":  "alcohol",
+                                                                   "direction_deg":  0,
+                                                                   "load_profile":  "constant",
+                                                                   "cloth_type":  "standard",
+                                                                   "slurry_type":  "diamond",
+                                                                   "lubricant_flow_ml_min":  0,
+                                                                   "cleaning_between_steps":  false,
+                                                                   "oscillation_hz":  0,
+                                                                   "path_pattern":  "linear"
+                                                               }
+                                                           ]
+                                             },
+                      "al_cast_polish":  {
+                                             "roughness_target_um":  0.08,
+                                             "relief_mode":  "phase_coupled",
+                                             "contamination_level":  0.03,
+                                             "steps":  [
+                                                           {
+                                                               "method":  "grinding_600",
+                                                               "duration_s":  70.0,
+                                                               "abrasive_um":  25.0,
+                                                               "load_n":  18.0,
+                                                               "rpm":  150.0,
+                                                               "coolant":  "water",
+                                                               "direction_deg":  0,
+                                                               "load_profile":  "constant",
+                                                               "cloth_type":  "standard",
+                                                               "slurry_type":  "diamond",
+                                                               "lubricant_flow_ml_min":  0,
+                                                               "cleaning_between_steps":  false,
+                                                               "oscillation_hz":  0,
+                                                               "path_pattern":  "linear"
+                                                           },
+                                                           {
+                                                               "method":  "polishing_3um",
+                                                               "duration_s":  110.0,
+                                                               "abrasive_um":  3.0,
+                                                               "load_n":  12.0,
+                                                               "rpm":  130.0,
+                                                               "coolant":  "water",
+                                                               "direction_deg":  0,
+                                                               "load_profile":  "constant",
+                                                               "cloth_type":  "standard",
+                                                               "slurry_type":  "diamond",
+                                                               "lubricant_flow_ml_min":  0,
+                                                               "cleaning_between_steps":  false,
+                                                               "oscillation_hz":  0,
+                                                               "path_pattern":  "linear"
+                                                           },
+                                                           {
+                                                               "method":  "electropolish",
+                                                               "duration_s":  35.0,
+                                                               "load_n":  0.0,
+                                                               "rpm":  0.0,
+                                                               "coolant":  "electrolyte",
+                                                               "direction_deg":  0,
+                                                               "load_profile":  "constant",
+                                                               "cloth_type":  "standard",
+                                                               "slurry_type":  "diamond",
+                                                               "lubricant_flow_ml_min":  0,
+                                                               "cleaning_between_steps":  false,
+                                                               "oscillation_hz":  0,
+                                                               "path_pattern":  "linear"
+                                                           }
+                                                       ]
+                                         },
+                      "si_etch_pit":  {
+                                          "roughness_target_um":  0.03,
+                                          "relief_mode":  "phase_coupled",
+                                          "contamination_level":  0.01,
+                                          "steps":  [
+                                                        {
+                                                            "method":  "polishing_1um",
+                                                            "duration_s":  120.0,
+                                                            "abrasive_um":  1.0,
+                                                            "load_n":  8.0,
+                                                            "rpm":  100.0,
+                                                            "coolant":  "alcohol",
+                                                            "direction_deg":  0,
+                                                            "load_profile":  "constant",
+                                                            "cloth_type":  "standard",
+                                                            "slurry_type":  "diamond",
+                                                            "lubricant_flow_ml_min":  0,
+                                                            "cleaning_between_steps":  false,
+                                                            "oscillation_hz":  0,
+                                                            "path_pattern":  "linear"
+                                                        },
+                                                        {
+                                                            "method":  "cleaning",
+                                                            "duration_s":  30.0,
+                                                            "load_n":  0.0,
+                                                            "rpm":  0.0,
+                                                            "coolant":  "ultrasonic",
+                                                            "direction_deg":  0,
+                                                            "load_profile":  "constant",
+                                                            "cloth_type":  "standard",
+                                                            "slurry_type":  "diamond",
+                                                            "lubricant_flow_ml_min":  0,
+                                                            "cleaning_between_steps":  false,
+                                                            "oscillation_hz":  0,
+                                                            "path_pattern":  "linear"
+                                                        }
+                                                    ]
+                                      },
+                      "textbook_steel_bw":  {
+                                                "roughness_target_um":  0.05,
+                                                "relief_mode":  "hardness_coupled",
+                                                "contamination_level":  0.02,
+                                                "steps":  [
+                                                              {
+                                                                  "method":  "grinding_800",
+                                                                  "duration_s":  90.0,
+                                                                  "abrasive_um":  18.0,
+                                                                  "load_n":  22.0,
+                                                                  "rpm":  180.0,
+                                                                  "coolant":  "water",
+                                                                  "direction_deg":  0,
+                                                                  "load_profile":  "constant",
+                                                                  "cloth_type":  "standard",
+                                                                  "slurry_type":  "diamond",
+                                                                  "lubricant_flow_ml_min":  0,
+                                                                  "cleaning_between_steps":  false,
+                                                                  "oscillation_hz":  0,
+                                                                  "path_pattern":  "linear"
+                                                              },
+                                                              {
+                                                                  "method":  "polishing_3um",
+                                                                  "duration_s":  110.0,
+                                                                  "abrasive_um":  3.0,
+                                                                  "load_n":  14.0,
+                                                                  "rpm":  140.0,
+                                                                  "coolant":  "alcohol",
+                                                                  "direction_deg":  0,
+                                                                  "load_profile":  "constant",
+                                                                  "cloth_type":  "standard",
+                                                                  "slurry_type":  "diamond",
+                                                                  "lubricant_flow_ml_min":  0,
+                                                                  "cleaning_between_steps":  false,
+                                                                  "oscillation_hz":  0,
+                                                                  "path_pattern":  "linear"
+                                                              },
+                                                              {
+                                                                  "method":  "polishing_1um",
+                                                                  "duration_s":  90.0,
+                                                                  "abrasive_um":  1.0,
+                                                                  "load_n":  10.0,
+                                                                  "rpm":  120.0,
+                                                                  "coolant":  "alcohol",
+                                                                  "direction_deg":  0,
+                                                                  "load_profile":  "constant",
+                                                                  "cloth_type":  "standard",
+                                                                  "slurry_type":  "diamond",
+                                                                  "lubricant_flow_ml_min":  0,
+                                                                  "cleaning_between_steps":  false,
+                                                                  "oscillation_hz":  0,
+                                                                  "path_pattern":  "linear"
+                                                              }
+                                                          ]
+                                            },
+                      "textbook_alsi_bw":  {
+                                               "roughness_target_um":  0.07,
+                                               "relief_mode":  "phase_coupled",
+                                               "contamination_level":  0.02,
+                                               "steps":  [
+                                                             {
+                                                                 "method":  "grinding_600",
+                                                                 "duration_s":  70.0,
+                                                                 "abrasive_um":  25.0,
+                                                                 "load_n":  18.0,
+                                                                 "rpm":  150.0,
+                                                                 "coolant":  "water",
+                                                                 "direction_deg":  0,
+                                                                 "load_profile":  "constant",
+                                                                 "cloth_type":  "standard",
+                                                                 "slurry_type":  "diamond",
+                                                                 "lubricant_flow_ml_min":  0,
+                                                                 "cleaning_between_steps":  false,
+                                                                 "oscillation_hz":  0,
+                                                                 "path_pattern":  "linear"
+                                                             },
+                                                             {
+                                                                 "method":  "polishing_3um",
+                                                                 "duration_s":  100.0,
+                                                                 "abrasive_um":  3.0,
+                                                                 "load_n":  12.0,
+                                                                 "rpm":  130.0,
+                                                                 "coolant":  "water",
+                                                                 "direction_deg":  0,
+                                                                 "load_profile":  "constant",
+                                                                 "cloth_type":  "standard",
+                                                                 "slurry_type":  "diamond",
+                                                                 "lubricant_flow_ml_min":  0,
+                                                                 "cleaning_between_steps":  false,
+                                                                 "oscillation_hz":  0,
+                                                                 "path_pattern":  "linear"
+                                                             },
+                                                             {
+                                                                 "method":  "electropolish",
+                                                                 "duration_s":  30.0,
+                                                                 "load_n":  0.0,
+                                                                 "rpm":  0.0,
+                                                                 "coolant":  "electrolyte",
+                                                                 "direction_deg":  0,
+                                                                 "load_profile":  "constant",
+                                                                 "cloth_type":  "standard",
+                                                                 "slurry_type":  "diamond",
+                                                                 "lubricant_flow_ml_min":  0,
+                                                                 "cleaning_between_steps":  false,
+                                                                 "oscillation_hz":  0,
+                                                                 "path_pattern":  "linear"
+                                                             }
+                                                         ]
+                                           },
+                      "textbook_brass_bw":  {
+                                                "roughness_target_um":  0.06,
+                                                "relief_mode":  "hardness_coupled",
+                                                "contamination_level":  0.02,
+                                                "steps":  [
+                                                              {
+                                                                  "method":  "grinding_800",
+                                                                  "duration_s":  80.0,
+                                                                  "abrasive_um":  18.0,
+                                                                  "load_n":  20.0,
+                                                                  "rpm":  170.0,
+                                                                  "coolant":  "water",
+                                                                  "direction_deg":  0,
+                                                                  "load_profile":  "constant",
+                                                                  "cloth_type":  "standard",
+                                                                  "slurry_type":  "diamond",
+                                                                  "lubricant_flow_ml_min":  0,
+                                                                  "cleaning_between_steps":  false,
+                                                                  "oscillation_hz":  0,
+                                                                  "path_pattern":  "linear"
+                                                              },
+                                                              {
+                                                                  "method":  "polishing_1um",
+                                                                  "duration_s":  95.0,
+                                                                  "abrasive_um":  1.0,
+                                                                  "load_n":  10.0,
+                                                                  "rpm":  120.0,
+                                                                  "coolant":  "alcohol",
+                                                                  "direction_deg":  0,
+                                                                  "load_profile":  "constant",
+                                                                  "cloth_type":  "standard",
+                                                                  "slurry_type":  "diamond",
+                                                                  "lubricant_flow_ml_min":  0,
+                                                                  "cleaning_between_steps":  false,
+                                                                  "oscillation_hz":  0,
+                                                                  "path_pattern":  "linear"
+                                                              }
+                                                          ]
+                                            },
+                      "textbook_heat_treatment_bw":  {
+                                                         "roughness_target_um":  0.05,
+                                                         "relief_mode":  "hardness_coupled",
+                                                         "contamination_level":  0.02,
+                                                         "steps":  [
+                                                                       {
+                                                                           "method":  "grinding_800",
+                                                                           "duration_s":  90.0,
+                                                                           "abrasive_um":  18.0,
+                                                                           "load_n":  22.0,
+                                                                           "rpm":  180.0,
+                                                                           "coolant":  "water",
+                                                                           "direction_deg":  0,
+                                                                           "load_profile":  "constant",
+                                                                           "cloth_type":  "standard",
+                                                                           "slurry_type":  "diamond",
+                                                                           "lubricant_flow_ml_min":  0,
+                                                                           "cleaning_between_steps":  false,
+                                                                           "oscillation_hz":  0,
+                                                                           "path_pattern":  "linear"
+                                                                       },
+                                                                       {
+                                                                           "method":  "polishing_1um",
+                                                                           "duration_s":  100.0,
+                                                                           "abrasive_um":  1.0,
+                                                                           "load_n":  10.0,
+                                                                           "rpm":  120.0,
+                                                                           "coolant":  "alcohol",
+                                                                           "direction_deg":  0,
+                                                                           "load_profile":  "constant",
+                                                                           "cloth_type":  "standard",
+                                                                           "slurry_type":  "diamond",
+                                                                           "lubricant_flow_ml_min":  0,
+                                                                           "cleaning_between_steps":  false,
+                                                                           "oscillation_hz":  0,
+                                                                           "path_pattern":  "linear"
+                                                                       }
+                                                                   ]
+                                                     }
+                  }
+}

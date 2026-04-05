@@ -1,0 +1,27 @@
+{
+  "backend": "calphad_py",
+  "strict_mode": true,
+  "db_paths": {
+    "fe-c": "core/calphad/databases/open/fe_c.tdb",
+    "fe-si": "core/calphad/databases/open/cost507.tdb",
+    "al-si": "core/calphad/databases/open/cost507.tdb",
+    "cu-zn": "core/calphad/databases/open/cost507.tdb",
+    "al-cu-mg": "core/calphad/databases/open/cost507.tdb"
+  },
+  "solver_options": {
+    "equilibrium_model": "global_min",
+    "pressure_pa": 101325.0,
+    "t_grid_step_c": 10.0,
+    "scheil_dt_c": 5.0
+  },
+  "scheil": {
+    "enabled": true
+  },
+  "kinetics": {
+    "enabled": true
+  },
+  "cache": {
+    "policy": "hybrid",
+    "cache_dir": ".cache/calphad"
+  }
+}

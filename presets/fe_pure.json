@@ -1,0 +1,45 @@
+{
+  "name": "Fe_pure_200x",
+  "material": "Electrotechnical pure iron",
+  "lab": "LR1",
+  "generator": "auto",
+  "image_size": [
+    2048,
+    2048
+  ],
+  "seed": 101,
+  "composition": {
+    "Fe": 99.95
+  },
+  "generation": {
+    "mean_grain_size_px": 52,
+    "grain_size_jitter": 0.22,
+    "equiaxed": 1.0,
+    "elongation": 1.0,
+    "orientation_deg": 0,
+    "boundary_width_px": 2,
+    "boundary_contrast": 0.55,
+    "pore_fraction": 0.002,
+    "inclusion_fraction": 0.0025,
+    "auto_hint": {
+      "preferred_generator": "grains"
+    },
+    "cooling_mode": "auto"
+  },
+  "microscope": {
+    "magnification": 200,
+    "focus": 0.95,
+    "brightness": 1.0,
+    "contrast": 1.08,
+    "pan_x": 0.5,
+    "pan_y": 0.5,
+    "noise_sigma": 2.5,
+    "vignette_strength": 0.12,
+    "uneven_strength": 0.07
+  },
+  "metadata": {
+    "scenario": "LR1 mandatory",
+    "notes": "Grain boundaries, pores and non-metallic inclusions",
+    "realism_profile": "high"
+  }
+}

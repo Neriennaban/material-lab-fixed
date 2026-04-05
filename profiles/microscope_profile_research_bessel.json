@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "heavy": {
+    "noise_sigma": 2.2,
+    "vignette_strength": 0.14,
+    "uneven_strength": 0.08,
+    "add_dust": false,
+    "add_scratches": false,
+    "etch_uneven": 0.0
+  },
+  "optics": {
+    "focus_coarse": 0.9,
+    "focus_fine": 0.0,
+    "brightness": 1.0,
+    "contrast": 1.1,
+    "psf_profile": "bessel_extended_dof",
+    "psf_strength": 0.85,
+    "sectioning_shear_deg": 35.0,
+    "hybrid_balance": 0.5
+  },
+  "stage": {
+    "step_small": 0.01,
+    "step_large": 0.05
+  },
+  "overlays": {
+    "reticle_enabled": true,
+    "scale_bar_enabled": true
+  }
+}

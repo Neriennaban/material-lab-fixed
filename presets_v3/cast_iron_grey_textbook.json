@@ -1,0 +1,125 @@
+{
+  "sample_id": "CastIron_grey_textbook",
+  "composition_wt": {
+    "Fe": 95.8,
+    "C": 3.2,
+    "Si": 2.2,
+    "Mn": 0.6,
+    "P": 0.15,
+    "S": 0.05
+  },
+  "system_hint": "fe-c-cast-iron",
+  "material_grade": "СЧ20",
+  "material_class_ru": "Серый чугун",
+  "prep_route": {
+    "roughness_target_um": 0.05,
+    "relief_mode": "hardness_coupled",
+    "contamination_level": 0.02,
+    "steps": [
+      {
+        "method": "grinding_600",
+        "duration_s": 120,
+        "abrasive_um": 25,
+        "load_n": 25,
+        "rpm": 180,
+        "coolant": "water"
+      },
+      {
+        "method": "grinding_800",
+        "duration_s": 90,
+        "abrasive_um": 18,
+        "load_n": 22,
+        "rpm": 180,
+        "coolant": "water"
+      },
+      {
+        "method": "polishing_3um",
+        "duration_s": 150,
+        "abrasive_um": 3,
+        "load_n": 15,
+        "rpm": 140,
+        "coolant": "alcohol"
+      },
+      {
+        "method": "polishing_1um",
+        "duration_s": 90,
+        "abrasive_um": 1,
+        "load_n": 10,
+        "rpm": 120,
+        "coolant": "alcohol"
+      }
+    ]
+  },
+  "etch_profile": {
+    "reagent": "nital_2",
+    "time_s": 8,
+    "temperature_c": 22,
+    "agitation": "active",
+    "overetch_factor": 1
+  },
+  "synthesis_profile": {
+    "profile_id": "textbook_grey_cast_iron",
+    "phase_topology_mode": "auto",
+    "contrast_target": 1.2,
+    "boundary_sharpness": 1.1,
+    "artifact_level": 0.15,
+    "composition_sensitivity_mode": "educational",
+    "generation_mode": "edu_engineering",
+    "phase_emphasis_style": "contrast_texture",
+    "phase_fraction_tolerance_pct": 15,
+    "system_generator_mode": "system_auto",
+    "target_microstructure": "pearlite_graphite_flakes"
+  },
+  "microscope_profile": {
+    "simulate_preview": false,
+    "magnification": 200,
+    "focus": 0.95,
+    "brightness": 1,
+    "contrast": 1.15
+  },
+  "seed": 3201,
+  "resolution": [2048, 2048],
+  "strict_validation": true,
+  "reference_profile_id": "cast_iron_ref",
+  "phase_model": {
+    "engine": "explicit_rules_v3",
+    "phase_control_mode": "auto_with_override",
+    "manual_phase_fractions": {
+      "pearlite": 0.70,
+      "ferrite": 0.10,
+      "graphite_flakes": 0.20
+    },
+    "manual_override_weight": 0.6,
+    "allow_custom_fallback": true,
+    "phase_balance_tolerance_pct": 15,
+    "graphite_morphology": "flake"
+  },
+  "expected_properties": {
+    "hardness_hb": {"min": 170, "max": 220, "typical": 195},
+    "tensile_strength_mpa": {"min": 200, "max": 250, "typical": 220},
+    "compressive_strength_mpa": {"min": 750, "max": 900, "typical": 825},
+    "elongation_pct": {"min": 0.5, "max": 1.0, "typical": 0.7},
+    "modulus_of_elasticity_gpa": {"min": 80, "max": 100, "typical": 90},
+    "density_g_cm3": 7.2,
+    "microstructure_description": "Перлитная основа (70%) + феррит (10%) + графит пластинчатый (20%)"
+  },
+  "metadata": {
+    "source": "Братковский_Шевченко_Материаловедение_2017",
+    "display_name_ru": "СЧ20, серый чугун",
+    "short_label_ru": "СЧ20",
+    "group_ru": "Библиотека образцов / Учебник / Чугуны",
+    "expected_properties_source": "bratkovskiy_shevchenko_2017_textbook",
+    "graphite_form": "пластинчатая",
+    "application": "Станины станков, блоки цилиндров, корпуса редукторов",
+    "advantages_ru": [
+      "Хорошие литейные свойства",
+      "Высокое демпфирование вибраций",
+      "Хорошая обрабатываемость резанием",
+      "Износостойкость"
+    ],
+    "disadvantages_ru": [
+      "Низкая пластичность",
+      "Чувствительность к концентраторам напряжений"
+    ]
+  }
+}

@@ -1,0 +1,178 @@
+{
+  "sample_id": "Steel_U8_tool_textbook",
+  "composition_wt": {
+    "Fe": 99.15,
+    "C": 0.85,
+    "Mn": 0.25,
+    "Si": 0.20
+  },
+  "system_hint": "fe-c",
+  "material_grade": "У8",
+  "material_class_ru": "Инструментальная углеродистая сталь",
+  "treatment_ru": "Закалка + низкий отпуск",
+  "prep_route": {
+    "roughness_target_um": 0.03,
+    "relief_mode": "hardness_coupled",
+    "contamination_level": 0.01,
+    "steps": [
+      {
+        "method": "grinding_800",
+        "duration_s": 90,
+        "abrasive_um": 18,
+        "load_n": 20,
+        "rpm": 180,
+        "coolant": "water"
+      },
+      {
+        "method": "polishing_3um",
+        "duration_s": 120,
+        "abrasive_um": 3,
+        "load_n": 12,
+        "rpm": 140,
+        "coolant": "alcohol"
+      },
+      {
+        "method": "polishing_1um",
+        "duration_s": 90,
+        "abrasive_um": 1,
+        "load_n": 10,
+        "rpm": 120,
+        "coolant": "alcohol"
+      },
+      {
+        "method": "polishing_005um",
+        "duration_s": 90,
+        "abrasive_um": 0.05,
+        "load_n": 6,
+        "rpm": 100,
+        "coolant": "alcohol"
+      }
+    ]
+  },
+  "etch_profile": {
+    "reagent": "nital_2",
+    "time_s": 6,
+    "temperature_c": 22,
+    "agitation": "active",
+    "overetch_factor": 0.8
+  },
+  "synthesis_profile": {
+    "profile_id": "textbook_martensite_cementite",
+    "phase_topology_mode": "auto",
+    "contrast_target": 1.25,
+    "boundary_sharpness": 1.3,
+    "artifact_level": 0.08,
+    "composition_sensitivity_mode": "educational",
+    "generation_mode": "edu_engineering",
+    "phase_emphasis_style": "contrast_texture",
+    "phase_fraction_tolerance_pct": 8,
+    "system_generator_mode": "system_auto",
+    "target_microstructure": "martensite_cementite"
+  },
+  "microscope_profile": {
+    "simulate_preview": false,
+    "magnification": 1000,
+    "focus": 0.98,
+    "brightness": 1,
+    "contrast": 1.2
+  },
+  "seed": 8501,
+  "resolution": [2048, 2048],
+  "strict_validation": true,
+  "reference_profile_id": "steel_ref",
+  "phase_model": {
+    "engine": "explicit_rules_v3",
+    "phase_control_mode": "auto_with_override",
+    "manual_phase_fractions": {
+      "martensite": 0.88,
+      "cementite": 0.06,
+      "retained_austenite": 0.06
+    },
+    "manual_override_weight": 0.7,
+    "allow_custom_fallback": true,
+    "phase_balance_tolerance_pct": 8
+  },
+  "thermal_program": {
+    "steps": [
+      {
+        "type": "heating",
+        "from_c": 20,
+        "to_c": 780,
+        "duration_s": 500,
+        "label": "Нагрев под закалку"
+      },
+      {
+        "type": "hold",
+        "temperature_c": 780,
+        "duration_s": 900,
+        "label": "Выдержка (Ac1 + 50°C)"
+      },
+      {
+        "type": "quench",
+        "from_c": 780,
+        "to_c": 20,
+        "medium": "water",
+        "duration_s": 120,
+        "label": "Закалка в воде"
+      },
+      {
+        "type": "heating",
+        "from_c": 20,
+        "to_c": 200,
+        "duration_s": 300,
+        "label": "Нагрев под низкий отпуск"
+      },
+      {
+        "type": "hold",
+        "temperature_c": 200,
+        "duration_s": 3600,
+        "label": "Низкий отпуск (1 час)"
+      },
+      {
+        "type": "cooling",
+        "from_c": 200,
+        "to_c": 20,
+        "medium": "air",
+        "duration_s": 300,
+        "label": "Охлаждение на воздухе"
+      }
+    ],
+    "quench": {
+      "medium_code": "water_20",
+      "quench_time_s": 120.0,
+      "bath_temperature_c": 20.0,
+      "sample_temperature_c": 780.0,
+      "custom_medium_name": "Вода",
+      "custom_severity_factor": 1.0
+    },
+    "tempering": {
+      "temperature_c": 200,
+      "duration_s": 3600,
+      "type": "low",
+      "type_ru": "Низкий отпуск"
+    },
+    "sampling_mode": "per_degree",
+    "degree_step_c": 1.0,
+    "max_frames": 450
+  },
+  "expected_properties": {
+    "hardness_hrc": {"min": 60, "max": 64, "typical": 62},
+    "hardness_hb": {"min": 700, "max": 800, "typical": 750},
+    "tensile_strength_mpa": {"min": 2000, "max": 2300, "typical": 2150},
+    "elongation_pct": {"min": 1, "max": 3, "typical": 2},
+    "impact_toughness_j_cm2": {"min": 15, "max": 25, "typical": 20},
+    "microstructure_description": "Мартенсит отпуска (88%) + цементит вторичный (6%) + остаточный аустенит (6%)"
+  },
+  "metadata": {
+    "source": "Братковский_Шевченко_Материаловедение_2017",
+    "display_name_ru": "У8, закалка и низкий отпуск",
+    "short_label_ru": "У8 зак.+отп.",
+    "group_ru": "Библиотека образцов / Учебник / Стали / У8",
+    "expected_properties_source": "bratkovskiy_shevchenko_2017_textbook",
+    "treatment": "Закалка + низкий отпуск",
+    "treatment_steps_ru": ["Закалка 780°C (вода)", "Низкий отпуск 200°C"],
+    "application": "Режущий инструмент: зубила, кернеры, пуансоны",
+    "advantage_ru": "Высокая твёрдость и износостойкость",
+    "warning_ru": "Хрупкость после низкого отпуска - не применять для ударных нагрузок"
+  }
+}

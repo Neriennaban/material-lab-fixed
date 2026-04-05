@@ -1,0 +1,39 @@
+{
+  "name": "Phase_AlSi_auto",
+  "material": "Al-Si phase simulator",
+  "lab": "LR1/LR3",
+  "generator": "auto",
+  "image_size": [
+    2048,
+    2048
+  ],
+  "seed": 3101,
+  "composition": {
+    "Al": 88.0,
+    "Si": 12.0
+  },
+  "generation": {
+    "system": "al-si",
+    "stage": "auto",
+    "temperature_c": 560.0,
+    "cooling_mode": "equilibrium",
+    "deformation_pct": 0.0,
+    "aging_hours": 8.0,
+    "aging_temperature_c": 180.0,
+    "auto_hint": {
+      "preferred_generator": "phase_map"
+    }
+  },
+  "microscope": {
+    "magnification": 400,
+    "focus": 0.96,
+    "brightness": 1.0,
+    "contrast": 1.14,
+    "noise_sigma": 2.0,
+    "vignette_strength": 0.16
+  },
+  "metadata": {
+    "scenario": "phase-stage",
+    "notes": "Change Si and temperature for Al-Si stage transitions"
+  }
+}

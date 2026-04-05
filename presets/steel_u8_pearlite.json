@@ -1,0 +1,41 @@
+{
+  "name": "Steel_U8_pearlite_400x",
+  "material": "Steel U8 (~0.8% C)",
+  "lab": "LR1",
+  "generator": "auto",
+  "image_size": [
+    2048,
+    2048
+  ],
+  "seed": 103,
+  "composition": {
+    "Fe": 99.2,
+    "C": 0.8
+  },
+  "generation": {
+    "pearlite_fraction": 0.86,
+    "lamella_period_px": 5.4,
+    "colony_size_px": 98.0,
+    "ferrite_brightness": 182,
+    "cementite_brightness": 56,
+    "auto_hint": {
+      "preferred_generator": "pearlite"
+    },
+    "cooling_mode": "auto"
+  },
+  "microscope": {
+    "magnification": 400,
+    "focus": 0.95,
+    "brightness": 0.99,
+    "contrast": 1.18,
+    "noise_sigma": 1.8,
+    "vignette_strength": 0.18,
+    "uneven_strength": 0.13,
+    "etch_uneven": 0.08
+  },
+  "metadata": {
+    "scenario": "LR1 mandatory",
+    "structure": "eutectoid pearlite ferrite+cementite",
+    "realism_profile": "high"
+  }
+}

@@ -1,0 +1,93 @@
+﻿{
+    "version":  1,
+    "profiles":  {
+                     "nital_2":  {
+                                     "reagent":  "nital_2",
+                                     "time_s":  8.0,
+                                     "temperature_c":  22.0,
+                                     "agitation":  "gentle",
+                                     "overetch_factor":  1.0,
+                                     "concentration_unit":  "wt_pct",
+                                     "concentration_value":  2,
+                                     "concentration_wt_pct":  2,
+                                     "concentration_mol_l":  0.3
+                                 },
+                     "picral":  {
+                                    "reagent":  "picral",
+                                    "time_s":  14.0,
+                                    "temperature_c":  24.0,
+                                    "agitation":  "gentle",
+                                    "overetch_factor":  1.0,
+                                    "concentration_unit":  "wt_pct",
+                                    "concentration_value":  2,
+                                    "concentration_wt_pct":  2,
+                                    "concentration_mol_l":  0.3
+                                },
+                     "keller":  {
+                                    "reagent":  "keller",
+                                    "time_s":  10.0,
+                                    "temperature_c":  22.0,
+                                    "agitation":  "active",
+                                    "overetch_factor":  1.0,
+                                    "concentration_unit":  "wt_pct",
+                                    "concentration_value":  2,
+                                    "concentration_wt_pct":  2,
+                                    "concentration_mol_l":  0.3
+                                },
+                     "fry":  {
+                                 "reagent":  "fry",
+                                 "time_s":  20.0,
+                                 "temperature_c":  25.0,
+                                 "agitation":  "active",
+                                 "overetch_factor":  1.0,
+                                 "concentration_unit":  "wt_pct",
+                                 "concentration_value":  2,
+                                 "concentration_wt_pct":  2,
+                                 "concentration_mol_l":  0.3
+                             },
+                     "textbook_steel_bw":  {
+                                               "reagent":  "nital_2",
+                                               "time_s":  9.0,
+                                               "temperature_c":  22.0,
+                                               "agitation":  "gentle",
+                                               "overetch_factor":  1.0,
+                                               "concentration_unit":  "wt_pct",
+                                               "concentration_value":  2,
+                                               "concentration_wt_pct":  2,
+                                               "concentration_mol_l":  0.3
+                                           },
+                     "textbook_alsi_bw":  {
+                                              "reagent":  "keller",
+                                              "time_s":  11.0,
+                                              "temperature_c":  22.0,
+                                              "agitation":  "active",
+                                              "overetch_factor":  1.0,
+                                              "concentration_unit":  "wt_pct",
+                                              "concentration_value":  2,
+                                              "concentration_wt_pct":  2,
+                                              "concentration_mol_l":  0.3
+                                          },
+                     "textbook_brass_bw":  {
+                                               "reagent":  "picral",
+                                               "time_s":  12.0,
+                                               "temperature_c":  23.0,
+                                               "agitation":  "gentle",
+                                               "overetch_factor":  1.0,
+                                               "concentration_unit":  "wt_pct",
+                                               "concentration_value":  2,
+                                               "concentration_wt_pct":  2,
+                                               "concentration_mol_l":  0.3
+                                           },
+                     "textbook_heat_treatment_bw":  {
+                                                        "reagent":  "nital_2",
+                                                        "time_s":  8.0,
+                                                        "temperature_c":  22.0,
+                                                        "agitation":  "active",
+                                                        "overetch_factor":  1.0,
+                                                        "concentration_unit":  "wt_pct",
+                                                        "concentration_value":  2,
+                                                        "concentration_wt_pct":  2,
+                                                        "concentration_mol_l":  0.3
+                                                    }
+                 }
+}

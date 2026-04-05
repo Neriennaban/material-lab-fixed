@@ -1,0 +1,4641 @@
+{
+  "sample_id": "Fe_C_hypoeutectoid_textbook",
+  "request_v3": {
+    "sample_id": "Fe_C_hypoeutectoid_textbook",
+    "composition_wt": {
+      "Fe": 99.55,
+      "C": 0.45
+    },
+    "system_hint": "fe-c",
+    "thermal_program": {
+      "points": [
+        {
+          "time_s": 0.0,
+          "temperature_c": 20.0,
+          "label": "Start",
+          "locked": true,
+          "transition_to_next": {
+            "model": "linear",
+            "curvature": 1.0,
+            "segment_medium_code": "inherit",
+            "segment_medium_factor": null,
+            "notes": ""
+          }
+        },
+        {
+          "time_s": 720.0,
+          "temperature_c": 780.0,
+          "label": "Point 1",
+          "locked": false,
+          "transition_to_next": {
+            "model": "linear",
+            "curvature": 1.0,
+            "segment_medium_code": "inherit",
+            "segment_medium_factor": null,
+            "notes": ""
+          }
+        },
+        {
+          "time_s": 2400.0,
+          "temperature_c": 780.0,
+          "label": "Point 2",
+          "locked": false,
+          "transition_to_next": {
+            "model": "linear",
+            "curvature": 1.0,
+            "segment_medium_code": "inherit",
+            "segment_medium_factor": null,
+            "notes": ""
+          }
+        },
+        {
+          "time_s": 4560.0,
+          "temperature_c": 20.0,
+          "label": "Point 3",
+          "locked": false,
+          "transition_to_next": {
+            "model": "linear",
+            "curvature": 1.0,
+            "segment_medium_code": "inherit",
+            "segment_medium_factor": null,
+            "notes": ""
+          }
+        }
+      ],
+      "quench": {
+        "medium_code": "water_20",
+        "quench_time_s": 35.0,
+        "bath_temperature_c": 20.0,
+        "sample_temperature_c": 840.0,
+        "custom_medium_name": "",
+        "custom_severity_factor": 1.0
+      },
+      "sampling_mode": "per_degree",
+      "degree_step_c": 1.0,
+      "max_frames": 320
+    },
+    "prep_route": {
+      "steps": [
+        {
+          "method": "grinding_800",
+          "duration_s": 90.0,
+          "abrasive_um": 18.0,
+          "load_n": 22.0,
+          "rpm": 180.0,
+          "coolant": "water",
+          "note": "",
+          "direction_deg": 0.0,
+          "load_profile": "constant",
+          "cloth_type": "standard",
+          "slurry_type": "diamond",
+          "lubricant_flow_ml_min": 0.0,
+          "cleaning_between_steps": false,
+          "oscillation_hz": 0.0,
+          "path_pattern": "linear"
+        },
+        {
+          "method": "polishing_3um",
+          "duration_s": 110.0,
+          "abrasive_um": 3.0,
+          "load_n": 14.0,
+          "rpm": 140.0,
+          "coolant": "alcohol",
+          "note": "",
+          "direction_deg": 0.0,
+          "load_profile": "constant",
+          "cloth_type": "standard",
+          "slurry_type": "diamond",
+          "lubricant_flow_ml_min": 0.0,
+          "cleaning_between_steps": false,
+          "oscillation_hz": 0.0,
+          "path_pattern": "linear"
+        },
+        {
+          "method": "polishing_1um",
+          "duration_s": 90.0,
+          "abrasive_um": 1.0,
+          "load_n": 10.0,
+          "rpm": 120.0,
+          "coolant": "alcohol",
+          "note": "",
+          "direction_deg": 0.0,
+          "load_profile": "constant",
+          "cloth_type": "standard",
+          "slurry_type": "diamond",
+          "lubricant_flow_ml_min": 0.0,
+          "cleaning_between_steps": false,
+          "oscillation_hz": 0.0,
+          "path_pattern": "linear"
+        }
+      ],
+      "roughness_target_um": 0.05,
+      "relief_mode": "hardness_coupled",
+      "contamination_level": 0.02
+    },
+    "etch_profile": {
+      "reagent": "nital_2",
+      "time_s": 8.0,
+      "temperature_c": 22.0,
+      "agitation": "active",
+      "overetch_factor": 1.0,
+      "concentration_value": 2.0,
+      "concentration_unit": "wt_pct",
+      "concentration_wt_pct": 2.0,
+      "concentration_mol_l": 0.31746031746031744
+    },
+    "synthesis_profile": {
+      "profile_id": "textbook_steel_bw",
+      "phase_topology_mode": "auto",
+      "system_generator_mode": "system_auto",
+      "contrast_target": 1.08,
+      "boundary_sharpness": 1.15,
+      "artifact_level": 0.2,
+      "composition_sensitivity_mode": "educational",
+      "generation_mode": "edu_engineering",
+      "phase_emphasis_style": "contrast_texture",
+      "phase_fraction_tolerance_pct": 20.0
+    },
+    "phase_model": {
+      "engine": "explicit_rules_v3",
+      "phase_control_mode": "auto_with_override",
+      "manual_phase_fractions": {},
+      "manual_override_weight": 0.35,
+      "allow_custom_fallback": true,
+      "phase_balance_tolerance_pct": 20.0
+    },
+    "microscope_profile": {
+      "simulate_preview": false,
+      "magnification": 200,
+      "focus": 0.95,
+      "brightness": 1.0,
+      "contrast": 1.1,
+      "noise_sigma": 1.5,
+      "vignette_strength": 0.12,
+      "uneven_strength": 0.08,
+      "add_dust": false,
+      "add_scratches": false,
+      "etch_uneven": 0.0
+    },
+    "seed": 4101,
+    "resolution": [
+      16384,
+      16384
+    ],
+    "strict_validation": true,
+    "reference_profile_id": "steel_ref",
+    "generate_intermediate_renders": false
+  },
+  "inferred_system": "fe-c",
+  "generator_version": "v3.0.0",
+  "phase_model": {
+    "engine": "explicit_rules_v3",
+    "phase_control_mode": "auto_with_override",
+    "override_weight": 0.35,
+    "allow_custom_fallback": true,
+    "phase_balance_tolerance_pct": 20.0
+  },
+  "phase_model_report": {
+    "auto_phase_fractions": {
+      "FERRITE": 0.427807486631016,
+      "PEARLITE": 0.572192513368984
+    },
+    "manual_phase_fractions": {},
+    "blended_phase_fractions": {
+      "FERRITE": 0.427807486631016,
+      "PEARLITE": 0.572192513368984
+    },
+    "blend_applied": false,
+    "phase_balance_tolerance_pct": 20.0,
+    "fraction_error_pct": {
+      "FERRITE": 0.0,
+      "PEARLITE": 0.0
+    },
+    "within_tolerance": true,
+    "fallback_used": false,
+    "fallback_reason": "",
+    "quench_medium_code_resolved": "water_20",
+    "temper_shift_c": {
+      "low": 0.0,
+      "medium": 0.0,
+      "high": 0.0
+    },
+    "stage_rule_source": "fe_c_stage_rules_v3.json",
+    "fraction_source": "default_formula",
+    "calibration_profile": "",
+    "calibration_mode": "default_formula",
+    "calibration_source": "",
+    "calibration_table_id": "",
+    "calibration_table_c_wt_requested": null,
+    "calibration_table_c_wt_used": null,
+    "calibration_table_clamped": false,
+    "calibration_medium_correction_applied": false,
+    "target_constituents_from_table": {},
+    "target_phase_fractions_from_table": {},
+    "actual_phase_fractions_after_blend": {
+      "FERRITE": 0.427807486631016,
+      "PEARLITE": 0.572192513368984
+    },
+    "table_match_error_by_phase_pct": {},
+    "table_match_error_pct": 0.0
+  },
+  "system_resolution": {
+    "inferred_system": "fe-c",
+    "stage": "alpha_pearlite",
+    "confidence": 1.0
+  },
+  "thermal_program_summary": {
+    "point_count": 4,
+    "duration_s": 4560.0,
+    "temperature_min_c": 20.0,
+    "temperature_max_c": 780.0,
+    "temperature_start_c": 20.0,
+    "temperature_end_c": 20.0,
+    "hold_time_s": 1680.0,
+    "heat_time_s": 720.0,
+    "cool_time_s": 2160.0,
+    "max_heating_rate_c_per_s": 1.0555555555555556,
+    "max_cooling_rate_c_per_s": -0.35185185185185186,
+    "max_effective_heating_rate_c_per_s": 0.6861111111111393,
+    "max_effective_cooling_rate_c_per_s": 0.4222222222222655,
+    "thermal_cycles": 0,
+    "segments": [
+      {
+        "index": 0,
+        "t0_s": 0.0,
+        "t1_s": 720.0,
+        "temp0_c": 20.0,
+        "temp1_c": 780.0,
+        "dt_s": 720.0,
+        "dtemp_c": 760.0,
+        "slope_c_per_s": 1.0555555555555556,
+        "kind": "heat"
+      },
+      {
+        "index": 1,
+        "t0_s": 720.0,
+        "t1_s": 2400.0,
+        "temp0_c": 780.0,
+        "temp1_c": 780.0,
+        "dt_s": 1680.0,
+        "dtemp_c": 0.0,
+        "slope_c_per_s": 0.0,
+        "kind": "hold"
+      },
+      {
+        "index": 2,
+        "t0_s": 2400.0,
+        "t1_s": 4560.0,
+        "temp0_c": 780.0,
+        "temp1_c": 20.0,
+        "dt_s": 2160.0,
+        "dtemp_c": -760.0,
+        "slope_c_per_s": -0.35185185185185186,
+        "kind": "cool"
+      }
+    ],
+    "curve_interpolation_mode": "mixed_per_segment",
+    "nonlinear_enabled": false,
+    "segment_count_with_nonlinear": 0,
+    "segment_transition_report": [
+      {
+        "segment_index": 0,
+        "kind": "heat",
+        "model": "linear",
+        "curvature": 1.0,
+        "segment_medium_code": "air",
+        "effective_rate_factor": 0.65
+      },
+      {
+        "segment_index": 1,
+        "kind": "hold",
+        "model": "linear",
+        "curvature": 1.0,
+        "segment_medium_code": "air",
+        "effective_rate_factor": 0.65
+      },
+      {
+        "segment_index": 2,
+        "kind": "cool",
+        "model": "linear",
+        "curvature": 1.0,
+        "segment_medium_code": "water_20",
+        "effective_rate_factor": 1.2
+      }
+    ],
+    "operation_inference": {
+      "count": 3,
+      "has_austenitization": true,
+      "has_quench": false,
+      "has_temper": false,
+      "quench_detected_by_curve": false,
+      "quench_presence_rule": "curve_only",
+      "max_temperature_c": 780.0,
+      "temper_peak_temperature_c": 0.0,
+      "temper_mean_temperature_c": 0.0,
+      "temper_total_hold_s": 0.0,
+      "temper_code": "",
+      "temper_band_detected": "",
+      "temper_band_confidence": 0.0,
+      "recommended_temper_shift_c": 0.0,
+      "recommended_temper_shift_map_c": {
+        "temper_low": 0.0,
+        "temper_medium": 0.0,
+        "temper_high": 0.0
+      },
+      "medium_code_resolved": "water_20",
+      "segment_transition_report": [
+        {
+          "segment_index": 0,
+          "kind": "heat",
+          "model": "linear",
+          "curvature": 1.0,
+          "segment_medium_code": "air",
+          "effective_rate_factor": 0.65
+        },
+        {
+          "segment_index": 1,
+          "kind": "hold",
+          "model": "linear",
+          "curvature": 1.0,
+          "segment_medium_code": "air",
+          "effective_rate_factor": 0.65
+        },
+        {
+          "segment_index": 2,
+          "kind": "cool",
+          "model": "linear",
+          "curvature": 1.0,
+          "segment_medium_code": "water_20",
+          "effective_rate_factor": 1.2
+        }
+      ],
+      "recommended_cooling_mode": "equilibrium",
+      "stage_inference_profile": "fe_c_temper_curve_v2"
+    },
+    "observed_temperature_c": 20.0,
+    "quench_observed_temperature_estimate_c": 20.0,
+    "has_temper": false,
+    "has_quench": false,
+    "temper_peak_temperature_c": 0.0,
+    "recommended_temper_shift_c": 0.0,
+    "recommended_temper_shift_map_c": {
+      "temper_low": 0.0,
+      "temper_medium": 0.0,
+      "temper_high": 0.0
+    },
+    "stage_inference_profile": "fe_c_temper_curve_v2",
+    "quench_medium_code_resolved": "water_20",
+    "quench_effect_applied": false,
+    "quench_effect_reason": "no_quench_segment",
+    "as_quenched_prediction": {
+      "martensite_fraction_est": 0.5738995500657368,
+      "retained_austenite_fraction_est": 0.154918600525615,
+      "martensite_type": "martensite_cubic"
+    },
+    "operation_guidance": {
+      "low_temper_required": true,
+      "recommended_hold_s": 3600.0
+    },
+    "sampling_mode": "per_degree",
+    "degree_step_c": 1.0,
+    "max_frames": 320,
+    "sampled_points_count": 320
+  },
+  "segment_transition_report": [
+    {
+      "segment_index": 0,
+      "kind": "heat",
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "effective_rate_factor": 0.65
+    },
+    {
+      "segment_index": 1,
+      "kind": "hold",
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "effective_rate_factor": 0.65
+    },
+    {
+      "segment_index": 2,
+      "kind": "cool",
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "water_20",
+      "effective_rate_factor": 1.2
+    }
+  ],
+  "thermal_curve_samples": [
+    {
+      "segment": 0,
+      "time_s": 0.0,
+      "temperature_c": 20.0,
+      "kind": "heat",
+      "u": 0.0,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 2.25705329153605,
+      "temperature_c": 22.38244514106583,
+      "kind": "heat",
+      "u": 0.003134796238244514,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 4.5141065830721,
+      "temperature_c": 24.76489028213166,
+      "kind": "heat",
+      "u": 0.006269592476489028,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 6.771159874608151,
+      "temperature_c": 27.147335423197493,
+      "kind": "heat",
+      "u": 0.009404388714733543,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 9.0282131661442,
+      "temperature_c": 29.529780564263323,
+      "kind": "heat",
+      "u": 0.012539184952978056,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 11.28526645768025,
+      "temperature_c": 31.912225705329153,
+      "kind": "heat",
+      "u": 0.01567398119122257,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 13.542319749216302,
+      "temperature_c": 34.294670846394986,
+      "kind": "heat",
+      "u": 0.018808777429467086,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 15.799373040752352,
+      "temperature_c": 36.677115987460816,
+      "kind": "heat",
+      "u": 0.0219435736677116,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 18.0564263322884,
+      "temperature_c": 39.059561128526646,
+      "kind": "heat",
+      "u": 0.025078369905956112,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 20.31347962382445,
+      "temperature_c": 41.442006269592476,
+      "kind": "heat",
+      "u": 0.028213166144200625,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 22.5705329153605,
+      "temperature_c": 43.824451410658305,
+      "kind": "heat",
+      "u": 0.03134796238244514,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 24.82758620689655,
+      "temperature_c": 46.20689655172414,
+      "kind": "heat",
+      "u": 0.034482758620689655,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 27.084639498432605,
+      "temperature_c": 48.58934169278997,
+      "kind": "heat",
+      "u": 0.03761755485893417,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 29.34169278996865,
+      "temperature_c": 50.9717868338558,
+      "kind": "heat",
+      "u": 0.04075235109717868,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 31.598746081504704,
+      "temperature_c": 53.35423197492163,
+      "kind": "heat",
+      "u": 0.0438871473354232,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 33.855799373040746,
+      "temperature_c": 55.736677115987455,
+      "kind": "heat",
+      "u": 0.04702194357366771,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 36.1128526645768,
+      "temperature_c": 58.11912225705329,
+      "kind": "heat",
+      "u": 0.050156739811912224,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 38.36990595611285,
+      "temperature_c": 60.50156739811912,
+      "kind": "heat",
+      "u": 0.05329153605015674,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 40.6269592476489,
+      "temperature_c": 62.88401253918495,
+      "kind": "heat",
+      "u": 0.05642633228840125,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 42.88401253918495,
+      "temperature_c": 65.26645768025078,
+      "kind": "heat",
+      "u": 0.05956112852664577,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 45.141065830721,
+      "temperature_c": 67.64890282131661,
+      "kind": "heat",
+      "u": 0.06269592476489028,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 47.39811912225705,
+      "temperature_c": 70.03134796238244,
+      "kind": "heat",
+      "u": 0.06583072100313479,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 49.6551724137931,
+      "temperature_c": 72.41379310344828,
+      "kind": "heat",
+      "u": 0.06896551724137931,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 51.912225705329156,
+      "temperature_c": 74.79623824451411,
+      "kind": "heat",
+      "u": 0.07210031347962383,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 54.16927899686521,
+      "temperature_c": 77.17868338557994,
+      "kind": "heat",
+      "u": 0.07523510971786834,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 56.42633228840125,
+      "temperature_c": 79.56112852664576,
+      "kind": "heat",
+      "u": 0.07836990595611285,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 58.6833855799373,
+      "temperature_c": 81.9435736677116,
+      "kind": "heat",
+      "u": 0.08150470219435736,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 60.940438871473354,
+      "temperature_c": 84.32601880877743,
+      "kind": "heat",
+      "u": 0.08463949843260188,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 63.19749216300941,
+      "temperature_c": 86.70846394984326,
+      "kind": "heat",
+      "u": 0.0877742946708464,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 65.45454545454545,
+      "temperature_c": 89.0909090909091,
+      "kind": "heat",
+      "u": 0.09090909090909091,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 67.71159874608149,
+      "temperature_c": 91.47335423197491,
+      "kind": "heat",
+      "u": 0.09404388714733541,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 69.96865203761755,
+      "temperature_c": 93.85579937304075,
+      "kind": "heat",
+      "u": 0.09717868338557993,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 72.2257053291536,
+      "temperature_c": 96.23824451410658,
+      "kind": "heat",
+      "u": 0.10031347962382445,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 74.48275862068965,
+      "temperature_c": 98.62068965517241,
+      "kind": "heat",
+      "u": 0.10344827586206896,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 76.7398119122257,
+      "temperature_c": 101.00313479623824,
+      "kind": "heat",
+      "u": 0.10658307210031348,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 78.99686520376174,
+      "temperature_c": 103.38557993730407,
+      "kind": "heat",
+      "u": 0.10971786833855798,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 81.2539184952978,
+      "temperature_c": 105.7680250783699,
+      "kind": "heat",
+      "u": 0.1128526645768025,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 83.51097178683385,
+      "temperature_c": 108.15047021943573,
+      "kind": "heat",
+      "u": 0.11598746081504702,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 85.7680250783699,
+      "temperature_c": 110.53291536050156,
+      "kind": "heat",
+      "u": 0.11912225705329153,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 88.02507836990596,
+      "temperature_c": 112.91536050156739,
+      "kind": "heat",
+      "u": 0.12225705329153605,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 90.282131661442,
+      "temperature_c": 115.29780564263322,
+      "kind": "heat",
+      "u": 0.12539184952978055,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 92.53918495297806,
+      "temperature_c": 117.68025078369907,
+      "kind": "heat",
+      "u": 0.12852664576802508,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 94.7962382445141,
+      "temperature_c": 120.06269592476488,
+      "kind": "heat",
+      "u": 0.13166144200626959,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 97.05329153605014,
+      "temperature_c": 122.44514106583071,
+      "kind": "heat",
+      "u": 0.1347962382445141,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 99.3103448275862,
+      "temperature_c": 124.82758620689656,
+      "kind": "heat",
+      "u": 0.13793103448275862,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 101.56739811912225,
+      "temperature_c": 127.21003134796237,
+      "kind": "heat",
+      "u": 0.14106583072100312,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 103.82445141065831,
+      "temperature_c": 129.59247648902823,
+      "kind": "heat",
+      "u": 0.14420062695924765,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 106.08150470219435,
+      "temperature_c": 131.97492163009403,
+      "kind": "heat",
+      "u": 0.14733542319749215,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 108.33855799373042,
+      "temperature_c": 134.3573667711599,
+      "kind": "heat",
+      "u": 0.15047021943573669,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 110.59561128526646,
+      "temperature_c": 136.73981191222572,
+      "kind": "heat",
+      "u": 0.1536050156739812,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 112.8526645768025,
+      "temperature_c": 139.12225705329152,
+      "kind": "heat",
+      "u": 0.1567398119122257,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 115.10971786833856,
+      "temperature_c": 141.50470219435738,
+      "kind": "heat",
+      "u": 0.15987460815047022,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 117.3667711598746,
+      "temperature_c": 143.8871473354232,
+      "kind": "heat",
+      "u": 0.16300940438871472,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 119.62382445141067,
+      "temperature_c": 146.26959247648904,
+      "kind": "heat",
+      "u": 0.16614420062695925,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 121.88087774294671,
+      "temperature_c": 148.65203761755487,
+      "kind": "heat",
+      "u": 0.16927899686520376,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 124.13793103448275,
+      "temperature_c": 151.03448275862067,
+      "kind": "heat",
+      "u": 0.17241379310344826,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 126.39498432601881,
+      "temperature_c": 153.41692789968653,
+      "kind": "heat",
+      "u": 0.1755485893416928,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 128.65203761755484,
+      "temperature_c": 155.79937304075233,
+      "kind": "heat",
+      "u": 0.1786833855799373,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 130.9090909090909,
+      "temperature_c": 158.1818181818182,
+      "kind": "heat",
+      "u": 0.18181818181818182,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 133.16614420062695,
+      "temperature_c": 160.56426332288402,
+      "kind": "heat",
+      "u": 0.18495297805642633,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 135.42319749216298,
+      "temperature_c": 162.94670846394982,
+      "kind": "heat",
+      "u": 0.18808777429467083,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 137.68025078369905,
+      "temperature_c": 165.32915360501568,
+      "kind": "heat",
+      "u": 0.19122257053291536,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 139.9373040752351,
+      "temperature_c": 167.7115987460815,
+      "kind": "heat",
+      "u": 0.19435736677115986,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 142.19435736677116,
+      "temperature_c": 170.09404388714734,
+      "kind": "heat",
+      "u": 0.1974921630094044,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 144.4514106583072,
+      "temperature_c": 172.47648902821317,
+      "kind": "heat",
+      "u": 0.2006269592476489,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 146.70846394984324,
+      "temperature_c": 174.858934169279,
+      "kind": "heat",
+      "u": 0.2037617554858934,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 148.9655172413793,
+      "temperature_c": 177.24137931034483,
+      "kind": "heat",
+      "u": 0.20689655172413793,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 151.22257053291534,
+      "temperature_c": 179.62382445141066,
+      "kind": "heat",
+      "u": 0.21003134796238243,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 153.4796238244514,
+      "temperature_c": 182.00626959247649,
+      "kind": "heat",
+      "u": 0.21316614420062696,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 155.73667711598745,
+      "temperature_c": 184.38871473354232,
+      "kind": "heat",
+      "u": 0.21630094043887146,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 157.9937304075235,
+      "temperature_c": 186.77115987460814,
+      "kind": "heat",
+      "u": 0.21943573667711597,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 160.25078369905955,
+      "temperature_c": 189.15360501567397,
+      "kind": "heat",
+      "u": 0.2225705329153605,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 162.5078369905956,
+      "temperature_c": 191.5360501567398,
+      "kind": "heat",
+      "u": 0.225705329153605,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 164.76489028213166,
+      "temperature_c": 193.91849529780563,
+      "kind": "heat",
+      "u": 0.22884012539184953,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 167.0219435736677,
+      "temperature_c": 196.30094043887146,
+      "kind": "heat",
+      "u": 0.23197492163009403,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 169.27899686520374,
+      "temperature_c": 198.6833855799373,
+      "kind": "heat",
+      "u": 0.23510971786833854,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 171.5360501567398,
+      "temperature_c": 201.06583072100312,
+      "kind": "heat",
+      "u": 0.23824451410658307,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 173.79310344827584,
+      "temperature_c": 203.44827586206895,
+      "kind": "heat",
+      "u": 0.24137931034482757,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 176.0501567398119,
+      "temperature_c": 205.83072100313478,
+      "kind": "heat",
+      "u": 0.2445141065830721,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 178.30721003134795,
+      "temperature_c": 208.2131661442006,
+      "kind": "heat",
+      "u": 0.2476489028213166,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 180.564263322884,
+      "temperature_c": 210.59561128526644,
+      "kind": "heat",
+      "u": 0.2507836990595611,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 182.82131661442006,
+      "temperature_c": 212.97805642633227,
+      "kind": "heat",
+      "u": 0.25391849529780564,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 185.07836990595612,
+      "temperature_c": 215.36050156739813,
+      "kind": "heat",
+      "u": 0.25705329153605017,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 187.33542319749213,
+      "temperature_c": 217.74294670846393,
+      "kind": "heat",
+      "u": 0.26018808777429464,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 189.5924764890282,
+      "temperature_c": 220.12539184952976,
+      "kind": "heat",
+      "u": 0.26332288401253917,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 191.84952978056427,
+      "temperature_c": 222.50783699059562,
+      "kind": "heat",
+      "u": 0.2664576802507837,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 194.10658307210028,
+      "temperature_c": 224.89028213166142,
+      "kind": "heat",
+      "u": 0.2695924764890282,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 196.36363636363635,
+      "temperature_c": 227.27272727272725,
+      "kind": "heat",
+      "u": 0.2727272727272727,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 198.6206896551724,
+      "temperature_c": 229.6551724137931,
+      "kind": "heat",
+      "u": 0.27586206896551724,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 200.87774294670848,
+      "temperature_c": 232.03761755485894,
+      "kind": "heat",
+      "u": 0.27899686520376177,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 203.1347962382445,
+      "temperature_c": 234.42006269592474,
+      "kind": "heat",
+      "u": 0.28213166144200624,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 205.39184952978056,
+      "temperature_c": 236.8025078369906,
+      "kind": "heat",
+      "u": 0.2852664576802508,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 207.64890282131663,
+      "temperature_c": 239.18495297805643,
+      "kind": "heat",
+      "u": 0.2884012539184953,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 209.90595611285264,
+      "temperature_c": 241.56739811912223,
+      "kind": "heat",
+      "u": 0.2915360501567398,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 212.1630094043887,
+      "temperature_c": 243.94984326018806,
+      "kind": "heat",
+      "u": 0.2946708463949843,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 214.42006269592477,
+      "temperature_c": 246.33228840125392,
+      "kind": "heat",
+      "u": 0.29780564263322884,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 216.67711598746084,
+      "temperature_c": 248.71473354231975,
+      "kind": "heat",
+      "u": 0.30094043887147337,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 218.93416927899685,
+      "temperature_c": 251.09717868338555,
+      "kind": "heat",
+      "u": 0.30407523510971785,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 221.19122257053291,
+      "temperature_c": 253.4796238244514,
+      "kind": "heat",
+      "u": 0.3072100313479624,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 223.44827586206898,
+      "temperature_c": 255.86206896551724,
+      "kind": "heat",
+      "u": 0.3103448275862069,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 225.705329153605,
+      "temperature_c": 258.24451410658304,
+      "kind": "heat",
+      "u": 0.3134796238244514,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 227.96238244514106,
+      "temperature_c": 260.62695924764887,
+      "kind": "heat",
+      "u": 0.3166144200626959,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 230.21943573667713,
+      "temperature_c": 263.00940438871476,
+      "kind": "heat",
+      "u": 0.31974921630094044,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 232.47648902821314,
+      "temperature_c": 265.39184952978053,
+      "kind": "heat",
+      "u": 0.3228840125391849,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 234.7335423197492,
+      "temperature_c": 267.7742946708464,
+      "kind": "heat",
+      "u": 0.32601880877742945,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 236.99059561128527,
+      "temperature_c": 270.1567398119122,
+      "kind": "heat",
+      "u": 0.329153605015674,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 239.24764890282134,
+      "temperature_c": 272.5391849529781,
+      "kind": "heat",
+      "u": 0.3322884012539185,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 241.50470219435735,
+      "temperature_c": 274.92163009404385,
+      "kind": "heat",
+      "u": 0.335423197492163,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 243.76175548589342,
+      "temperature_c": 277.30407523510974,
+      "kind": "heat",
+      "u": 0.3385579937304075,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 246.01880877742948,
+      "temperature_c": 279.68652037617557,
+      "kind": "heat",
+      "u": 0.34169278996865204,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 248.2758620689655,
+      "temperature_c": 282.06896551724134,
+      "kind": "heat",
+      "u": 0.3448275862068965,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 250.53291536050156,
+      "temperature_c": 284.4514106583072,
+      "kind": "heat",
+      "u": 0.34796238244514105,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 252.78996865203763,
+      "temperature_c": 286.83385579937305,
+      "kind": "heat",
+      "u": 0.3510971786833856,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 255.04702194357364,
+      "temperature_c": 289.2163009404388,
+      "kind": "heat",
+      "u": 0.35423197492163006,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 257.3040752351097,
+      "temperature_c": 291.59874608150466,
+      "kind": "heat",
+      "u": 0.3573667711598746,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 259.56112852664575,
+      "temperature_c": 293.98119122257054,
+      "kind": "heat",
+      "u": 0.3605015673981191,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 261.8181818181818,
+      "temperature_c": 296.3636363636364,
+      "kind": "heat",
+      "u": 0.36363636363636365,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 264.0752351097178,
+      "temperature_c": 298.74608150470215,
+      "kind": "heat",
+      "u": 0.3667711598746081,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 266.3322884012539,
+      "temperature_c": 301.12852664576803,
+      "kind": "heat",
+      "u": 0.36990595611285265,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 268.58934169278996,
+      "temperature_c": 303.51097178683386,
+      "kind": "heat",
+      "u": 0.3730407523510972,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 270.84639498432597,
+      "temperature_c": 305.89341692789964,
+      "kind": "heat",
+      "u": 0.37617554858934166,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 273.10344827586204,
+      "temperature_c": 308.2758620689655,
+      "kind": "heat",
+      "u": 0.3793103448275862,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 275.3605015673981,
+      "temperature_c": 310.65830721003135,
+      "kind": "heat",
+      "u": 0.3824451410658307,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 277.6175548589341,
+      "temperature_c": 313.0407523510971,
+      "kind": "heat",
+      "u": 0.3855799373040752,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 279.8746081504702,
+      "temperature_c": 315.423197492163,
+      "kind": "heat",
+      "u": 0.3887147335423197,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 282.13166144200625,
+      "temperature_c": 317.80564263322884,
+      "kind": "heat",
+      "u": 0.39184952978056425,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 284.3887147335423,
+      "temperature_c": 320.1880877742947,
+      "kind": "heat",
+      "u": 0.3949843260188088,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 286.6457680250783,
+      "temperature_c": 322.5705329153605,
+      "kind": "heat",
+      "u": 0.39811912225705326,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 288.9028213166144,
+      "temperature_c": 324.95297805642633,
+      "kind": "heat",
+      "u": 0.4012539184952978,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 291.15987460815046,
+      "temperature_c": 327.33542319749216,
+      "kind": "heat",
+      "u": 0.4043887147335423,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 293.41692789968647,
+      "temperature_c": 329.717868338558,
+      "kind": "heat",
+      "u": 0.4075235109717868,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 295.67398119122254,
+      "temperature_c": 332.1003134796238,
+      "kind": "heat",
+      "u": 0.4106583072100313,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 297.9310344827586,
+      "temperature_c": 334.48275862068965,
+      "kind": "heat",
+      "u": 0.41379310344827586,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 300.1880877742947,
+      "temperature_c": 336.8652037617555,
+      "kind": "heat",
+      "u": 0.4169278996865204,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 302.4451410658307,
+      "temperature_c": 339.2476489028213,
+      "kind": "heat",
+      "u": 0.42006269592476486,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 304.70219435736675,
+      "temperature_c": 341.63009404388714,
+      "kind": "heat",
+      "u": 0.4231974921630094,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 306.9592476489028,
+      "temperature_c": 344.01253918495297,
+      "kind": "heat",
+      "u": 0.4263322884012539,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 309.2163009404388,
+      "temperature_c": 346.3949843260188,
+      "kind": "heat",
+      "u": 0.4294670846394984,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 311.4733542319749,
+      "temperature_c": 348.77742946708463,
+      "kind": "heat",
+      "u": 0.43260188087774293,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 313.73040752351096,
+      "temperature_c": 351.15987460815046,
+      "kind": "heat",
+      "u": 0.43573667711598746,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 315.987460815047,
+      "temperature_c": 353.5423197492163,
+      "kind": "heat",
+      "u": 0.43887147335423193,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 318.24451410658304,
+      "temperature_c": 355.9247648902821,
+      "kind": "heat",
+      "u": 0.44200626959247646,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 320.5015673981191,
+      "temperature_c": 358.30721003134795,
+      "kind": "heat",
+      "u": 0.445141065830721,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 322.7586206896552,
+      "temperature_c": 360.6896551724138,
+      "kind": "heat",
+      "u": 0.4482758620689655,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 325.0156739811912,
+      "temperature_c": 363.0721003134796,
+      "kind": "heat",
+      "u": 0.45141065830721,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 327.27272727272725,
+      "temperature_c": 365.45454545454544,
+      "kind": "heat",
+      "u": 0.45454545454545453,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 329.5297805642633,
+      "temperature_c": 367.83699059561127,
+      "kind": "heat",
+      "u": 0.45768025078369906,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 331.78683385579933,
+      "temperature_c": 370.2194357366771,
+      "kind": "heat",
+      "u": 0.46081504702194354,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 334.0438871473354,
+      "temperature_c": 372.60188087774293,
+      "kind": "heat",
+      "u": 0.46394984326018807,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 336.30094043887146,
+      "temperature_c": 374.98432601880876,
+      "kind": "heat",
+      "u": 0.4670846394984326,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 338.5579937304075,
+      "temperature_c": 377.3667711598746,
+      "kind": "heat",
+      "u": 0.47021943573667707,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 340.81504702194354,
+      "temperature_c": 379.7492163009404,
+      "kind": "heat",
+      "u": 0.4733542319749216,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 343.0721003134796,
+      "temperature_c": 382.13166144200625,
+      "kind": "heat",
+      "u": 0.47648902821316613,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 345.3291536050157,
+      "temperature_c": 384.5141065830721,
+      "kind": "heat",
+      "u": 0.47962382445141066,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 347.5862068965517,
+      "temperature_c": 386.8965517241379,
+      "kind": "heat",
+      "u": 0.48275862068965514,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 349.84326018808775,
+      "temperature_c": 389.27899686520374,
+      "kind": "heat",
+      "u": 0.48589341692789967,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 352.1003134796238,
+      "temperature_c": 391.66144200626957,
+      "kind": "heat",
+      "u": 0.4890282131661442,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 354.35736677115983,
+      "temperature_c": 394.0438871473354,
+      "kind": "heat",
+      "u": 0.4921630094043887,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 356.6144200626959,
+      "temperature_c": 396.4263322884012,
+      "kind": "heat",
+      "u": 0.4952978056426332,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 358.87147335423197,
+      "temperature_c": 398.80877742946706,
+      "kind": "heat",
+      "u": 0.49843260188087773,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 361.128526645768,
+      "temperature_c": 401.1912225705329,
+      "kind": "heat",
+      "u": 0.5015673981191222,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 363.38557993730404,
+      "temperature_c": 403.5736677115987,
+      "kind": "heat",
+      "u": 0.5047021943573667,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 365.6426332288401,
+      "temperature_c": 405.95611285266455,
+      "kind": "heat",
+      "u": 0.5078369905956113,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 367.8996865203762,
+      "temperature_c": 408.33855799373043,
+      "kind": "heat",
+      "u": 0.5109717868338558,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 370.15673981191225,
+      "temperature_c": 410.72100313479626,
+      "kind": "heat",
+      "u": 0.5141065830721003,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 372.4137931034483,
+      "temperature_c": 413.1034482758621,
+      "kind": "heat",
+      "u": 0.5172413793103449,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 374.67084639498427,
+      "temperature_c": 415.48589341692787,
+      "kind": "heat",
+      "u": 0.5203761755485893,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 376.92789968652033,
+      "temperature_c": 417.8683385579937,
+      "kind": "heat",
+      "u": 0.5235109717868338,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 379.1849529780564,
+      "temperature_c": 420.2507836990595,
+      "kind": "heat",
+      "u": 0.5266457680250783,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 381.44200626959247,
+      "temperature_c": 422.6332288401254,
+      "kind": "heat",
+      "u": 0.5297805642633229,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 383.69905956112854,
+      "temperature_c": 425.01567398119124,
+      "kind": "heat",
+      "u": 0.5329153605015674,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 385.9561128526646,
+      "temperature_c": 427.39811912225707,
+      "kind": "heat",
+      "u": 0.5360501567398119,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 388.21316614420056,
+      "temperature_c": 429.78056426332284,
+      "kind": "heat",
+      "u": 0.5391849529780564,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 390.4702194357366,
+      "temperature_c": 432.1630094043887,
+      "kind": "heat",
+      "u": 0.5423197492163009,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 392.7272727272727,
+      "temperature_c": 434.5454545454545,
+      "kind": "heat",
+      "u": 0.5454545454545454,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 394.98432601880876,
+      "temperature_c": 436.92789968652033,
+      "kind": "heat",
+      "u": 0.54858934169279,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 397.2413793103448,
+      "temperature_c": 439.3103448275862,
+      "kind": "heat",
+      "u": 0.5517241379310345,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 399.4984326018809,
+      "temperature_c": 441.69278996865205,
+      "kind": "heat",
+      "u": 0.554858934169279,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 401.75548589341696,
+      "temperature_c": 444.0752351097179,
+      "kind": "heat",
+      "u": 0.5579937304075235,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 404.0125391849529,
+      "temperature_c": 446.45768025078365,
+      "kind": "heat",
+      "u": 0.561128526645768,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 406.269592476489,
+      "temperature_c": 448.8401253918495,
+      "kind": "heat",
+      "u": 0.5642633228840125,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 408.52664576802505,
+      "temperature_c": 451.2225705329153,
+      "kind": "heat",
+      "u": 0.567398119122257,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 410.7836990595611,
+      "temperature_c": 453.6050156739812,
+      "kind": "heat",
+      "u": 0.5705329153605015,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 413.0407523510972,
+      "temperature_c": 455.98746081504703,
+      "kind": "heat",
+      "u": 0.5736677115987461,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 415.29780564263325,
+      "temperature_c": 458.36990595611286,
+      "kind": "heat",
+      "u": 0.5768025078369906,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 417.5548589341693,
+      "temperature_c": 460.7523510971787,
+      "kind": "heat",
+      "u": 0.5799373040752351,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 419.81191222570527,
+      "temperature_c": 463.13479623824446,
+      "kind": "heat",
+      "u": 0.5830721003134796,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 422.06896551724134,
+      "temperature_c": 465.5172413793103,
+      "kind": "heat",
+      "u": 0.5862068965517241,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 424.3260188087774,
+      "temperature_c": 467.8996865203761,
+      "kind": "heat",
+      "u": 0.5893416927899686,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 426.5830721003135,
+      "temperature_c": 470.282131661442,
+      "kind": "heat",
+      "u": 0.5924764890282131,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 428.84012539184954,
+      "temperature_c": 472.66457680250784,
+      "kind": "heat",
+      "u": 0.5956112852664577,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 431.0971786833856,
+      "temperature_c": 475.04702194357367,
+      "kind": "heat",
+      "u": 0.5987460815047022,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 433.3542319749217,
+      "temperature_c": 477.4294670846395,
+      "kind": "heat",
+      "u": 0.6018808777429467,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 435.6112852664576,
+      "temperature_c": 479.81191222570527,
+      "kind": "heat",
+      "u": 0.6050156739811912,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 437.8683385579937,
+      "temperature_c": 482.1943573667711,
+      "kind": "heat",
+      "u": 0.6081504702194357,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 440.12539184952976,
+      "temperature_c": 484.576802507837,
+      "kind": "heat",
+      "u": 0.6112852664576802,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 442.38244514106583,
+      "temperature_c": 486.9592476489028,
+      "kind": "heat",
+      "u": 0.6144200626959248,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 444.6394984326019,
+      "temperature_c": 489.34169278996865,
+      "kind": "heat",
+      "u": 0.6175548589341693,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 446.89655172413796,
+      "temperature_c": 491.7241379310345,
+      "kind": "heat",
+      "u": 0.6206896551724138,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 449.1536050156739,
+      "temperature_c": 494.10658307210025,
+      "kind": "heat",
+      "u": 0.6238244514106582,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 451.41065830721,
+      "temperature_c": 496.4890282131661,
+      "kind": "heat",
+      "u": 0.6269592476489028,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 453.66771159874605,
+      "temperature_c": 498.87147335423197,
+      "kind": "heat",
+      "u": 0.6300940438871473,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 455.9247648902821,
+      "temperature_c": 501.2539184952978,
+      "kind": "heat",
+      "u": 0.6332288401253918,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 458.1818181818182,
+      "temperature_c": 503.6363636363636,
+      "kind": "heat",
+      "u": 0.6363636363636364,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 460.43887147335425,
+      "temperature_c": 506.01880877742946,
+      "kind": "heat",
+      "u": 0.6394984326018809,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 462.6959247648903,
+      "temperature_c": 508.40125391849534,
+      "kind": "heat",
+      "u": 0.6426332288401254,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 464.9529780564263,
+      "temperature_c": 510.78369905956106,
+      "kind": "heat",
+      "u": 0.6457680250783698,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 467.21003134796234,
+      "temperature_c": 513.166144200627,
+      "kind": "heat",
+      "u": 0.6489028213166144,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 469.4670846394984,
+      "temperature_c": 515.5485893416928,
+      "kind": "heat",
+      "u": 0.6520376175548589,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 471.7241379310345,
+      "temperature_c": 517.9310344827586,
+      "kind": "heat",
+      "u": 0.6551724137931034,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 473.98119122257054,
+      "temperature_c": 520.3134796238244,
+      "kind": "heat",
+      "u": 0.658307210031348,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 476.2382445141066,
+      "temperature_c": 522.6959247648903,
+      "kind": "heat",
+      "u": 0.6614420062695925,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 478.4952978056427,
+      "temperature_c": 525.0783699059562,
+      "kind": "heat",
+      "u": 0.664576802507837,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 480.75235109717863,
+      "temperature_c": 527.4608150470219,
+      "kind": "heat",
+      "u": 0.6677115987460814,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 483.0094043887147,
+      "temperature_c": 529.8432601880877,
+      "kind": "heat",
+      "u": 0.670846394984326,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 485.26645768025077,
+      "temperature_c": 532.2257053291536,
+      "kind": "heat",
+      "u": 0.6739811912225705,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 487.52351097178683,
+      "temperature_c": 534.6081504702195,
+      "kind": "heat",
+      "u": 0.677115987460815,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 489.7805642633229,
+      "temperature_c": 536.9905956112852,
+      "kind": "heat",
+      "u": 0.6802507836990596,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 492.03761755485897,
+      "temperature_c": 539.3730407523511,
+      "kind": "heat",
+      "u": 0.6833855799373041,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 494.2946708463949,
+      "temperature_c": 541.7554858934169,
+      "kind": "heat",
+      "u": 0.6865203761755485,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 496.551724137931,
+      "temperature_c": 544.1379310344827,
+      "kind": "heat",
+      "u": 0.689655172413793,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 498.80877742946706,
+      "temperature_c": 546.5203761755486,
+      "kind": "heat",
+      "u": 0.6927899686520376,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 501.0658307210031,
+      "temperature_c": 548.9028213166144,
+      "kind": "heat",
+      "u": 0.6959247648902821,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 503.3228840125392,
+      "temperature_c": 551.2852664576802,
+      "kind": "heat",
+      "u": 0.6990595611285266,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 505.57993730407526,
+      "temperature_c": 553.6677115987461,
+      "kind": "heat",
+      "u": 0.7021943573667712,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 507.83699059561127,
+      "temperature_c": 556.0501567398119,
+      "kind": "heat",
+      "u": 0.7053291536050157,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 510.0940438871473,
+      "temperature_c": 558.4326018808777,
+      "kind": "heat",
+      "u": 0.7084639498432601,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 512.3510971786833,
+      "temperature_c": 560.8150470219435,
+      "kind": "heat",
+      "u": 0.7115987460815046,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 514.6081504702194,
+      "temperature_c": 563.1974921630093,
+      "kind": "heat",
+      "u": 0.7147335423197492,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 516.8652037617554,
+      "temperature_c": 565.5799373040752,
+      "kind": "heat",
+      "u": 0.7178683385579937,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 519.1222570532915,
+      "temperature_c": 567.9623824451411,
+      "kind": "heat",
+      "u": 0.7210031347962382,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 521.3793103448276,
+      "temperature_c": 570.3448275862069,
+      "kind": "heat",
+      "u": 0.7241379310344828,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 523.6363636363636,
+      "temperature_c": 572.7272727272727,
+      "kind": "heat",
+      "u": 0.7272727272727273,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 525.8934169278996,
+      "temperature_c": 575.1097178683385,
+      "kind": "heat",
+      "u": 0.7304075235109717,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 528.1504702194356,
+      "temperature_c": 577.4921630094043,
+      "kind": "heat",
+      "u": 0.7335423197492162,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 530.4075235109717,
+      "temperature_c": 579.8746081504702,
+      "kind": "heat",
+      "u": 0.7366771159874608,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 532.6645768025078,
+      "temperature_c": 582.2570532915361,
+      "kind": "heat",
+      "u": 0.7398119122257053,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 534.9216300940438,
+      "temperature_c": 584.6394984326018,
+      "kind": "heat",
+      "u": 0.7429467084639498,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 537.1786833855799,
+      "temperature_c": 587.0219435736677,
+      "kind": "heat",
+      "u": 0.7460815047021944,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 539.435736677116,
+      "temperature_c": 589.4043887147336,
+      "kind": "heat",
+      "u": 0.7492163009404389,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 541.6927899686519,
+      "temperature_c": 591.7868338557993,
+      "kind": "heat",
+      "u": 0.7523510971786833,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 543.949843260188,
+      "temperature_c": 594.1692789968652,
+      "kind": "heat",
+      "u": 0.7554858934169278,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 546.2068965517241,
+      "temperature_c": 596.551724137931,
+      "kind": "heat",
+      "u": 0.7586206896551724,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 548.4639498432601,
+      "temperature_c": 598.9341692789968,
+      "kind": "heat",
+      "u": 0.7617554858934169,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 550.7210031347962,
+      "temperature_c": 601.3166144200627,
+      "kind": "heat",
+      "u": 0.7648902821316614,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 552.9780564263323,
+      "temperature_c": 603.6990595611285,
+      "kind": "heat",
+      "u": 0.768025078369906,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 555.2351097178682,
+      "temperature_c": 606.0815047021943,
+      "kind": "heat",
+      "u": 0.7711598746081504,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 557.4921630094043,
+      "temperature_c": 608.4639498432601,
+      "kind": "heat",
+      "u": 0.7742946708463949,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 559.7492163009404,
+      "temperature_c": 610.846394984326,
+      "kind": "heat",
+      "u": 0.7774294670846394,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 562.0062695924764,
+      "temperature_c": 613.2288401253918,
+      "kind": "heat",
+      "u": 0.780564263322884,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 564.2633228840125,
+      "temperature_c": 615.6112852664577,
+      "kind": "heat",
+      "u": 0.7836990595611285,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 566.5203761755486,
+      "temperature_c": 617.9937304075235,
+      "kind": "heat",
+      "u": 0.786833855799373,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 568.7774294670846,
+      "temperature_c": 620.3761755485893,
+      "kind": "heat",
+      "u": 0.7899686520376176,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 571.0344827586206,
+      "temperature_c": 622.7586206896551,
+      "kind": "heat",
+      "u": 0.793103448275862,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 573.2915360501567,
+      "temperature_c": 625.141065830721,
+      "kind": "heat",
+      "u": 0.7962382445141065,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 575.5485893416927,
+      "temperature_c": 627.5235109717868,
+      "kind": "heat",
+      "u": 0.799373040752351,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 577.8056426332288,
+      "temperature_c": 629.9059561128527,
+      "kind": "heat",
+      "u": 0.8025078369905956,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 580.0626959247649,
+      "temperature_c": 632.2884012539184,
+      "kind": "heat",
+      "u": 0.8056426332288401,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 582.3197492163009,
+      "temperature_c": 634.6708463949843,
+      "kind": "heat",
+      "u": 0.8087774294670846,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 584.576802507837,
+      "temperature_c": 637.0532915360502,
+      "kind": "heat",
+      "u": 0.8119122257053292,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 586.8338557993729,
+      "temperature_c": 639.435736677116,
+      "kind": "heat",
+      "u": 0.8150470219435736,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 589.090909090909,
+      "temperature_c": 641.8181818181818,
+      "kind": "heat",
+      "u": 0.8181818181818181,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 591.3479623824451,
+      "temperature_c": 644.2006269592476,
+      "kind": "heat",
+      "u": 0.8213166144200627,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 593.6050156739811,
+      "temperature_c": 646.5830721003134,
+      "kind": "heat",
+      "u": 0.8244514106583072,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 595.8620689655172,
+      "temperature_c": 648.9655172413793,
+      "kind": "heat",
+      "u": 0.8275862068965517,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 598.1191222570533,
+      "temperature_c": 651.3479623824452,
+      "kind": "heat",
+      "u": 0.8307210031347962,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 600.3761755485893,
+      "temperature_c": 653.730407523511,
+      "kind": "heat",
+      "u": 0.8338557993730408,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 602.6332288401253,
+      "temperature_c": 656.1128526645767,
+      "kind": "heat",
+      "u": 0.8369905956112852,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 604.8902821316614,
+      "temperature_c": 658.4952978056426,
+      "kind": "heat",
+      "u": 0.8401253918495297,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 607.1473354231974,
+      "temperature_c": 660.8777429467084,
+      "kind": "heat",
+      "u": 0.8432601880877743,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 609.4043887147335,
+      "temperature_c": 663.2601880877743,
+      "kind": "heat",
+      "u": 0.8463949843260188,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 611.6614420062696,
+      "temperature_c": 665.6426332288402,
+      "kind": "heat",
+      "u": 0.8495297805642633,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 613.9184952978056,
+      "temperature_c": 668.0250783699059,
+      "kind": "heat",
+      "u": 0.8526645768025078,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 616.1755485893416,
+      "temperature_c": 670.4075235109717,
+      "kind": "heat",
+      "u": 0.8557993730407523,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 618.4326018808777,
+      "temperature_c": 672.7899686520376,
+      "kind": "heat",
+      "u": 0.8589341692789968,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 620.6896551724137,
+      "temperature_c": 675.1724137931034,
+      "kind": "heat",
+      "u": 0.8620689655172413,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 622.9467084639498,
+      "temperature_c": 677.5548589341693,
+      "kind": "heat",
+      "u": 0.8652037617554859,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 625.2037617554859,
+      "temperature_c": 679.9373040752351,
+      "kind": "heat",
+      "u": 0.8683385579937304,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 627.4608150470219,
+      "temperature_c": 682.3197492163009,
+      "kind": "heat",
+      "u": 0.8714733542319749,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 629.717868338558,
+      "temperature_c": 684.7021943573668,
+      "kind": "heat",
+      "u": 0.8746081504702194,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 631.974921630094,
+      "temperature_c": 687.0846394984326,
+      "kind": "heat",
+      "u": 0.8777429467084639,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 634.23197492163,
+      "temperature_c": 689.4670846394984,
+      "kind": "heat",
+      "u": 0.8808777429467084,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 636.4890282131661,
+      "temperature_c": 691.8495297805642,
+      "kind": "heat",
+      "u": 0.8840125391849529,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 638.7460815047021,
+      "temperature_c": 694.23197492163,
+      "kind": "heat",
+      "u": 0.8871473354231975,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 641.0031347962382,
+      "temperature_c": 696.6144200626959,
+      "kind": "heat",
+      "u": 0.890282131661442,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 643.2601880877743,
+      "temperature_c": 698.9968652037618,
+      "kind": "heat",
+      "u": 0.8934169278996865,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 645.5172413793103,
+      "temperature_c": 701.3793103448276,
+      "kind": "heat",
+      "u": 0.896551724137931,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 647.7742946708463,
+      "temperature_c": 703.7617554858933,
+      "kind": "heat",
+      "u": 0.8996865203761755,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 650.0313479623824,
+      "temperature_c": 706.1442006269592,
+      "kind": "heat",
+      "u": 0.90282131661442,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 652.2884012539184,
+      "temperature_c": 708.526645768025,
+      "kind": "heat",
+      "u": 0.9059561128526645,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 654.5454545454545,
+      "temperature_c": 710.9090909090909,
+      "kind": "heat",
+      "u": 0.9090909090909091,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 656.8025078369906,
+      "temperature_c": 713.2915360501568,
+      "kind": "heat",
+      "u": 0.9122257053291536,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 659.0595611285266,
+      "temperature_c": 715.6739811912225,
+      "kind": "heat",
+      "u": 0.9153605015673981,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 661.3166144200627,
+      "temperature_c": 718.0564263322884,
+      "kind": "heat",
+      "u": 0.9184952978056427,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 663.5736677115987,
+      "temperature_c": 720.4388714733542,
+      "kind": "heat",
+      "u": 0.9216300940438871,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 665.8307210031347,
+      "temperature_c": 722.82131661442,
+      "kind": "heat",
+      "u": 0.9247648902821316,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 668.0877742946708,
+      "temperature_c": 725.2037617554859,
+      "kind": "heat",
+      "u": 0.9278996865203761,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 670.3448275862069,
+      "temperature_c": 727.5862068965517,
+      "kind": "heat",
+      "u": 0.9310344827586207,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 672.6018808777429,
+      "temperature_c": 729.9686520376175,
+      "kind": "heat",
+      "u": 0.9341692789968652,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 674.858934169279,
+      "temperature_c": 732.3510971786834,
+      "kind": "heat",
+      "u": 0.9373040752351097,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 677.115987460815,
+      "temperature_c": 734.7335423197492,
+      "kind": "heat",
+      "u": 0.9404388714733541,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 679.373040752351,
+      "temperature_c": 737.115987460815,
+      "kind": "heat",
+      "u": 0.9435736677115987,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 681.6300940438871,
+      "temperature_c": 739.4984326018808,
+      "kind": "heat",
+      "u": 0.9467084639498432,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 683.8871473354232,
+      "temperature_c": 741.8808777429467,
+      "kind": "heat",
+      "u": 0.9498432601880877,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 686.1442006269592,
+      "temperature_c": 744.2633228840125,
+      "kind": "heat",
+      "u": 0.9529780564263323,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 688.4012539184953,
+      "temperature_c": 746.6457680250784,
+      "kind": "heat",
+      "u": 0.9561128526645768,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 690.6583072100314,
+      "temperature_c": 749.0282131661442,
+      "kind": "heat",
+      "u": 0.9592476489028213,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 692.9153605015673,
+      "temperature_c": 751.4106583072099,
+      "kind": "heat",
+      "u": 0.9623824451410657,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 695.1724137931034,
+      "temperature_c": 753.7931034482758,
+      "kind": "heat",
+      "u": 0.9655172413793103,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 697.4294670846394,
+      "temperature_c": 756.1755485893417,
+      "kind": "heat",
+      "u": 0.9686520376175548,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 699.6865203761755,
+      "temperature_c": 758.5579937304075,
+      "kind": "heat",
+      "u": 0.9717868338557993,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 701.9435736677116,
+      "temperature_c": 760.9404388714734,
+      "kind": "heat",
+      "u": 0.9749216300940439,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 704.2006269592476,
+      "temperature_c": 763.3228840125391,
+      "kind": "heat",
+      "u": 0.9780564263322884,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 706.4576802507837,
+      "temperature_c": 765.705329153605,
+      "kind": "heat",
+      "u": 0.9811912225705329,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 708.7147335423197,
+      "temperature_c": 768.0877742946708,
+      "kind": "heat",
+      "u": 0.9843260188087773,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 710.9717868338557,
+      "temperature_c": 770.4702194357367,
+      "kind": "heat",
+      "u": 0.9874608150470219,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 713.2288401253918,
+      "temperature_c": 772.8526645768025,
+      "kind": "heat",
+      "u": 0.9905956112852664,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 715.4858934169279,
+      "temperature_c": 775.2351097178683,
+      "kind": "heat",
+      "u": 0.9937304075235109,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 717.7429467084639,
+      "temperature_c": 777.6175548589341,
+      "kind": "heat",
+      "u": 0.9968652037617555,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    },
+    {
+      "segment": 0,
+      "time_s": 720.0,
+      "temperature_c": 780.0,
+      "kind": "heat",
+      "u": 1.0,
+      "model": "linear",
+      "curvature": 1.0,
+      "segment_medium_code": "air",
+      "segment_medium_factor": 0.65
+    }
+  ],
+  "operations_from_curve": {
+    "operations": [
+      {
+        "code": "austenitization_heat",
+        "label_ru": "Нагрев под аустенизацию",
+        "confidence": 0.92,
+        "reason": "Нагрев до высокой температуры (>=700°C).",
+        "segment": {
+          "segment_index": 0,
+          "t0_s": 0.0,
+          "t1_s": 720.0,
+          "temp0_c": 20.0,
+          "temp1_c": 780.0,
+          "duration_s": 720.0,
+          "slope_c_per_s": 1.0555555555555556,
+          "kind": "heat"
+        }
+      },
+      {
+        "code": "austenitization_hold",
+        "label_ru": "Выдержка при аустенизации",
+        "confidence": 0.9,
+        "reason": "Изотермическая выдержка в аустенитной области.",
+        "segment": {
+          "segment_index": 1,
+          "t0_s": 720.0,
+          "t1_s": 2400.0,
+          "temp0_c": 780.0,
+          "temp1_c": 780.0,
+          "duration_s": 1680.0,
+          "slope_c_per_s": 0.0,
+          "kind": "hold"
+        }
+      },
+      {
+        "code": "slow_cooling",
+        "label_ru": "Медленное охлаждение",
+        "confidence": 0.7,
+        "reason": "Низкая эффективная скорость охлаждения.",
+        "segment": {
+          "segment_index": 2,
+          "t0_s": 2400.0,
+          "t1_s": 4560.0,
+          "temp0_c": 780.0,
+          "temp1_c": 20.0,
+          "duration_s": 2160.0,
+          "slope_c_per_s": -0.35185185185185186,
+          "kind": "cool",
+          "slope_c_per_s_effective": -0.4222222222222655,
+          "medium_code_used": "water_20"
+        }
+      }
+    ],
+    "summary": {
+      "count": 3,
+      "has_austenitization": true,
+      "has_quench": false,
+      "has_temper": false,
+      "quench_detected_by_curve": false,
+      "quench_presence_rule": "curve_only",
+      "max_temperature_c": 780.0,
+      "temper_peak_temperature_c": 0.0,
+      "temper_mean_temperature_c": 0.0,
+      "temper_total_hold_s": 0.0,
+      "temper_code": "",
+      "temper_band_detected": "",
+      "temper_band_confidence": 0.0,
+      "recommended_temper_shift_c": 0.0,
+      "recommended_temper_shift_map_c": {
+        "temper_low": 0.0,
+        "temper_medium": 0.0,
+        "temper_high": 0.0
+      },
+      "medium_code_resolved": "water_20",
+      "segment_transition_report": [
+        {
+          "segment_index": 0,
+          "kind": "heat",
+          "model": "linear",
+          "curvature": 1.0,
+          "segment_medium_code": "air",
+          "effective_rate_factor": 0.65
+        },
+        {
+          "segment_index": 1,
+          "kind": "hold",
+          "model": "linear",
+          "curvature": 1.0,
+          "segment_medium_code": "air",
+          "effective_rate_factor": 0.65
+        },
+        {
+          "segment_index": 2,
+          "kind": "cool",
+          "model": "linear",
+          "curvature": 1.0,
+          "segment_medium_code": "water_20",
+          "effective_rate_factor": 1.2
+        }
+      ],
+      "recommended_cooling_mode": "equilibrium",
+      "stage_inference_profile": "fe_c_temper_curve_v2"
+    },
+    "source": "thermal_curve_inference_v1"
+  },
+  "curve_plot": null,
+  "curve_csv": null,
+  "quench_summary": {
+    "medium_code_input": "water_20",
+    "medium_code_resolved": "water_20",
+    "medium_code": "water_20",
+    "label_ru": "Вода 20°C",
+    "legacy_mapping_applied": false,
+    "mapping_note": "",
+    "quench_time_s": 35.0,
+    "bath_temperature_c": 20.0,
+    "sample_temperature_c": 840.0,
+    "delta_t_c": 820.0,
+    "severity_base": 1.0,
+    "severity_effective": 1.047346115791947,
+    "cooling_rate_ref_c_per_s": 340.0,
+    "cooling_rate_effective_c_per_s": 356.097679369262,
+    "cooling_rate_800_400_min": 200.0,
+    "cooling_rate_800_400_max": 500.0,
+    "cooling_rate_band_800_400": [
+      200.0,
+      500.0
+    ],
+    "hardness_hrc_as_quenched_min": 62.0,
+    "hardness_hrc_as_quenched_max": 65.0,
+    "hardness_hrc_as_quenched_range": [
+      62.0,
+      65.0
+    ],
+    "stress_mpa_min": 800.0,
+    "stress_mpa_max": 1200.0,
+    "stress_mpa_range": [
+      800.0,
+      1200.0
+    ],
+    "harden_depth_mm_min": 15.0,
+    "harden_depth_mm_max": 25.0,
+    "harden_depth_mm_range": [
+      15.0,
+      25.0
+    ],
+    "retained_austenite_pct_min": 5.0,
+    "retained_austenite_pct_max": 30.0,
+    "retained_austenite_pct_range": [
+      5.0,
+      30.0
+    ],
+    "retained_austenite_est_pct": 15.491860052561503,
+    "stress_est_mpa": 1008.130239159016,
+    "hardness_est_hrc": 63.74097679369262,
+    "harden_depth_est_mm": 20.2032559789754,
+    "martensite_completion_index": 0.5803255978975399,
+    "martensite_type": "martensite_cubic",
+    "defect_risk": "высокий (трещины/коробление)",
+    "low_temper_required": true,
+    "recommended_temper_hold_s": 3600.0,
+    "temper_shift_c": {
+      "low": 0.0,
+      "medium": 0.0,
+      "high": 0.0
+    },
+    "temper_shift_c_low": 0.0,
+    "temper_shift_c_medium": 0.0,
+    "temper_shift_c_high": 0.0,
+    "custom_medium_name": "",
+    "custom_severity_factor": 1.0,
+    "as_quenched_prediction": {
+      "martensite_fraction_est": 0.5738995500657368,
+      "retained_austenite_fraction_est": 0.154918600525615,
+      "martensite_type": "martensite_cubic"
+    },
+    "operation_guidance": {
+      "low_temper_required": true,
+      "recommended_hold_s": 3600.0
+    },
+    "warnings": [
+      "Среда закалки выбрана, но на кривой нет закалочного сегмента; влияние среды не применяется."
+    ],
+    "effect_applied": false,
+    "effect_reason": "no_quench_segment",
+    "observed_temperature_c": 20.0,
+    "quench_observed_temperature_estimate_c": 20.0,
+    "max_effective_cooling_rate_c_per_s": 0.4222222222222655
+  },
+  "quench_medium_profile": {
+    "medium_code_resolved": "water_20",
+    "cooling_rate_band_800_400": [
+      200.0,
+      500.0
+    ],
+    "hardness_hrc_as_quenched_range": [
+      62.0,
+      65.0
+    ],
+    "stress_mpa_range": [
+      800.0,
+      1200.0
+    ],
+    "harden_depth_mm_range": [
+      15.0,
+      25.0
+    ],
+    "defect_risk": "высокий (трещины/коробление)"
+  },
+  "temper_adjustment": {
+    "shift_c": 0.0,
+    "source_medium": "water_20",
+    "applied_to_ranges": {
+      "low": 0.0,
+      "medium": 0.0,
+      "high": 0.0
+    }
+  },
+  "as_quenched_prediction": {
+    "martensite_fraction_est": 0.5738995500657368,
+    "retained_austenite_fraction_est": 0.154918600525615,
+    "martensite_type": "martensite_cubic"
+  },
+  "operation_guidance": {
+    "low_temper_required": true,
+    "recommended_hold_s": 3600.0
+  },
+  "process_timeline": [
+    {
+      "index": 0,
+      "operation": "segment",
+      "label": "segment",
+      "start_s": 0.0,
+      "end_s": 0.0
+    },
+    {
+      "index": 1,
+      "operation": "segment",
+      "label": "segment",
+      "start_s": 0.0,
+      "end_s": 0.0
+    },
+    {
+      "index": 2,
+      "operation": "segment",
+      "label": "segment",
+      "start_s": 0.0,
+      "end_s": 0.0
+    }
+  ],
+  "resolved_stage_by_step": [
+    {
+      "index": 0,
+      "operation": "segment",
+      "stage": "fe-c"
+    },
+    {
+      "index": 1,
+      "operation": "segment",
+      "stage": "fe-c"
+    },
+    {
+      "index": 2,
+      "operation": "segment",
+      "stage": "fe-c"
+    }
+  ],
+  "stage_rule_source": "fe_c_stage_rules_v3.json",
+  "prep_timeline": [
+    {
+      "step_index": 0,
+      "method": "grinding_800",
+      "duration_s": 90.0,
+      "abrasive_um": 18.0,
+      "load_n": 22.0,
+      "rpm": 180.0,
+      "direction_deg": 0.0,
+      "load_profile": "constant",
+      "cloth_type": "standard",
+      "slurry_type": "diamond",
+      "lubricant_flow_ml_min": 0.0,
+      "oscillation_hz": 0.0,
+      "path_pattern": "linear",
+      "roughness_after_um": 0.1365
+    },
+    {
+      "step_index": 1,
+      "method": "polishing_3um",
+      "duration_s": 110.0,
+      "abrasive_um": 3.0,
+      "load_n": 14.0,
+      "rpm": 140.0,
+      "direction_deg": 0.0,
+      "load_profile": "constant",
+      "cloth_type": "standard",
+      "slurry_type": "diamond",
+      "lubricant_flow_ml_min": 0.0,
+      "oscillation_hz": 0.0,
+      "path_pattern": "linear",
+      "roughness_after_um": 0.08463000000000001
+    },
+    {
+      "step_index": 2,
+      "method": "polishing_1um",
+      "duration_s": 90.0,
+      "abrasive_um": 1.0,
+      "load_n": 10.0,
+      "rpm": 120.0,
+      "direction_deg": 0.0,
+      "load_profile": "constant",
+      "cloth_type": "standard",
+      "slurry_type": "diamond",
+      "lubricant_flow_ml_min": 0.0,
+      "oscillation_hz": 0.0,
+      "path_pattern": "linear",
+      "roughness_after_um": 0.052470600000000006
+    }
+  ],
+  "etch_summary": {
+    "reagent": "nital_2",
+    "time_s": 8.0,
+    "temperature_c": 22.0,
+    "agitation": "active",
+    "overetch_factor": 1.0,
+    "etch_rate_mean": 1.1654088497161865,
+    "etch_rate_std": 0.055474862456321716,
+    "concentration": {
+      "reagent": "nital_2",
+      "unit": "wt_pct",
+      "input_value": 2.0,
+      "wt_pct": 2.0,
+      "mol_l": 0.31746031746031744,
+      "wt_pct_range": [
+        0.5,
+        10.0
+      ],
+      "mol_l_range": [
+        0.01,
+        5.0
+      ],
+      "within_range": true,
+      "warnings": []
+    },
+    "phase_selectivity_mode": "fe-c:nital_2",
+    "prep_coupling_applied": true,
+    "stain_level_mean": 0.4851331114768982,
+    "relief_shading_mean": 0.5051941275596619
+  },
+  "etch_concentration": {
+    "reagent": "nital_2",
+    "unit": "wt_pct",
+    "input_value": 2.0,
+    "wt_pct": 2.0,
+    "mol_l": 0.31746031746031744,
+    "wt_pct_range": [
+      0.5,
+      10.0
+    ],
+    "mol_l_range": [
+      0.01,
+      5.0
+    ],
+    "within_range": true,
+    "warnings": []
+  },
+  "texture_profile": {
+    "profile_id": "textbook_steel_bw",
+    "phase_topology_mode": "auto",
+    "system_generator_mode": "system_auto",
+    "system_generator": {
+      "requested_mode": "system_auto",
+      "resolved_mode": "system_fe_c",
+      "resolved_system": "fe-c",
+      "resolved_stage": "alpha_pearlite",
+      "fallback_used": false,
+      "selection_reason": "auto_by_inferred_system:fe-c",
+      "confidence": 1.0,
+      "fe_c_unified": {
+        "enabled": true,
+        "stage_coverage_pass": true,
+        "resolved_stage": "alpha_pearlite",
+        "blending_mode": "fractional",
+        "fallback_reason": ""
+      }
+    },
+    "contrast_target": 1.08,
+    "boundary_sharpness": 1.15,
+    "artifact_level": 0.2,
+    "composition_effect": {
+      "mode": "educational",
+      "solute_index": 0.214286,
+      "composition_hash": "74865885ebc5a8bc",
+      "seed_offset": 1954957440,
+      "single_phase_compensation": false
+    },
+    "phase_visibility_report": {
+      "target_phase_fractions": {
+        "FERRITE": 0.44224598930481285,
+        "PEARLITE": 0.5577540106951873
+      },
+      "achieved_phase_fractions": {
+        "FERRITE": 0.4422459602355957,
+        "PEARLITE": 0.5577540397644043
+      },
+      "fraction_error_pct": {
+        "FERRITE": 6.5730877944676285e-06,
+        "PEARLITE": 5.211834693445405e-06
+      },
+      "within_tolerance": true,
+      "separability_score": 0.6969323501590196
+    },
+    "engineering_trace": {
+      "generation_mode": "edu_engineering",
+      "phase_emphasis_style": "contrast_texture",
+      "phase_fraction_tolerance_pct": 20.0,
+      "system_generator_name": "system_fe_c",
+      "blending_mode": "fractional",
+      "medium_code_resolved": "water_20",
+      "medium_influence_applied": false,
+      "quench_effect_applied": false,
+      "fraction_source": "default_formula",
+      "applied_realism_heuristics": {
+        "stage_family": "pearlitic",
+        "boundary_biased_proeutectoid": true,
+        "contextual_martensite_style": false
+      }
+    }
+  },
+  "composition_effect": {
+    "mode": "educational",
+    "solute_index": 0.214286,
+    "composition_hash": "74865885ebc5a8bc",
+    "seed_offset": 1954957440,
+    "single_phase_compensation": false
+  },
+  "phase_visibility_report": {
+    "target_phase_fractions": {
+      "FERRITE": 0.44224598930481285,
+      "PEARLITE": 0.5577540106951873
+    },
+    "achieved_phase_fractions": {
+      "FERRITE": 0.4422459602355957,
+      "PEARLITE": 0.5577540397644043
+    },
+    "fraction_error_pct": {
+      "FERRITE": 6.5730877944676285e-06,
+      "PEARLITE": 5.211834693445405e-06
+    },
+    "within_tolerance": true,
+    "separability_score": 0.6969323501590196
+  },
+  "system_generator": {
+    "requested_mode": "system_auto",
+    "resolved_mode": "system_fe_c",
+    "resolved_system": "fe-c",
+    "resolved_stage": "alpha_pearlite",
+    "fallback_used": false,
+    "selection_reason": "auto_by_inferred_system:fe-c",
+    "confidence": 1.0,
+    "fe_c_unified": {
+      "enabled": true,
+      "stage_coverage_pass": true,
+      "resolved_stage": "alpha_pearlite",
+      "blending_mode": "fractional",
+      "fallback_reason": ""
+    }
+  },
+  "fe_c_phase_render": {
+    "input_phase_fractions": {
+      "FERRITE": 0.427807486631016,
+      "PEARLITE": 0.572192513368984
+    },
+    "normalized_phase_fractions": {
+      "FERRITE": 0.44224598930481285,
+      "PEARLITE": 0.5577540106951873
+    },
+    "rendered_phase_layers": [
+      "FERRITE",
+      "PEARLITE"
+    ],
+    "seed_split": {
+      "seed_topology": 5102,
+      "seed_boundary": 5104,
+      "seed_particles": 5108,
+      "seed_lamella": 5114,
+      "seed_noise": 5122
+    },
+    "phase_masks_present": true,
+    "medium_influence_applied": false,
+    "quench_effect_applied": false,
+    "temper_shift_applied": {
+      "low": 0.0,
+      "medium": 0.0,
+      "high": 0.0
+    },
+    "retained_austenite_used": 0.154918600525615,
+    "homogeneity_mode": "light",
+    "specialized_realism_mode": "stage_specialized",
+    "fragment_filter_mode": "coarse_only",
+    "specialized_fragment_filter_mode": "contextual",
+    "min_fragment_area_px": 1817,
+    "fraction_source": "default_formula",
+    "table_locked": false,
+    "morphology_trace": {
+      "family": "pearlitic",
+      "prior_austenite_grain_count": 1210,
+      "prior_austenite_grain_size_px": 117.74,
+      "colony_size_px": 113.925224,
+      "interlamellar_spacing_px": 7.529999999999999,
+      "cooling_index": 0.18,
+      "proeutectoid_phase": "FERRITE",
+      "boundary_phase_bias": 0.41117262840270996,
+      "colony_anisotropy": "grain_oriented_lamellae"
+    }
+  },
+  "engineering_trace": {
+    "generation_mode": "edu_engineering",
+    "phase_emphasis_style": "contrast_texture",
+    "phase_fraction_tolerance_pct": 20.0,
+    "system_generator_name": "system_fe_c",
+    "blending_mode": "fractional",
+    "medium_code_resolved": "water_20",
+    "medium_influence_applied": false,
+    "quench_effect_applied": false,
+    "fraction_source": "default_formula",
+    "applied_realism_heuristics": {
+      "stage_family": "pearlitic",
+      "boundary_biased_proeutectoid": true,
+      "contextual_martensite_style": false
+    },
+    "validation_severity_summary": {
+      "critical_errors": [],
+      "soft_errors": [],
+      "warnings": []
+    }
+  },
+  "quality_metrics": {
+    "passed": true,
+    "warnings": [],
+    "dynamic_range_p05_p95": 77.0,
+    "std_contrast": 27.75927734375,
+    "phase_coverage": {
+      "FERRITE": 0.4422459602355957,
+      "PEARLITE": 0.5577540397644043
+    },
+    "feature_density": {
+      "phase_boundaries": 0.0749819278717041,
+      "high_contrast": 0.13937848806381226,
+      "low_contrast": 0.14995259046554565
+    },
+    "prep_stats": {
+      "scratch_mean": 0.47489336133003235,
+      "contamination_mean": 0.02323664352297783,
+      "topography_mean": 0.49665725231170654
+    },
+    "phase_separability_score": 0.8779848313315906,
+    "phase_visibility_report": {
+      "target_phase_fractions": {
+        "FERRITE": 0.44224598930481285,
+        "PEARLITE": 0.5577540106951873
+      },
+      "achieved_phase_fractions": {
+        "FERRITE": 0.4422459602355957,
+        "PEARLITE": 0.5577540397644043
+      },
+      "fraction_error_pct": {
+        "FERRITE": 6.5730877944676285e-06,
+        "PEARLITE": 5.211834693445405e-06
+      },
+      "within_tolerance": true,
+      "separability_score": 0.6969323501590196
+    },
+    "computed_at_resolution": [
+      4096,
+      4096
+    ]
+  },
+  "textbook_profile": {
+    "profile_id": "textbook_steel_bw",
+    "target_microconstituents": [
+      "FERRITE",
+      "PEARLITE",
+      "CEMENTITE",
+      "MARTENSITE"
+    ],
+    "readability_targets": {
+      "separability_score_min": 0.26,
+      "dynamic_range_min": 58.0
+    },
+    "achieved_readability": {
+      "separability_score": 0.8779848313315906,
+      "dynamic_range_p05_p95": 77.0,
+      "within_tolerance": true,
+      "multi_phase": true,
+      "dominant_fraction": 0.572192513368984
+    },
+    "pass": true
+  },
+  "diagram_style": {
+    "deprecated": true,
+    "removed": true,
+    "value": null
+  },
+  "diagram_style_report": {
+    "deprecated": true,
+    "removed": true,
+    "value": null
+  },
+  "microscope_ready": {
+    "um_per_px": 0.125,
+    "native_um_per_px": 0.5,
+    "render_scale": 4.0,
+    "um_per_px_100x": 1.0,
+    "recommended_magnifications": [
+      100,
+      200,
+      400,
+      600
+    ]
+  },
+  "high_resolution_render": {
+    "enabled": true,
+    "requested_resolution": [
+      16384,
+      16384
+    ],
+    "internal_resolution": [
+      4096,
+      4096
+    ],
+    "upscale_method": "lanczos",
+    "mask_resolution": [
+      4096,
+      4096
+    ]
+  },
+  "phase_fraction_estimate": {
+    "FERRITE": 0.4422459602355957,
+    "PEARLITE": 0.5577540397644043
+  },
+  "brinell": {
+    "estimated": {
+      "mode": "estimated",
+      "system": "fe-c",
+      "stage": "alpha_pearlite",
+      "HBW": 226.32104542153564,
+      "note": "Оценочный расчет по структуре (учебный)."
+    },
+    "direct": null
+  },
+  "property_indicators": {
+    "hardness_hv_est": 188.1172839506173,
+    "uts_mpa_est": 592.5694444444445
+  },
+  "technology_influence": {
+    "source": "thermal_program_v3",
+    "has_quench": false,
+    "has_temper": false,
+    "quench_medium": "water_20",
+    "quench_effect_applied": false
+  },
+  "final_stage": "alpha_pearlite",
+  "prep_summary": {
+    "roughness_target_um": 0.05,
+    "roughness_achieved_um": 0.052470600000000006,
+    "relief_mode": "hardness_coupled",
+    "contamination_level": 0.02,
+    "step_count": 3,
+    "phase_coupling_applied": true,
+    "relief_mean": 0.5237108469009399,
+    "scratch_mean": 0.4769085645675659,
+    "smear_mean": 0.21800655126571655,
+    "pullout_mean": 0.00806270819157362
+  },
+  "reference_profile_id": "steel_ref",
+  "validation_report": {
+    "is_valid": true,
+    "errors": [],
+    "warnings": [],
+    "normalized_composition": {
+      "Fe": 99.55,
+      "C": 0.45
+    },
+    "inferred_system": "fe-c",
+    "confidence": 1.0,
+    "raw_sum_wt": 100.0,
+    "normalized_sum_wt": 100.0
+  },
+  "intermediate_renders_count": 0
+}

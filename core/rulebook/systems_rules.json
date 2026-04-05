@@ -1,0 +1,64 @@
+{
+  "systems": {
+    "fe-c": {
+      "required_any": [["Fe", "C"]],
+      "ranges_wt": {
+        "C": [0.0, 6.67],
+        "Fe": [60.0, 100.0],
+        "Si": [0.0, 4.0],
+        "Mn": [0.0, 3.0],
+        "Cr": [0.0, 18.0],
+        "Ni": [0.0, 25.0]
+      }
+    },
+    "fe-si": {
+      "required_any": [["Fe", "Si"]],
+      "ranges_wt": {
+        "Si": [0.0, 6.0],
+        "Fe": [70.0, 100.0],
+        "C": [0.0, 1.2]
+      }
+    },
+    "al-si": {
+      "required_any": [["Al", "Si"]],
+      "ranges_wt": {
+        "Al": [40.0, 100.0],
+        "Si": [0.0, 25.0],
+        "Cu": [0.0, 8.0],
+        "Mg": [0.0, 3.0],
+        "Zn": [0.0, 8.0]
+      }
+    },
+    "cu-zn": {
+      "required_any": [["Cu", "Zn"]],
+      "ranges_wt": {
+        "Cu": [35.0, 100.0],
+        "Zn": [0.0, 50.0],
+        "Pb": [0.0, 4.0],
+        "Sn": [0.0, 3.0]
+      }
+    },
+    "al-cu-mg": {
+      "required_any": [["Al", "Cu"], ["Al", "Mg"]],
+      "ranges_wt": {
+        "Al": [70.0, 100.0],
+        "Cu": [0.0, 10.0],
+        "Mg": [0.0, 5.0],
+        "Mn": [0.0, 2.0],
+        "Si": [0.0, 2.0]
+      }
+    },
+    "custom-multicomponent": {
+      "required_any": [],
+      "ranges_wt": {}
+    }
+  },
+  "system_inference": {
+    "fe-c": ["Fe", "C"],
+    "fe-si": ["Fe", "Si"],
+    "al-si": ["Al", "Si"],
+    "cu-zn": ["Cu", "Zn"],
+    "al-cu-mg": ["Al", "Cu", "Mg"]
+  }
+}
+

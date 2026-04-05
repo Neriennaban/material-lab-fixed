@@ -1,0 +1,118 @@
+{
+  "profile_id": "fe_c_tempering_tables_v1",
+  "calibration_source": "user_tables_2026_03_04",
+  "range_c_wt": {
+    "min": 0.05,
+    "max": 0.8,
+    "soft_extrapolation_margin": 0.05
+  },
+  "phase_key_map": {
+    "martensite": "MARTENSITE",
+    "tempered_martensite_low": "MARTENSITE",
+    "troostite_temper": "TROOSTITE",
+    "sorbite_temper": "SORBITE",
+    "retained_austenite": "AUSTENITE",
+    "cementite_excess": "CEMENTITE"
+  },
+  "tables": {
+    "quench_water_20": [
+      { "c_wt": 0.05, "martensite": 100.0, "retained_austenite": 0.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.1, "martensite": 100.0, "retained_austenite": 0.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.15, "martensite": 100.0, "retained_austenite": 0.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.2, "martensite": 100.0, "retained_austenite": 0.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.25, "martensite": 98.7, "retained_austenite": 1.3, "cementite_excess": 0.0 },
+      { "c_wt": 0.3, "martensite": 97.5, "retained_austenite": 2.5, "cementite_excess": 0.0 },
+      { "c_wt": 0.35, "martensite": 96.2, "retained_austenite": 3.8, "cementite_excess": 0.0 },
+      { "c_wt": 0.4, "martensite": 95.0, "retained_austenite": 5.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.45, "martensite": 93.7, "retained_austenite": 6.3, "cementite_excess": 0.0 },
+      { "c_wt": 0.5, "martensite": 92.5, "retained_austenite": 7.5, "cementite_excess": 0.0 },
+      { "c_wt": 0.55, "martensite": 91.2, "retained_austenite": 8.8, "cementite_excess": 0.0 },
+      { "c_wt": 0.6, "martensite": 90.0, "retained_austenite": 10.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.65, "martensite": 88.7, "retained_austenite": 11.3, "cementite_excess": 0.0 },
+      { "c_wt": 0.7, "martensite": 87.5, "retained_austenite": 12.5, "cementite_excess": 0.0 },
+      { "c_wt": 0.75, "martensite": 86.2, "retained_austenite": 13.8, "cementite_excess": 0.0 },
+      { "c_wt": 0.8, "martensite": 84.0, "retained_austenite": 15.0, "cementite_excess": 1.0 }
+    ],
+    "temper_low_150_250": [
+      { "c_wt": 0.05, "tempered_martensite_low": 100.0, "retained_austenite": 0.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.1, "tempered_martensite_low": 100.0, "retained_austenite": 0.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.15, "tempered_martensite_low": 100.0, "retained_austenite": 0.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.2, "tempered_martensite_low": 100.0, "retained_austenite": 0.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.25, "tempered_martensite_low": 98.7, "retained_austenite": 1.3, "cementite_excess": 0.0 },
+      { "c_wt": 0.3, "tempered_martensite_low": 97.5, "retained_austenite": 2.5, "cementite_excess": 0.0 },
+      { "c_wt": 0.35, "tempered_martensite_low": 96.2, "retained_austenite": 3.8, "cementite_excess": 0.0 },
+      { "c_wt": 0.4, "tempered_martensite_low": 95.0, "retained_austenite": 5.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.45, "tempered_martensite_low": 93.7, "retained_austenite": 6.3, "cementite_excess": 0.0 },
+      { "c_wt": 0.5, "tempered_martensite_low": 92.5, "retained_austenite": 7.5, "cementite_excess": 0.0 },
+      { "c_wt": 0.55, "tempered_martensite_low": 91.2, "retained_austenite": 8.8, "cementite_excess": 0.0 },
+      { "c_wt": 0.6, "tempered_martensite_low": 90.0, "retained_austenite": 10.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.65, "tempered_martensite_low": 88.7, "retained_austenite": 11.3, "cementite_excess": 0.0 },
+      { "c_wt": 0.7, "tempered_martensite_low": 87.5, "retained_austenite": 12.5, "cementite_excess": 0.0 },
+      { "c_wt": 0.75, "tempered_martensite_low": 86.2, "retained_austenite": 13.8, "cementite_excess": 0.0 },
+      { "c_wt": 0.8, "tempered_martensite_low": 84.0, "retained_austenite": 15.0, "cementite_excess": 1.0 }
+    ],
+    "temper_medium_250_450": [
+      { "c_wt": 0.05, "troostite_temper": 100.0, "retained_austenite": 0.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.1, "troostite_temper": 100.0, "retained_austenite": 0.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.15, "troostite_temper": 100.0, "retained_austenite": 0.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.2, "troostite_temper": 100.0, "retained_austenite": 0.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.25, "troostite_temper": 99.6, "retained_austenite": 0.4, "cementite_excess": 0.0 },
+      { "c_wt": 0.3, "troostite_temper": 99.3, "retained_austenite": 0.8, "cementite_excess": 0.0 },
+      { "c_wt": 0.35, "troostite_temper": 98.9, "retained_austenite": 1.1, "cementite_excess": 0.0 },
+      { "c_wt": 0.4, "troostite_temper": 98.5, "retained_austenite": 1.5, "cementite_excess": 0.0 },
+      { "c_wt": 0.45, "troostite_temper": 98.1, "retained_austenite": 1.9, "cementite_excess": 0.0 },
+      { "c_wt": 0.5, "troostite_temper": 97.8, "retained_austenite": 2.3, "cementite_excess": 0.0 },
+      { "c_wt": 0.55, "troostite_temper": 97.4, "retained_austenite": 2.6, "cementite_excess": 0.0 },
+      { "c_wt": 0.6, "troostite_temper": 97.0, "retained_austenite": 3.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.65, "troostite_temper": 96.6, "retained_austenite": 3.4, "cementite_excess": 0.0 },
+      { "c_wt": 0.7, "troostite_temper": 96.3, "retained_austenite": 3.7, "cementite_excess": 0.0 },
+      { "c_wt": 0.75, "troostite_temper": 95.9, "retained_austenite": 4.1, "cementite_excess": 0.0 },
+      { "c_wt": 0.8, "troostite_temper": 94.5, "retained_austenite": 4.5, "cementite_excess": 1.0 }
+    ],
+    "temper_high_450_650": [
+      { "c_wt": 0.05, "sorbite_temper": 100.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.1, "sorbite_temper": 100.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.15, "sorbite_temper": 100.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.2, "sorbite_temper": 100.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.25, "sorbite_temper": 100.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.3, "sorbite_temper": 100.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.35, "sorbite_temper": 100.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.4, "sorbite_temper": 100.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.45, "sorbite_temper": 100.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.5, "sorbite_temper": 100.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.55, "sorbite_temper": 100.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.6, "sorbite_temper": 100.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.65, "sorbite_temper": 100.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.7, "sorbite_temper": 100.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.75, "sorbite_temper": 100.0, "cementite_excess": 0.0 },
+      { "c_wt": 0.8, "sorbite_temper": 99.0, "cementite_excess": 1.0 }
+    ]
+  },
+  "medium_corrections": {
+    "water_20": {},
+    "water_100": {
+      "quench_water_20": { "martensite": -4.0, "retained_austenite": 4.0 },
+      "temper_low_150_250": { "tempered_martensite_low": -3.0, "retained_austenite": 3.0 },
+      "temper_medium_250_450": { "troostite_temper": -1.5, "retained_austenite": 1.5 },
+      "temper_high_450_650": { "sorbite_temper": -0.8, "cementite_excess": 0.8 }
+    },
+    "brine_20_30": {
+      "quench_water_20": { "martensite": 2.5, "retained_austenite": -2.5 },
+      "temper_low_150_250": { "tempered_martensite_low": 2.0, "retained_austenite": -2.0 },
+      "temper_medium_250_450": { "troostite_temper": 1.0, "retained_austenite": -1.0 },
+      "temper_high_450_650": { "sorbite_temper": 0.4, "cementite_excess": -0.4 }
+    },
+    "oil_20_80": {
+      "quench_water_20": { "martensite": -8.0, "retained_austenite": 8.0 },
+      "temper_low_150_250": { "tempered_martensite_low": -6.5, "retained_austenite": 6.5 },
+      "temper_medium_250_450": { "troostite_temper": -3.0, "retained_austenite": 3.0 },
+      "temper_high_450_650": { "sorbite_temper": -1.2, "cementite_excess": 1.2 }
+    },
+    "polymer": {
+      "quench_water_20": { "martensite": -5.0, "retained_austenite": 5.0 },
+      "temper_low_150_250": { "tempered_martensite_low": -4.0, "retained_austenite": 4.0 },
+      "temper_medium_250_450": { "troostite_temper": -2.0, "retained_austenite": 2.0 },
+      "temper_high_450_650": { "sorbite_temper": -1.0, "cementite_excess": 1.0 }
+    }
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "units": ["wt_pct", "mol_l"],
+  "defaults": {
+    "wt_pct": 2.0
+  },
+  "reagents": {
+    "nital_2": {
+      "solute": "HNO3",
+      "wt_pct_range": [0.5, 10.0],
+      "wt_pct_nominal": 2.0,
+      "molar_mass_g_mol": 63.01,
+      "density_g_ml": 1.0
+    },
+    "picral": {
+      "solute": "PicricAcid",
+      "wt_pct_range": [1.0, 6.0],
+      "wt_pct_nominal": 4.0,
+      "molar_mass_g_mol": 229.1,
+      "density_g_ml": 1.0
+    },
+    "keller": {
+      "solute": "HF_mix",
+      "wt_pct_range": [0.5, 8.0],
+      "wt_pct_nominal": 2.5,
+      "molar_mass_g_mol": 20.01,
+      "density_g_ml": 1.0
+    },
+    "fry": {
+      "solute": "CuCl2_mix",
+      "wt_pct_range": [2.0, 15.0],
+      "wt_pct_nominal": 6.0,
+      "molar_mass_g_mol": 134.45,
+      "density_g_ml": 1.0
+    },
+    "custom": {
+      "solute": "Custom",
+      "wt_pct_range": [0.1, 30.0],
+      "wt_pct_nominal": 3.0,
+      "molar_mass_g_mol": 100.0,
+      "density_g_ml": 1.0
+    }
+  }
+}

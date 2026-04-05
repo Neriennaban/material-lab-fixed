@@ -1,0 +1,176 @@
+{
+  "sample_id": "Steel45_improved_textbook",
+  "composition_wt": {
+    "Fe": 99.5,
+    "C": 0.45,
+    "Mn": 0.65,
+    "Si": 0.25
+  },
+  "system_hint": "fe-c",
+  "material_grade": "Ст45",
+  "material_class_ru": "Среднеуглеродистая конструкционная сталь",
+  "treatment_ru": "Улучшение (закалка + высокий отпуск)",
+  "prep_route": {
+    "roughness_target_um": 0.04,
+    "relief_mode": "hardness_coupled",
+    "contamination_level": 0.02,
+    "steps": [
+      {
+        "method": "grinding_800",
+        "duration_s": 90,
+        "abrasive_um": 18,
+        "load_n": 22,
+        "rpm": 180,
+        "coolant": "water"
+      },
+      {
+        "method": "polishing_3um",
+        "duration_s": 110,
+        "abrasive_um": 3,
+        "load_n": 14,
+        "rpm": 140,
+        "coolant": "alcohol"
+      },
+      {
+        "method": "polishing_1um",
+        "duration_s": 90,
+        "abrasive_um": 1,
+        "load_n": 10,
+        "rpm": 120,
+        "coolant": "alcohol"
+      },
+      {
+        "method": "polishing_005um",
+        "duration_s": 60,
+        "abrasive_um": 0.05,
+        "load_n": 8,
+        "rpm": 100,
+        "coolant": "alcohol"
+      }
+    ]
+  },
+  "etch_profile": {
+    "reagent": "nital_4",
+    "time_s": 12,
+    "temperature_c": 22,
+    "agitation": "active",
+    "overetch_factor": 1
+  },
+  "synthesis_profile": {
+    "profile_id": "textbook_tempered_sorbite",
+    "phase_topology_mode": "auto",
+    "contrast_target": 1.15,
+    "boundary_sharpness": 1.1,
+    "artifact_level": 0.1,
+    "composition_sensitivity_mode": "educational",
+    "generation_mode": "edu_engineering",
+    "phase_emphasis_style": "contrast_texture",
+    "phase_fraction_tolerance_pct": 10,
+    "system_generator_mode": "system_auto",
+    "target_microstructure": "tempered_sorbite"
+  },
+  "microscope_profile": {
+    "simulate_preview": false,
+    "magnification": 500,
+    "focus": 0.97,
+    "brightness": 1,
+    "contrast": 1.15
+  },
+  "seed": 4502,
+  "resolution": [2048, 2048],
+  "strict_validation": true,
+  "reference_profile_id": "steel_ref",
+  "phase_model": {
+    "engine": "explicit_rules_v3",
+    "phase_control_mode": "auto_with_override",
+    "manual_phase_fractions": {
+      "tempered_sorbite": 1.0
+    },
+    "manual_override_weight": 0.6,
+    "allow_custom_fallback": true,
+    "phase_balance_tolerance_pct": 10
+  },
+  "thermal_program": {
+    "steps": [
+      {
+        "type": "heating",
+        "from_c": 20,
+        "to_c": 840,
+        "duration_s": 600,
+        "label": "Аустенитизация"
+      },
+      {
+        "type": "hold",
+        "temperature_c": 840,
+        "duration_s": 1200,
+        "label": "Выдержка при закалке"
+      },
+      {
+        "type": "quench",
+        "from_c": 840,
+        "to_c": 20,
+        "medium": "water",
+        "duration_s": 180,
+        "label": "Закалка в воде"
+      },
+      {
+        "type": "heating",
+        "from_c": 20,
+        "to_c": 600,
+        "duration_s": 400,
+        "label": "Нагрев под отпуск"
+      },
+      {
+        "type": "hold",
+        "temperature_c": 600,
+        "duration_s": 3600,
+        "label": "Высокий отпуск (1 час)"
+      },
+      {
+        "type": "cooling",
+        "from_c": 600,
+        "to_c": 20,
+        "medium": "air",
+        "duration_s": 600,
+        "label": "Охлаждение на воздухе"
+      }
+    ],
+    "quench": {
+      "medium_code": "water_20",
+      "quench_time_s": 180.0,
+      "bath_temperature_c": 20.0,
+      "sample_temperature_c": 840.0,
+      "custom_medium_name": "Вода",
+      "custom_severity_factor": 1.0
+    },
+    "tempering": {
+      "temperature_c": 600,
+      "duration_s": 3600,
+      "type": "high",
+      "type_ru": "Высокий отпуск"
+    },
+    "sampling_mode": "per_degree",
+    "degree_step_c": 1.0,
+    "max_frames": 400
+  },
+  "expected_properties": {
+    "hardness_hb": {"min": 250, "max": 310, "typical": 280},
+    "tensile_strength_mpa": {"min": 750, "max": 850, "typical": 800},
+    "yield_strength_mpa": {"min": 550, "max": 650, "typical": 600},
+    "elongation_pct": {"min": 12, "max": 18, "typical": 15},
+    "impact_toughness_j_cm2": {"min": 70, "max": 100, "typical": 85},
+    "reduction_of_area_pct": {"min": 40, "max": 50, "typical": 45},
+    "microstructure_description": "Сорбит отпуска - глобулярные карбиды в ферритной матрице"
+  },
+  "metadata": {
+    "source": "Братковский_Шевченко_Материаловедение_2017",
+    "display_name_ru": "Ст45, улучшение",
+    "short_label_ru": "Ст45 улучш.",
+    "group_ru": "Библиотека образцов / Учебник / Стали / Ст45",
+    "expected_properties_source": "bratkovskiy_shevchenko_2017_textbook",
+    "treatment": "Улучшение",
+    "treatment_steps_ru": ["Закалка 840°C (вода)", "Высокий отпуск 600°C"],
+    "application": "Ответственные детали: валы, оси, шестерни",
+    "advantage_ru": "Оптимальное сочетание прочности и вязкости"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "name": "Phase_FeSi_auto",
+  "material": "Fe-Si phase simulator",
+  "lab": "LR1/LR2",
+  "generator": "auto",
+  "image_size": [
+    2048,
+    2048
+  ],
+  "seed": 3401,
+  "composition": {
+    "Fe": 98.6,
+    "Si": 1.4
+  },
+  "generation": {
+    "system": "fe-si",
+    "stage": "auto",
+    "temperature_c": 700.0,
+    "cooling_mode": "equilibrium",
+    "deformation_pct": 0.0,
+    "aging_hours": 8.0,
+    "aging_temperature_c": 180.0,
+    "auto_hint": {
+      "preferred_generator": "phase_map"
+    }
+  },
+  "microscope": {
+    "magnification": 200,
+    "focus": 0.97,
+    "brightness": 1.01,
+    "contrast": 1.12,
+    "noise_sigma": 2.1,
+    "vignette_strength": 0.13
+  },
+  "metadata": {
+    "scenario": "phase-stage",
+    "notes": "Use temperature/deformation for ferrite states"
+  }
+}

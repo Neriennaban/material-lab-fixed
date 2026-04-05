@@ -1,0 +1,42 @@
+{
+  "name": "Copper_M1_annealed_ultra",
+  "material": "Copper M1 conductor ultra",
+  "lab": "LR2",
+  "generator": "auto",
+  "image_size": [
+    2048,
+    2048
+  ],
+  "seed": 2109,
+  "composition": {
+    "Cu": 99.9
+  },
+  "generation": {
+    "mean_grain_size_px": 62,
+    "grain_size_jitter": 0.2,
+    "equiaxed": 1.1,
+    "elongation": 1.0,
+    "orientation_deg": 0.0,
+    "boundary_width_px": 2,
+    "boundary_contrast": 0.57,
+    "pore_fraction": 0.0004,
+    "inclusion_fraction": 0.001,
+    "auto_hint": {
+      "preferred_generator": "grains"
+    },
+    "cooling_mode": "auto"
+  },
+  "microscope": {
+    "magnification": 200,
+    "focus": 0.98,
+    "brightness": 1.03,
+    "contrast": 1.12,
+    "noise_sigma": 1.8,
+    "vignette_strength": 0.15,
+    "uneven_strength": 0.09
+  },
+  "metadata": {
+    "realism_profile": "ultra",
+    "scenario": "alloy preset"
+  }
+}

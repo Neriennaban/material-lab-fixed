@@ -1,0 +1,49 @@
+{
+  "version": 1,
+  "profiles": {
+    "pure_iron_electropolish": {
+      "prep_method": "electropolish_bath",
+      "electrolyte_code": "II-1",
+      "voltage_v": 30.0,
+      "electrolyte_temperature_c": 20.0,
+      "post_polish_followup": "electrolytic_etch",
+      "note": "ASM Table 2: Iron, pure"
+    },
+    "steel_electropolish": {
+      "prep_method": "electropolish_bath",
+      "electrolyte_code": "II-1",
+      "voltage_v": 35.0,
+      "electrolyte_temperature_c": 20.0,
+      "post_polish_followup": "chemical_etch"
+    },
+    "stainless_electropolish": {
+      "prep_method": "electropolish_bath",
+      "electrolyte_code": "III-11",
+      "voltage_v": 20.0,
+      "electrolyte_temperature_c": 38.0,
+      "post_polish_followup": "chemical_etch"
+    },
+    "copper_alloy_electropolish": {
+      "prep_method": "local_electropolish_tampon",
+      "electrolyte_code": "table3_copper_alloy",
+      "voltage_v": 5.0,
+      "electrolyte_temperature_c": 10.0,
+      "spot_diameter_mm": 7.0,
+      "probe_tip_radius_mm": 1.6,
+      "movement_pattern": "circular",
+      "electrolyte_refresh_interval_s": 60.0,
+      "post_polish_followup": "chemical_etch"
+    },
+    "aluminum_electropolish": {
+      "prep_method": "local_electropolish_tampon",
+      "electrolyte_code": "table3_aluminum",
+      "voltage_v": 35.0,
+      "electrolyte_temperature_c": 10.0,
+      "spot_diameter_mm": 7.0,
+      "probe_tip_radius_mm": 1.6,
+      "movement_pattern": "circular",
+      "electrolyte_refresh_interval_s": 60.0,
+      "post_polish_followup": "chemical_etch"
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "name": "Brass_L68_400x_ultra",
+  "material": "Brass L68 ultra",
+  "lab": "LR1",
+  "generator": "auto",
+  "image_size": [
+    2048,
+    2048
+  ],
+  "seed": 2103,
+  "composition": {
+    "Cu": 68.0,
+    "Zn": 32.0
+  },
+  "generation": {
+    "mean_grain_size_px": 48,
+    "grain_size_jitter": 0.18,
+    "equiaxed": 1.07,
+    "elongation": 1.0,
+    "boundary_width_px": 2,
+    "boundary_contrast": 0.62,
+    "pore_fraction": 0.0005,
+    "inclusion_fraction": 0.0016,
+    "auto_hint": {
+      "preferred_generator": "grains"
+    },
+    "cooling_mode": "auto"
+  },
+  "microscope": {
+    "magnification": 400,
+    "focus": 0.98,
+    "brightness": 1.01,
+    "contrast": 1.18,
+    "noise_sigma": 1.9,
+    "vignette_strength": 0.17,
+    "uneven_strength": 0.12,
+    "etch_uneven": 0.07
+  },
+  "metadata": {
+    "realism_profile": "ultra",
+    "scenario": "alloy preset"
+  }
+}

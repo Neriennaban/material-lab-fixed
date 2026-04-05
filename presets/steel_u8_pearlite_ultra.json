@@ -1,0 +1,40 @@
+{
+  "name": "Steel_U8_pearlite_600x_ultra",
+  "material": "High-carbon steel U8 ultra",
+  "lab": "LR1",
+  "generator": "auto",
+  "image_size": [
+    2048,
+    2048
+  ],
+  "seed": 2102,
+  "composition": {
+    "Fe": 99.2,
+    "C": 0.8
+  },
+  "generation": {
+    "pearlite_fraction": 0.9,
+    "lamella_period_px": 4.8,
+    "colony_size_px": 90.0,
+    "ferrite_brightness": 170,
+    "cementite_brightness": 48,
+    "auto_hint": {
+      "preferred_generator": "pearlite"
+    },
+    "cooling_mode": "auto"
+  },
+  "microscope": {
+    "magnification": 600,
+    "focus": 0.97,
+    "brightness": 0.98,
+    "contrast": 1.23,
+    "noise_sigma": 1.6,
+    "vignette_strength": 0.22,
+    "uneven_strength": 0.15,
+    "etch_uneven": 0.14
+  },
+  "metadata": {
+    "realism_profile": "ultra",
+    "scenario": "alloy preset"
+  }
+}

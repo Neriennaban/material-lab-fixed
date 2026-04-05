@@ -1,0 +1,151 @@
+{
+  "version": 1,
+  "defaults": {
+    "phase_tone_targets": {
+      "FERRITE": 192.0,
+      "PEARLITE": 118.0,
+      "CEMENTITE": 76.0,
+      "CARBIDE": 82.0,
+      "MARTENSITE": 108.0,
+      "MARTENSITE_T": 102.0,
+      "MARTENSITE_C": 118.0,
+      "TROOSTITE": 126.0,
+      "SORBITE": 142.0,
+      "BAINITE": 122.0,
+      "AUSTENITE": 150.0,
+      "LIQUID": 184.0,
+      "FCC_A1": 170.0,
+      "ALPHA": 178.0,
+      "BETA": 126.0,
+      "BETA_PRIME": 114.0,
+      "SI": 104.0,
+      "EUTECTIC_ALSI": 124.0,
+      "FESI_INTERMETALLIC": 98.0,
+      "PRECIPITATE": 112.0,
+      "MATRIX": 168.0,
+      "SECONDARY": 126.0
+    },
+    "boundary_emphasis": {
+      "contrast_texture": 16.0,
+      "max_contrast": 24.0,
+      "morphology_only": 9.0
+    },
+    "readability_thresholds": {
+      "separability_score_min": 0.18,
+      "dynamic_range_min": 46.0
+    }
+  },
+  "systems": {
+    "fe-c": {
+      "phase_tone_targets": {
+        "FERRITE": 196.0,
+        "PEARLITE": 112.0,
+        "CEMENTITE": 70.0,
+        "MARTENSITE": 104.0,
+        "MARTENSITE_T": 98.0,
+        "MARTENSITE_C": 112.0,
+        "TROOSTITE": 124.0,
+        "SORBITE": 140.0,
+        "BAINITE": 118.0
+      },
+      "boundary_emphasis": {
+        "contrast_texture": 18.0,
+        "max_contrast": 26.0,
+        "morphology_only": 10.0
+      },
+      "readability_thresholds": {
+        "separability_score_min": 0.26,
+        "dynamic_range_min": 58.0
+      },
+      "texture_family_params": {
+        "pearlite": {
+          "lamella_period_px_base": 5.2,
+          "lamella_period_px_min": 2.8,
+          "lamella_period_px_max": 7.6
+        },
+        "martensite": {
+          "needle_count_base": 3400
+        }
+      }
+    },
+    "al-si": {
+      "phase_tone_targets": {
+        "FCC_A1": 184.0,
+        "EUTECTIC_ALSI": 112.0,
+        "SI": 78.0
+      },
+      "readability_thresholds": {
+        "separability_score_min": 0.12,
+        "dynamic_range_min": 52.0
+      }
+    },
+    "cu-zn": {
+      "phase_tone_targets": {
+        "ALPHA": 182.0,
+        "BETA": 128.0,
+        "BETA_PRIME": 112.0,
+        "DEFORMATION_BANDS": 104.0
+      },
+      "readability_thresholds": {
+        "separability_score_min": 0.20,
+        "dynamic_range_min": 48.0
+      }
+    },
+    "fe-si": {
+      "phase_tone_targets": {
+        "BCC_B2": 176.0,
+        "FESI_INTERMETALLIC": 108.0
+      },
+      "readability_thresholds": {
+        "separability_score_min": 0.16,
+        "dynamic_range_min": 44.0
+      }
+    },
+    "al-cu-mg": {
+      "phase_tone_targets": {
+        "FCC_A1": 172.0,
+        "THETA": 116.0,
+        "S_PHASE": 108.0,
+        "QPHASE": 98.0
+      },
+      "readability_thresholds": {
+        "separability_score_min": 0.18,
+        "dynamic_range_min": 46.0
+      }
+    }
+  },
+  "profiles": {
+    "textbook_steel_bw": {
+      "target_microconstituents": [
+        "FERRITE",
+        "PEARLITE",
+        "CEMENTITE",
+        "MARTENSITE"
+      ]
+    },
+    "textbook_alsi_bw": {
+      "target_microconstituents": [
+        "FCC_A1",
+        "EUTECTIC_ALSI",
+        "SI"
+      ]
+    },
+    "textbook_brass_bw": {
+      "target_microconstituents": [
+        "ALPHA",
+        "BETA",
+        "BETA_PRIME"
+      ]
+    },
+    "textbook_heat_treatment_bw": {
+      "target_microconstituents": [
+        "MARTENSITE",
+        "BAINITE",
+        "CEMENTITE",
+        "FERRITE",
+        "THETA",
+        "S_PHASE"
+      ]
+    }
+  }
+}

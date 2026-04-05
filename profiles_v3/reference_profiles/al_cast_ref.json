@@ -1,0 +1,13 @@
+{
+  "profile_id": "al_cast_ref",
+  "descriptor": {
+    "mean": 161.8,
+    "std": 39.2,
+    "p10": 101.0,
+    "p90": 223.0,
+    "dynamic_range": 122.0,
+    "gradient_mean": 9.6,
+    "entropy": 2.53
+  },
+  "source_image": "built-in"
+}

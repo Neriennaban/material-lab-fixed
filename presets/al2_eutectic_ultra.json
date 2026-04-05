@@ -1,0 +1,38 @@
+{
+  "name": "AlSi_AL2_eutectic_600x_ultra",
+  "material": "AL2 cast alloy ultra",
+  "lab": "LR1",
+  "generator": "auto",
+  "image_size": [
+    2048,
+    2048
+  ],
+  "seed": 2104,
+  "composition": {
+    "Al": 87.5,
+    "Si": 12.5
+  },
+  "generation": {
+    "si_phase_fraction": 0.37,
+    "eutectic_scale_px": 5.8,
+    "morphology": "needle",
+    "auto_hint": {
+      "preferred_generator": "eutectic"
+    },
+    "cooling_mode": "auto"
+  },
+  "microscope": {
+    "magnification": 600,
+    "focus": 0.97,
+    "brightness": 0.98,
+    "contrast": 1.23,
+    "noise_sigma": 1.8,
+    "vignette_strength": 0.21,
+    "uneven_strength": 0.16,
+    "etch_uneven": 0.16
+  },
+  "metadata": {
+    "realism_profile": "ultra",
+    "scenario": "alloy preset"
+  }
+}

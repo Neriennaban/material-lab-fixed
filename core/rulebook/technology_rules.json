@@ -1,0 +1,435 @@
+{
+  "global_limits": {
+    "temperature_c": [-273.15, 2500.0],
+    "duration_min": [0.0, 100000.0],
+    "deformation_pct": [0.0, 95.0],
+    "aging_hours": [0.0, 500.0],
+    "pressure_mpa": [0.0, 5000.0]
+  },
+  "operations": {
+    "anneal_full": {
+      "category": "heat_treat",
+      "defaults": {
+        "temperature_c": 850.0,
+        "duration_min": 120.0,
+        "cooling_mode": "slow_cool"
+      },
+      "effects": {
+        "grain_size_factor": 0.08,
+        "elongation_factor": -0.15,
+        "texture_strength": -0.12,
+        "dislocation_proxy": -0.28,
+        "precipitation_level": -0.06,
+        "segregation_level": -0.05,
+        "residual_stress": -0.30,
+        "porosity_factor": 0.0
+      }
+    },
+    "anneal_recrystallization": {
+      "category": "heat_treat",
+      "defaults": {
+        "temperature_c": 680.0,
+        "duration_min": 60.0,
+        "cooling_mode": "equilibrium"
+      },
+      "effects": {
+        "grain_size_factor": -0.08,
+        "elongation_factor": -0.25,
+        "texture_strength": -0.18,
+        "dislocation_proxy": -0.35,
+        "precipitation_level": -0.03,
+        "segregation_level": -0.02,
+        "residual_stress": -0.34,
+        "porosity_factor": 0.0
+      }
+    },
+    "normalize": {
+      "category": "heat_treat",
+      "defaults": {
+        "temperature_c": 880.0,
+        "duration_min": 45.0,
+        "cooling_mode": "normalized"
+      },
+      "effects": {
+        "grain_size_factor": -0.03,
+        "elongation_factor": -0.14,
+        "texture_strength": -0.08,
+        "dislocation_proxy": -0.14,
+        "precipitation_level": 0.02,
+        "segregation_level": -0.03,
+        "residual_stress": -0.18,
+        "porosity_factor": 0.0
+      }
+    },
+    "quench_water": {
+      "category": "heat_treat",
+      "defaults": {
+        "temperature_c": 860.0,
+        "duration_min": 30.0,
+        "cooling_mode": "quenched"
+      },
+      "effects": {
+        "grain_size_factor": -0.01,
+        "elongation_factor": 0.04,
+        "texture_strength": 0.08,
+        "dislocation_proxy": 0.32,
+        "precipitation_level": -0.12,
+        "segregation_level": 0.02,
+        "residual_stress": 0.40,
+        "porosity_factor": 0.0
+      }
+    },
+    "quench_oil": {
+      "category": "heat_treat",
+      "defaults": {
+        "temperature_c": 840.0,
+        "duration_min": 30.0,
+        "cooling_mode": "quenched"
+      },
+      "effects": {
+        "grain_size_factor": 0.0,
+        "elongation_factor": 0.03,
+        "texture_strength": 0.05,
+        "dislocation_proxy": 0.24,
+        "precipitation_level": -0.10,
+        "segregation_level": 0.01,
+        "residual_stress": 0.30,
+        "porosity_factor": 0.0
+      }
+    },
+    "temper_low": {
+      "category": "heat_treat",
+      "defaults": {
+        "temperature_c": 200.0,
+        "duration_min": 90.0,
+        "cooling_mode": "tempered"
+      },
+      "effects": {
+        "grain_size_factor": 0.01,
+        "elongation_factor": -0.01,
+        "texture_strength": -0.02,
+        "dislocation_proxy": -0.08,
+        "precipitation_level": 0.06,
+        "segregation_level": 0.0,
+        "residual_stress": -0.10,
+        "porosity_factor": 0.0
+      }
+    },
+    "temper_medium": {
+      "category": "heat_treat",
+      "defaults": {
+        "temperature_c": 400.0,
+        "duration_min": 90.0,
+        "cooling_mode": "tempered"
+      },
+      "effects": {
+        "grain_size_factor": 0.03,
+        "elongation_factor": -0.05,
+        "texture_strength": -0.04,
+        "dislocation_proxy": -0.18,
+        "precipitation_level": 0.10,
+        "segregation_level": 0.0,
+        "residual_stress": -0.18,
+        "porosity_factor": 0.0
+      }
+    },
+    "temper_high": {
+      "category": "heat_treat",
+      "defaults": {
+        "temperature_c": 600.0,
+        "duration_min": 120.0,
+        "cooling_mode": "tempered"
+      },
+      "effects": {
+        "grain_size_factor": 0.08,
+        "elongation_factor": -0.09,
+        "texture_strength": -0.06,
+        "dislocation_proxy": -0.26,
+        "precipitation_level": 0.12,
+        "segregation_level": 0.0,
+        "residual_stress": -0.24,
+        "porosity_factor": 0.0
+      }
+    },
+    "solution_treat": {
+      "category": "heat_treat",
+      "defaults": {
+        "temperature_c": 505.0,
+        "duration_min": 60.0,
+        "cooling_mode": "solutionized"
+      },
+      "effects": {
+        "grain_size_factor": 0.02,
+        "elongation_factor": 0.0,
+        "texture_strength": -0.03,
+        "dislocation_proxy": -0.05,
+        "precipitation_level": -0.25,
+        "segregation_level": -0.08,
+        "residual_stress": 0.02,
+        "porosity_factor": 0.0
+      }
+    },
+    "age_natural": {
+      "category": "aging",
+      "defaults": {
+        "temperature_c": 25.0,
+        "duration_min": 1440.0,
+        "cooling_mode": "natural_aged",
+        "aging_hours": 24.0,
+        "aging_temperature_c": 25.0
+      },
+      "effects": {
+        "grain_size_factor": 0.0,
+        "elongation_factor": -0.02,
+        "texture_strength": 0.0,
+        "dislocation_proxy": -0.03,
+        "precipitation_level": 0.14,
+        "segregation_level": 0.0,
+        "residual_stress": -0.04,
+        "porosity_factor": 0.0
+      }
+    },
+    "age_artificial": {
+      "category": "aging",
+      "defaults": {
+        "temperature_c": 185.0,
+        "duration_min": 480.0,
+        "cooling_mode": "aged",
+        "aging_hours": 8.0,
+        "aging_temperature_c": 185.0
+      },
+      "effects": {
+        "grain_size_factor": 0.01,
+        "elongation_factor": -0.04,
+        "texture_strength": 0.01,
+        "dislocation_proxy": -0.06,
+        "precipitation_level": 0.24,
+        "segregation_level": -0.02,
+        "residual_stress": -0.05,
+        "porosity_factor": 0.0
+      }
+    },
+    "overage": {
+      "category": "aging",
+      "defaults": {
+        "temperature_c": 240.0,
+        "duration_min": 900.0,
+        "cooling_mode": "overaged",
+        "aging_hours": 20.0,
+        "aging_temperature_c": 240.0
+      },
+      "effects": {
+        "grain_size_factor": 0.05,
+        "elongation_factor": -0.08,
+        "texture_strength": -0.02,
+        "dislocation_proxy": -0.09,
+        "precipitation_level": 0.32,
+        "segregation_level": 0.01,
+        "residual_stress": -0.08,
+        "porosity_factor": 0.0
+      }
+    },
+    "cold_roll": {
+      "category": "deformation",
+      "defaults": {
+        "temperature_c": 30.0,
+        "duration_min": 5.0,
+        "cooling_mode": "cold_worked",
+        "deformation_pct": 25.0
+      },
+      "effects": {
+        "grain_size_factor": -0.05,
+        "elongation_factor": 0.30,
+        "texture_strength": 0.24,
+        "dislocation_proxy": 0.30,
+        "precipitation_level": 0.0,
+        "segregation_level": 0.0,
+        "residual_stress": 0.18,
+        "porosity_factor": 0.0
+      }
+    },
+    "hot_roll": {
+      "category": "deformation",
+      "defaults": {
+        "temperature_c": 780.0,
+        "duration_min": 5.0,
+        "cooling_mode": "equilibrium",
+        "deformation_pct": 20.0
+      },
+      "effects": {
+        "grain_size_factor": -0.03,
+        "elongation_factor": 0.14,
+        "texture_strength": 0.10,
+        "dislocation_proxy": 0.08,
+        "precipitation_level": 0.0,
+        "segregation_level": -0.01,
+        "residual_stress": 0.06,
+        "porosity_factor": 0.0
+      }
+    },
+    "forging": {
+      "category": "deformation",
+      "defaults": {
+        "temperature_c": 900.0,
+        "duration_min": 10.0,
+        "cooling_mode": "equilibrium",
+        "deformation_pct": 35.0
+      },
+      "effects": {
+        "grain_size_factor": -0.04,
+        "elongation_factor": 0.12,
+        "texture_strength": 0.08,
+        "dislocation_proxy": 0.12,
+        "precipitation_level": 0.0,
+        "segregation_level": -0.02,
+        "residual_stress": 0.05,
+        "porosity_factor": -0.02
+      }
+    },
+    "drawing": {
+      "category": "deformation",
+      "defaults": {
+        "temperature_c": 25.0,
+        "duration_min": 8.0,
+        "cooling_mode": "cold_worked",
+        "deformation_pct": 30.0
+      },
+      "effects": {
+        "grain_size_factor": -0.06,
+        "elongation_factor": 0.36,
+        "texture_strength": 0.28,
+        "dislocation_proxy": 0.34,
+        "precipitation_level": 0.0,
+        "segregation_level": 0.0,
+        "residual_stress": 0.22,
+        "porosity_factor": 0.0
+      }
+    },
+    "cast_slow": {
+      "category": "casting",
+      "defaults": {
+        "temperature_c": 1450.0,
+        "duration_min": 20.0,
+        "cooling_mode": "slow_cool"
+      },
+      "effects": {
+        "grain_size_factor": 0.16,
+        "elongation_factor": -0.08,
+        "texture_strength": -0.04,
+        "dislocation_proxy": -0.08,
+        "precipitation_level": 0.0,
+        "segregation_level": 0.15,
+        "residual_stress": 0.10,
+        "porosity_factor": 0.08
+      }
+    },
+    "cast_fast": {
+      "category": "casting",
+      "defaults": {
+        "temperature_c": 1450.0,
+        "duration_min": 12.0,
+        "cooling_mode": "quenched"
+      },
+      "effects": {
+        "grain_size_factor": -0.08,
+        "elongation_factor": -0.05,
+        "texture_strength": 0.06,
+        "dislocation_proxy": 0.04,
+        "precipitation_level": 0.0,
+        "segregation_level": 0.07,
+        "residual_stress": 0.16,
+        "porosity_factor": 0.05
+      }
+    },
+    "directional_solidification": {
+      "category": "casting",
+      "defaults": {
+        "temperature_c": 1420.0,
+        "duration_min": 25.0,
+        "cooling_mode": "slow_cool"
+      },
+      "effects": {
+        "grain_size_factor": 0.06,
+        "elongation_factor": 0.22,
+        "texture_strength": 0.24,
+        "dislocation_proxy": -0.02,
+        "precipitation_level": 0.0,
+        "segregation_level": 0.12,
+        "residual_stress": 0.12,
+        "porosity_factor": 0.06
+      }
+    },
+    "stress_relief": {
+      "category": "finish",
+      "defaults": {
+        "temperature_c": 520.0,
+        "duration_min": 90.0,
+        "cooling_mode": "equilibrium"
+      },
+      "effects": {
+        "grain_size_factor": 0.02,
+        "elongation_factor": -0.03,
+        "texture_strength": -0.02,
+        "dislocation_proxy": -0.08,
+        "precipitation_level": 0.02,
+        "segregation_level": 0.0,
+        "residual_stress": -0.28,
+        "porosity_factor": 0.0
+      }
+    },
+    "homogenize": {
+      "category": "finish",
+      "defaults": {
+        "temperature_c": 550.0,
+        "duration_min": 180.0,
+        "cooling_mode": "slow_cool"
+      },
+      "effects": {
+        "grain_size_factor": 0.05,
+        "elongation_factor": -0.04,
+        "texture_strength": -0.02,
+        "dislocation_proxy": -0.06,
+        "precipitation_level": -0.01,
+        "segregation_level": -0.22,
+        "residual_stress": -0.08,
+        "porosity_factor": -0.02
+      }
+    }
+  },
+  "compatibility": {
+    "fe-c": {
+      "forbid_without_previous": {
+        "temper_low": ["quench_water", "quench_oil"],
+        "temper_medium": ["quench_water", "quench_oil"],
+        "temper_high": ["quench_water", "quench_oil"]
+      }
+    },
+    "al-cu-mg": {
+      "forbid_without_previous": {
+        "age_natural": ["solution_treat", "quench_water", "quench_oil"],
+        "age_artificial": ["solution_treat", "quench_water", "quench_oil"],
+        "overage": ["solution_treat", "quench_water", "quench_oil"]
+      }
+    }
+  },
+  "mutually_exclusive_cooling_modes": [
+    ["quenched", "overaged"],
+    ["quenched", "aged"],
+    ["cold_worked", "solutionized"]
+  ],
+  "route_defaults": {
+    "fe-c_quench_temper": [
+      {"method": "quench_water", "temperature_c": 860, "duration_min": 30, "cooling_mode": "quenched"},
+      {"method": "temper_medium", "temperature_c": 400, "duration_min": 90, "cooling_mode": "tempered"}
+    ],
+    "al_cu_mg_solution_age": [
+      {"method": "solution_treat", "temperature_c": 505, "duration_min": 60, "cooling_mode": "solutionized"},
+      {"method": "quench_water", "temperature_c": 25, "duration_min": 5, "cooling_mode": "quenched"},
+      {"method": "age_artificial", "temperature_c": 185, "duration_min": 480, "cooling_mode": "aged", "aging_hours": 8, "aging_temperature_c": 185}
+    ],
+    "cold_work_recrystallize": [
+      {"method": "cold_roll", "temperature_c": 25, "duration_min": 5, "cooling_mode": "cold_worked", "deformation_pct": 35},
+      {"method": "anneal_recrystallization", "temperature_c": 680, "duration_min": 60, "cooling_mode": "equilibrium"}
+    ]
+  }
+}

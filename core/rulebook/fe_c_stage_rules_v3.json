@@ -1,0 +1,34 @@
+﻿{
+  "version": 2,
+  "defaults": {
+    "austenitize_min_c": 780.0,
+    "temper_low_max_c": 260.0,
+    "temper_medium_max_c": 460.0,
+    "temper_high_max_c": 680.0,
+    "temper_hold_min_s": 120.0
+  },
+  "stages": {
+    "martensite_tetragonal": {
+      "c_min_wt": 0.6,
+      "cooling_rate_min_c_per_s": 22.0,
+      "severity_min": 0.72
+    },
+    "martensite_cubic": {
+      "c_max_wt": 0.6,
+      "cooling_rate_min_c_per_s": 20.0,
+      "severity_min": 0.56
+    },
+    "troostite_quench": {
+      "severity_min": 0.42,
+      "severity_max": 0.76,
+      "cooling_rate_min_c_per_s": 9.0,
+      "cooling_rate_max_c_per_s": 30.0
+    },
+    "sorbite_quench": {
+      "severity_min": 0.22,
+      "severity_max": 0.58,
+      "cooling_rate_min_c_per_s": 4.0,
+      "cooling_rate_max_c_per_s": 18.0
+    }
+  }
+}

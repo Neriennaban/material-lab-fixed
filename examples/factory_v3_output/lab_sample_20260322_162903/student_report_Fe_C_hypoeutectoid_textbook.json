@@ -1,0 +1,23 @@
+{
+  "student_info": {
+    "name": "",
+    "group": "",
+    "date": "2026-03-25T13:18:14"
+  },
+  "lab_info": {
+    "lab_number": "ЛР1",
+    "sample_id": "Fe_C_hypoeutectoid_textbook",
+    "image_sha256": "4c73736f75d0dd9b8bfd58a041309d83f2c7e834c3c8105148c9f723edfbeed1"
+  },
+  "measurements": {
+    "ferrite_percent": 88.0,
+    "pearlite_percent": 2.0,
+    "carbon_calculated": 0.016,
+    "steel_grade": "феррит"
+  },
+  "methodology": {
+    "measurement_method": "секущие линии",
+    "number_of_measurements": 0,
+    "measurement_locations": "случайные области"
+  }
+}

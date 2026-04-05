@@ -1,0 +1,39 @@
+{
+  "name": "Phase_CuZn_auto",
+  "material": "Cu-Zn brass phase simulator",
+  "lab": "LR2/LR3",
+  "generator": "auto",
+  "image_size": [
+    2048,
+    2048
+  ],
+  "seed": 3201,
+  "composition": {
+    "Cu": 68.0,
+    "Zn": 32.0
+  },
+  "generation": {
+    "system": "cu-zn",
+    "stage": "auto",
+    "temperature_c": 700.0,
+    "cooling_mode": "equilibrium",
+    "deformation_pct": 0.0,
+    "aging_hours": 8.0,
+    "aging_temperature_c": 180.0,
+    "auto_hint": {
+      "preferred_generator": "phase_map"
+    }
+  },
+  "microscope": {
+    "magnification": 400,
+    "focus": 0.96,
+    "brightness": 1.01,
+    "contrast": 1.15,
+    "noise_sigma": 1.9,
+    "vignette_strength": 0.16
+  },
+  "metadata": {
+    "scenario": "phase-stage",
+    "notes": "Use Zn and deformation for alpha/alpha-beta/beta stages"
+  }
+}

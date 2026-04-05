@@ -1,0 +1,46 @@
+{
+  "known_systems": [
+    "fe-c",
+    "fe-si",
+    "al-si",
+    "cu-zn",
+    "al-cu-mg"
+  ],
+  "inference_markers": {
+    "fe-c": ["Fe", "C"],
+    "fe-si": ["Fe", "Si"],
+    "al-si": ["Al", "Si"],
+    "cu-zn": ["Cu", "Zn"],
+    "al-cu-mg": ["Al", "Cu", "Mg"]
+  },
+  "fallback": {
+    "matrix_element_priority": ["Fe", "Al", "Cu", "Ni", "Ti", "Mg"],
+    "alloying_index_scale": 35.0,
+    "default_phases": {
+      "MATRIX": 0.72,
+      "SECONDARY": 0.18,
+      "PRECIPITATES": 0.1
+    }
+  },
+  "fe_c": {
+    "eutectoid_c": 0.77,
+    "ferrite_solubility_c": 0.022,
+    "cementite_c": 6.67,
+    "max_c_hypereutectoid": 2.1
+  },
+  "al_si": {
+    "eutectic_si": 12.6
+  },
+  "cu_zn": {
+    "alpha_max_zn": 35.0,
+    "alpha_beta_max_zn": 46.0,
+    "beta_max_zn": 50.0
+  },
+  "al_cu_mg": {
+    "precip_scale": 8.0
+  },
+  "manual_override": {
+    "min_weight": 0.0,
+    "max_weight": 1.0
+  }
+}
