@@ -24,9 +24,9 @@
   },
   "fe_c": {
     "eutectoid_c": 0.77,
-    "ferrite_solubility_c": 0.022,
+    "ferrite_solubility_c": 0.02,
     "cementite_c": 6.67,
-    "max_c_hypereutectoid": 2.1
+    "max_c_hypereutectoid": 2.14
   },
   "al_si": {
     "eutectic_si": 12.6

@@ -21,6 +21,7 @@ from core.metallography_v3.realism_utils import (
     multiscale_noise,
     normalize01,
     rescale_to_u8,
+    select_fraction_mask,
 )
 from core.metallography_v3.pure_ferrite_generator import (
     generate_pure_ferrite_micrograph,
@@ -78,7 +79,7 @@ _STAGE_DEFAULT_FRACTIONS: dict[str, dict[str, float]] = {
     "alpha_gamma": {"FERRITE": 0.55, "AUSTENITE": 0.45},
     "gamma_cementite": {"AUSTENITE": 0.72, "CEMENTITE": 0.28},
     "alpha_pearlite": {"FERRITE": 0.5, "PEARLITE": 0.5},
-    "pearlite": {"PEARLITE": 0.9949, "CEMENTITE": 0.0051},
+    "pearlite": {"PEARLITE": 1.0},
     "pearlite_cementite": {"PEARLITE": 0.82, "CEMENTITE": 0.18},
     "ledeburite": {"LEDEBURITE": 0.62, "PEARLITE": 0.28, "CEMENTITE": 0.1},
     "martensite": {"MARTENSITE": 0.9, "CEMENTITE": 0.1},
@@ -440,6 +441,30 @@ def _phase_boundaries(labels: np.ndarray) -> np.ndarray:
     return borders
 
 
+def _distance_from_boundaries(mask: np.ndarray, *, max_steps: int = 48) -> np.ndarray:
+    if ndimage is not None:
+        return distance_to_mask(mask)
+
+    boundary = mask.astype(bool, copy=False)
+    dist = np.full(mask.shape, float(max_steps), dtype=np.float32)
+    dist[boundary] = 0.0
+    frontier = boundary.copy()
+    visited = boundary.copy()
+
+    for step in range(1, max(1, int(max_steps)) + 1):
+        grown = np.zeros_like(frontier, dtype=bool)
+        grown[1:, :] |= frontier[:-1, :]
+        grown[:-1, :] |= frontier[1:, :]
+        grown[:, 1:] |= frontier[:, :-1]
+        grown[:, :-1] |= frontier[:, 1:]
+        frontier = grown & ~visited
+        if not np.any(frontier):
+            break
+        dist[frontier] = float(step)
+        visited |= frontier
+    return dist
+
+
 def _suppress_small_inclusions(image_gray: np.ndarray) -> np.ndarray:
     if ndimage is None:
         return image_gray
@@ -552,8 +577,8 @@ def _pearlite_image(
     seed: int,
     lamella_period_px: float,
     colony_size_px: float,
-    ferrite_tone: float = 95.0,
-    cementite_tone: float = 175.0,
+    ferrite_tone: float = 184.0,
+    cementite_tone: float = 82.0,
 ) -> tuple[np.ndarray, dict[str, Any]]:
     h, w = labels.shape
     proj, theta_map, phase_map, spacing_factor, _ = _phase_field_from_labels(
@@ -658,11 +683,17 @@ def _build_pearlitic_render(
     )
     labels = grain["labels"]
     boundaries = boundary_mask_from_labels(labels, width=2)
-    dist = distance_to_mask(boundaries)
-    boundary_pref = np.exp(
-        -dist / clamp(5.5 - 2.2 * cool_idx + max(0.0, c_wt - 0.77) * 2.0, 1.6, 8.0)
-    ).astype(np.float32)
+    dist = _distance_from_boundaries(
+        boundaries, max_steps=max(24, int(round(grain_scale * 0.35)))
+    )
+    boundary_scale = clamp(
+        5.8 - 2.1 * cool_idx + max(0.0, c_wt - 0.77) * 2.4,
+        1.6,
+        8.5,
+    )
+    boundary_pref = np.exp(-((dist / boundary_scale) ** 1.35)).astype(np.float32)
     boundary_pref = normalize01(boundary_pref)
+    boundary_rank = normalize01(float(np.max(dist)) - dist.astype(np.float32))
     low = low_frequency_field(size, seed_split["seed_noise"], sigma=26.0)
     noise = multiscale_noise(
         size=size,
@@ -699,47 +730,63 @@ def _build_pearlitic_render(
         seed=seed_split["seed_boundary"],
         mean_grain_size_px=grain_scale * 0.9,
     )
-    # Proeutectoid ferrite: bright white/light gray (~210-230), lightly etched by nital
+    # Проэвтектоидный феррит: светлый, с тёмными канавками по границам.
     ferrite_img = ferrite_grain["image"].astype(np.float32) * 0.12 + 205.0
-    ferrite_img[boundaries] -= 40.0  # grain boundary grooves are dark
+    ferrite_img[boundaries] -= 40.0
     ferrite_img += (noise - 0.5) * 8.0
     ferrite_img = np.clip(ferrite_img, 0.0, 255.0).astype(np.uint8)
 
-    # Proeutectoid cementite: brightest phase (~235-250), NOT attacked by nital
-    cementite_img = 235.0 + (noise - 0.5) * 8.0 + boundary_pref * 10.0
+    # Проэвтектоидный цементит для учебного режима делаем тёмным и читаемым.
+    cementite_img = 70.0 + (noise - 0.5) * 12.0 - boundary_pref * 18.0
     cementite_img = np.clip(cementite_img, 0.0, 255.0).astype(np.uint8)
 
-    ordered_fields: list[tuple[str, np.ndarray]] = []
+    proeutectoid = (
+        "FERRITE"
+        if stage == "alpha_pearlite"
+        else ("CEMENTITE" if stage == "pearlite_cementite" else "")
+    )
+    proeutectoid_frac = float(phase_fractions.get(proeutectoid, 0.0)) if proeutectoid else 0.0
     if stage == "alpha_pearlite":
-        ferr_field = normalize01(boundary_pref * 0.78 + low * 0.12 + noise * 0.10)
-        ordered_fields.append(("FERRITE", ferr_field))
-        ordered_fields.append(
-            ("PEARLITE", normalize01((1.0 - ferr_field) * 0.55 + low * 0.45))
+        ferr_field = normalize01(boundary_rank * 0.95 + low * 0.03 + noise * 0.02)
+        ferr_mask = select_fraction_mask(
+            field=ferr_field,
+            available=np.ones(size, dtype=bool),
+            fraction_total=proeutectoid_frac,
         )
+        phase_masks = {
+            "FERRITE": ferr_mask.astype(np.uint8),
+            "PEARLITE": (~ferr_mask).astype(np.uint8),
+        }
     elif stage == "pearlite_cementite":
-        cem_field = normalize01(boundary_pref * 0.84 + noise * 0.16)
-        ordered_fields.append(("CEMENTITE", cem_field))
-        ordered_fields.append(
-            ("PEARLITE", normalize01((1.0 - cem_field) * 0.58 + low * 0.42))
+        cem_field = normalize01(boundary_rank * 0.97 + low * 0.02 + noise * 0.01)
+        cem_mask = select_fraction_mask(
+            field=cem_field,
+            available=np.ones(size, dtype=bool),
+            fraction_total=proeutectoid_frac,
         )
+        phase_masks = {
+            "CEMENTITE": cem_mask.astype(np.uint8),
+            "PEARLITE": (~cem_mask).astype(np.uint8),
+        }
     else:
+        ordered_fields: list[tuple[str, np.ndarray]] = []
         if (
             "CEMENTITE" in phase_fractions
             and float(phase_fractions.get("CEMENTITE", 0.0)) > 0.0
         ):
-            cem_field = normalize01(boundary_pref * 0.65 + noise * 0.35)
+            cem_field = normalize01(boundary_rank * 0.84 + noise * 0.16)
             ordered_fields.append(("CEMENTITE", cem_field))
         ordered_fields.append(
             ("PEARLITE", normalize01(low * 0.55 + (1.0 - boundary_pref) * 0.45))
         )
 
-    dominant = _dominant_structure(phase_fractions)
-    phase_masks = allocate_phase_masks(
-        size=size,
-        phase_fractions=phase_fractions,
-        ordered_fields=ordered_fields,
-        remainder_name=dominant,
-    )
+        dominant = _dominant_structure(phase_fractions)
+        phase_masks = allocate_phase_masks(
+            size=size,
+            phase_fractions=phase_fractions,
+            ordered_fields=ordered_fields,
+            remainder_name=dominant,
+        )
 
     canvas = pearlite_image.astype(np.float32)
     if "PEARLITE" in phase_masks:
@@ -766,11 +813,6 @@ def _build_pearlitic_render(
         amount=0.38,
     )
 
-    proeutectoid = (
-        "FERRITE"
-        if stage == "alpha_pearlite"
-        else ("CEMENTITE" if stage == "pearlite_cementite" else "")
-    )
     boundary_bias = 0.0
     if (
         proeutectoid
@@ -789,6 +831,7 @@ def _build_pearlitic_render(
         "interlamellar_spacing_px": float(pearlite_meta["interlamellar_spacing_px"]),
         "cooling_index": float(cool_idx),
         "proeutectoid_phase": str(proeutectoid),
+        "proeutectoid_fraction_target": float(proeutectoid_frac),
         "boundary_phase_bias": float(boundary_bias),
         "colony_anisotropy": "grain_oriented_lamellae",
     }

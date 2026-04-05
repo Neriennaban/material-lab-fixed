@@ -2,7 +2,7 @@
   "sample_id": "Fe_C_eutectoid_research_optics_stir",
   "composition_wt": {
     "Fe": 99.2,
-    "C": 0.8
+    "C": 0.77
   },
   "system_hint": "fe-c",
   "prep_route": {

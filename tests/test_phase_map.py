@@ -14,6 +14,9 @@ class PhaseMapTests(unittest.TestCase):
         self.assertEqual(resolve_fe_c_stage(0.4, 1550.0, "equilibrium", "auto"), "liquid")
         self.assertEqual(resolve_fe_c_stage(0.4, 820.0, "equilibrium", "auto"), "austenite")
         self.assertEqual(resolve_fe_c_stage(0.4, 680.0, "equilibrium", "auto"), "alpha_pearlite")
+        self.assertEqual(resolve_fe_c_stage(0.02, 20.0, "equilibrium", "auto"), "ferrite")
+        self.assertEqual(resolve_fe_c_stage(0.77, 20.0, "equilibrium", "auto"), "pearlite")
+        self.assertEqual(resolve_fe_c_stage(2.14, 20.0, "equilibrium", "auto"), "pearlite_cementite")
         self.assertEqual(resolve_fe_c_stage(0.8, 120.0, "quenched", "auto"), "martensite")
         self.assertEqual(resolve_fe_c_stage(0.8, 400.0, "tempered", "auto"), "tempered_medium")
 

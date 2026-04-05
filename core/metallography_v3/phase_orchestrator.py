@@ -112,7 +112,7 @@ def _liquid_fraction_al_si(si_wt: float, temp_c: float) -> float:
 def _ferrite_vs_pearlite(
     c_wt: float,
     *,
-    ferrite_solubility_c: float = 0.022,
+    ferrite_solubility_c: float = 0.02,
     eutectoid_c: float = 0.77,
 ) -> tuple[float, float]:
     pearlite = _clamp(
@@ -148,6 +148,96 @@ def _pearlite_equilibrium_constituents(
     )
     pearlite = _clamp(1.0 - cementite, 0.0, 1.0)
     return _norm_dict({"FERRITE": 0.0, "PEARLITE": pearlite, "CEMENTITE": cementite})
+
+
+def _pearlite_internal_true_phases(
+    *,
+    ferrite_solubility_c: float,
+    eutectoid_c: float,
+    cementite_c: float,
+) -> dict[str, float]:
+    ferrite = _clamp(
+        (float(cementite_c) - float(eutectoid_c))
+        / max(1e-9, float(cementite_c) - float(ferrite_solubility_c)),
+        0.0,
+        1.0,
+    )
+    return _norm_phase_dict({"FERRITE": ferrite, "CEMENTITE": 1.0 - ferrite})
+
+
+def _true_phases_from_steel_microconstituents(
+    *,
+    microconstituents: dict[str, float],
+    pearlite_internal: dict[str, float],
+) -> dict[str, float]:
+    ferrite = float(microconstituents.get("FERRITE", 0.0))
+    pearlite = float(microconstituents.get("PEARLITE", 0.0))
+    cementite = float(microconstituents.get("CEMENTITE", 0.0))
+    return _norm_phase_dict(
+        {
+            "FERRITE": ferrite
+            + pearlite * float(pearlite_internal.get("FERRITE", 0.0)),
+            "CEMENTITE": cementite
+            + pearlite * float(pearlite_internal.get("CEMENTITE", 0.0)),
+        }
+    )
+
+
+def _steel_room_temperature_equilibrium(
+    *,
+    c_wt: float,
+    ferrite_solubility_c: float,
+    eutectoid_c: float,
+    steel_limit_c: float,
+    cementite_c: float,
+) -> dict[str, Any]:
+    c = float(max(0.0, c_wt))
+    ferrite_limit = float(ferrite_solubility_c)
+    eutectoid = float(eutectoid_c)
+    steel_limit = float(steel_limit_c)
+    pearlite_internal = _pearlite_internal_true_phases(
+        ferrite_solubility_c=ferrite_limit,
+        eutectoid_c=eutectoid,
+        cementite_c=float(cementite_c),
+    )
+
+    if c <= ferrite_limit + 1e-9:
+        micro = {"FERRITE": 1.0}
+    elif c < eutectoid - 1e-9:
+        ferrite, pearlite = _ferrite_vs_pearlite(
+            c,
+            ferrite_solubility_c=ferrite_limit,
+            eutectoid_c=eutectoid,
+        )
+        micro = {"FERRITE": ferrite, "PEARLITE": pearlite}
+    elif c <= steel_limit + 1e-9:
+        proeutectoid_cementite = _clamp(
+            (c - eutectoid) / max(1e-9, float(cementite_c) - eutectoid),
+            0.0,
+            1.0,
+        )
+        micro = {
+            "PEARLITE": _clamp(1.0 - proeutectoid_cementite, 0.0, 1.0),
+            "CEMENTITE": proeutectoid_cementite,
+        }
+    else:
+        micro = {}
+
+    micro_norm = _norm_phase_dict(micro)
+    return {
+        "microconstituents": micro_norm,
+        "true_phases": _true_phases_from_steel_microconstituents(
+            microconstituents=micro_norm,
+            pearlite_internal=pearlite_internal,
+        ),
+        "pearlite_internal_true_phases": pearlite_internal,
+        "thresholds_wt_pct": {
+            "ferrite_max_c": float(ferrite_limit),
+            "eutectoid_c": float(eutectoid),
+            "steel_limit_c": float(steel_limit),
+            "cementite_c": float(cementite_c),
+        },
+    }
 
 
 def _rule_float(payload: dict[str, Any], key: str, default: float) -> float:
@@ -581,9 +671,10 @@ def estimate_auto_phase_fractions(
     if sys_name == "fe-c":
         c = float(comp.get("C", 0.0) * 100.0)
         fe_c_rules = dict(_RULES.get("fe_c", {})) if isinstance(_RULES, dict) else {}
-        eutectoid_c = _rule_float(fe_c_rules, "eutectoid_c", 0.8)
-        ferrite_solubility_c = _rule_float(fe_c_rules, "ferrite_solubility_c", 0.022)
+        eutectoid_c = _rule_float(fe_c_rules, "eutectoid_c", 0.77)
+        ferrite_solubility_c = _rule_float(fe_c_rules, "ferrite_solubility_c", 0.02)
         cementite_c = _rule_float(fe_c_rules, "cementite_c", 6.67)
+        steel_limit_c = _rule_float(fe_c_rules, "max_c_hypereutectoid", 2.14)
         qsum = dict(quench_summary or {})
         retained_austenite_fraction = _clamp(
             _rule_float(
@@ -666,6 +757,30 @@ def estimate_auto_phase_fractions(
                     return phase_from_table
         if calibration_trace is not None and isinstance(calibration_trace, dict) and not calibration_trace:
             calibration_trace.update({"fraction_source": "default_formula"})
+        steel_equilibrium = _steel_room_temperature_equilibrium(
+            c_wt=c,
+            ferrite_solubility_c=ferrite_solubility_c,
+            eutectoid_c=eutectoid_c,
+            steel_limit_c=steel_limit_c,
+            cementite_c=cementite_c,
+        )
+        if calibration_trace is not None and isinstance(calibration_trace, dict):
+            calibration_trace.update(
+                {
+                    "steel_microconstituents_auto": dict(
+                        steel_equilibrium.get("microconstituents", {})
+                    ),
+                    "steel_true_phases_auto": dict(
+                        steel_equilibrium.get("true_phases", {})
+                    ),
+                    "pearlite_internal_true_phases": dict(
+                        steel_equilibrium.get("pearlite_internal_true_phases", {})
+                    ),
+                    "steel_equilibrium_thresholds_wt_pct": dict(
+                        steel_equilibrium.get("thresholds_wt_pct", {})
+                    ),
+                }
+            )
         if stage_l == "liquid":
             return {"LIQUID": 1.0}
         if stage_l == "liquid_gamma":
@@ -676,10 +791,21 @@ def estimate_auto_phase_fractions(
         if stage_l == "austenite":
             return {"AUSTENITE": 1.0}
         if stage_l == "alpha_gamma":
-            ferrite = _clamp((0.8 - c) / 0.8, 0.25, 0.95)
+            ferrite = _clamp(
+                (float(eutectoid_c) - c) / max(1e-9, float(eutectoid_c)),
+                0.25,
+                0.95,
+            )
             return {"FERRITE": ferrite, "AUSTENITE": 1.0 - ferrite}
         if stage_l == "gamma_cementite":
-            cementite = _clamp((c - 0.8) / (2.1 - 0.8) * 0.45 + 0.05, 0.05, 0.5)
+            cementite = _clamp(
+                (c - float(eutectoid_c))
+                / max(1e-9, float(steel_limit_c) - float(eutectoid_c))
+                * 0.45
+                + 0.05,
+                0.05,
+                0.5,
+            )
             return {"AUSTENITE": 1.0 - cementite, "CEMENTITE": cementite}
         if stage_l == "alpha_pearlite":
             return _pearlite_equilibrium_constituents(
@@ -956,6 +1082,26 @@ def build_phase_bundle(
         if isinstance(calibration_trace.get("target_phase_fractions_from_table", {}), dict)
         else {}
     )
+    pearlite_internal_true_phases = (
+        dict(calibration_trace.get("pearlite_internal_true_phases", {}))
+        if isinstance(calibration_trace.get("pearlite_internal_true_phases", {}), dict)
+        else {}
+    )
+    steel_microconstituents_auto = (
+        dict(calibration_trace.get("steel_microconstituents_auto", {}))
+        if isinstance(calibration_trace.get("steel_microconstituents_auto", {}), dict)
+        else {}
+    )
+    steel_true_phases_auto = (
+        dict(calibration_trace.get("steel_true_phases_auto", {}))
+        if isinstance(calibration_trace.get("steel_true_phases_auto", {}), dict)
+        else {}
+    )
+    steel_thresholds = (
+        dict(calibration_trace.get("steel_equilibrium_thresholds_wt_pct", {}))
+        if isinstance(calibration_trace.get("steel_equilibrium_thresholds_wt_pct", {}), dict)
+        else {}
+    )
     table_match_error_by_phase_pct: dict[str, float] = {}
     table_match_error_pct = 0.0
     if table_target_phases:
@@ -964,11 +1110,27 @@ def build_phase_bundle(
             av = max(0.0, float(blended.get(str(phase_name), 0.0)))
             table_match_error_by_phase_pct[str(phase_name)] = float(abs(av - tv) * 100.0)
         table_match_error_pct = float(max(table_match_error_by_phase_pct.values() or [0.0]))
+    steel_true_phases_blended = (
+        _true_phases_from_steel_microconstituents(
+            microconstituents=blended,
+            pearlite_internal=pearlite_internal_true_phases,
+        )
+        if pearlite_internal_true_phases
+        else {}
+    )
 
     report = {
         "auto_phase_fractions": auto_fractions,
         "manual_phase_fractions": manual_norm,
         "blended_phase_fractions": blended,
+        "microconstituent_fractions_auto": steel_microconstituents_auto,
+        "microconstituent_fractions_after_blend": (
+            dict(blended) if steel_microconstituents_auto else {}
+        ),
+        "true_phase_fractions_auto": steel_true_phases_auto,
+        "true_phase_fractions_after_blend": steel_true_phases_blended,
+        "pearlite_internal_true_phases": pearlite_internal_true_phases,
+        "steel_equilibrium_thresholds_wt_pct": steel_thresholds,
         "blend_applied": blend_applied,
         "phase_balance_tolerance_pct": tol,
         "fraction_error_pct": error_pct,

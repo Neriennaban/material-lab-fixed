@@ -287,13 +287,13 @@ def _render_fe_c_textbook_snapshot(
 
         # Ensure A3 and Acm are visible in textbook style even if absent in source rulebook.
         x_a3_0, y_a3_0 = 0.0, 911.0
-        x_a3_1, y_a3_1 = 0.8, 727.0
+        x_a3_1, y_a3_1 = 0.77, 727.0
         style_a3 = line_styles.get("a3", {})
         color_a3 = tuple(int(v) for v in list(style_a3.get("color", [45, 90, 230]))[:3])
         width_a3 = int(style_a3.get("width", 2))
         _draw_polyline(draw, [(px(x_a3_0), py(y_a3_0)), (px(x_a3_1), py(y_a3_1))], color=color_a3, width=width_a3)
 
-        x_acm_0, y_acm_0 = 0.8, 727.0
+        x_acm_0, y_acm_0 = 0.77, 727.0
         x_acm_1, y_acm_1 = 2.14, 1147.0
         style_acm = line_styles.get("acm", {})
         color_acm = tuple(int(v) for v in list(style_acm.get("color", [210, 48, 48]))[:3])

@@ -260,7 +260,7 @@ def resolve_fe_c_stage(c_wt: float, temperature_c: float, cooling_mode: str, req
         return "tempered_high"
 
     liquidus = 1538.0 - 83.0 * min(c, 4.3)
-    solidus = 1493.0 - 58.0 * c if c <= 2.1 else 1147.0 + (4.3 - min(c, 4.3)) * 38.0
+    solidus = 1493.0 - 58.0 * c if c <= 2.14 else 1147.0 + (4.3 - min(c, 4.3)) * 38.0
 
     if temp >= liquidus:
         return "liquid"
@@ -276,22 +276,22 @@ def resolve_fe_c_stage(c_wt: float, temperature_c: float, cooling_mode: str, req
     else:
         acm = 727.0 + 160.0 * min(c - 0.77, 1.5)
         if temp >= max(727.0, acm):
-            return "austenite" if c <= 1.0 else "gamma_cementite"
+            return "austenite" if c <= 0.77 else "gamma_cementite"
 
     if temp >= 727.0:
         if c < 0.77:
             return "alpha_gamma"
-        if c <= 2.1:
+        if c <= 2.14:
             return "gamma_cementite"
         return "ledeburite"
 
-    if c < 0.02:
+    if c <= 0.02:
         return "ferrite"
     if c < 0.77:
         return "alpha_pearlite"
-    if c <= 1.0:
+    if c <= 0.77:
         return "pearlite"
-    if c <= 2.1:
+    if c <= 2.14:
         return "pearlite_cementite"
     return "ledeburite"
 

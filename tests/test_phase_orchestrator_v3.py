@@ -37,23 +37,23 @@ class PhaseOrchestratorV3Tests(unittest.TestCase):
 
     def test_eutectoid_pearlite_is_near_full(self) -> None:
         proc = ProcessingState(temperature_c=690.0, cooling_mode="slow_cool")
-        phases = estimate_auto_phase_fractions("fe-c", "pearlite", {"Fe": 99.2, "C": 0.8}, proc)
+        phases = estimate_auto_phase_fractions("fe-c", "pearlite", {"Fe": 99.23, "C": 0.77}, proc)
         self.assertGreaterEqual(float(phases.get("PEARLITE", 0.0)), 0.98)
         self.assertLessEqual(float(phases.get("FERRITE", 0.0)), 0.02)
-        self.assertAlmostEqual(float(phases.get("CEMENTITE", 0.0)), 0.0051, delta=0.002)
+        self.assertAlmostEqual(float(phases.get("CEMENTITE", 0.0)), 0.0, delta=1e-6)
 
-    def test_fe_c_table_alignment_for_05_and_80(self) -> None:
+    def test_fe_c_table_alignment_for_05_and_77(self) -> None:
         proc = ProcessingState(temperature_c=680.0, cooling_mode="slow_cool")
 
         steel_05 = estimate_auto_phase_fractions("fe-c", "alpha_pearlite", {"Fe": 99.95, "C": 0.05}, proc)
-        self.assertAlmostEqual(float(steel_05.get("FERRITE", 0.0)), 0.9626, delta=0.01)
-        self.assertAlmostEqual(float(steel_05.get("PEARLITE", 0.0)), 0.0374, delta=0.01)
+        self.assertAlmostEqual(float(steel_05.get("FERRITE", 0.0)), 0.96, delta=0.01)
+        self.assertAlmostEqual(float(steel_05.get("PEARLITE", 0.0)), 0.04, delta=0.01)
         self.assertAlmostEqual(float(steel_05.get("CEMENTITE", 0.0)), 0.0, delta=1e-6)
 
-        steel_80 = estimate_auto_phase_fractions("fe-c", "pearlite", {"Fe": 99.2, "C": 0.8}, proc)
-        self.assertAlmostEqual(float(steel_80.get("PEARLITE", 0.0)), 0.9949, delta=0.01)
-        self.assertAlmostEqual(float(steel_80.get("CEMENTITE", 0.0)), 0.0051, delta=0.003)
-        self.assertAlmostEqual(float(steel_80.get("FERRITE", 0.0)), 0.0, delta=1e-6)
+        steel_77 = estimate_auto_phase_fractions("fe-c", "pearlite", {"Fe": 99.23, "C": 0.77}, proc)
+        self.assertAlmostEqual(float(steel_77.get("PEARLITE", 0.0)), 1.0, delta=1e-6)
+        self.assertAlmostEqual(float(steel_77.get("CEMENTITE", 0.0)), 0.0, delta=1e-6)
+        self.assertAlmostEqual(float(steel_77.get("FERRITE", 0.0)), 0.0, delta=1e-6)
 
     def test_blend_modes(self) -> None:
         auto = {"FERRITE": 0.7, "PEARLITE": 0.3}
@@ -92,6 +92,24 @@ class PhaseOrchestratorV3Tests(unittest.TestCase):
         self.assertIn("manual_phase_fractions", report)
         self.assertIn("blended_phase_fractions", report)
         self.assertIn("fallback_used", report)
+        self.assertIn("true_phase_fractions_after_blend", report)
+        self.assertIn("pearlite_internal_true_phases", report)
+
+    def test_steel_equilibrium_report_for_hypereutectoid_range(self) -> None:
+        bundle = build_phase_bundle(
+            composition={"Fe": 98.0, "C": 2.0},
+            processing=ProcessingState(temperature_c=20.0, cooling_mode="equilibrium"),
+            system_hint="fe-c",
+            phase_model=PhaseModelConfigV3(),
+        )
+        self.assertEqual(bundle.stage, "pearlite_cementite")
+        report = bundle.phase_model_report
+        micro = dict(report.get("microconstituent_fractions_auto", {}))
+        true_phases = dict(report.get("true_phase_fractions_auto", {}))
+        self.assertGreater(float(micro.get("PEARLITE", 0.0)), 0.7)
+        self.assertGreater(float(micro.get("CEMENTITE", 0.0)), 0.18)
+        self.assertGreater(float(true_phases.get("CEMENTITE", 0.0)), 0.25)
+        self.assertLess(float(true_phases.get("FERRITE", 0.0)), 0.75)
 
     def test_fe_c_temper_stage_uses_curve_inference(self) -> None:
         bundle = build_phase_bundle(
