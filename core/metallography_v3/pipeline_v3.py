@@ -715,6 +715,12 @@ class MetallographyPipelineV3:
                 ),
                 thermal_summary=thermal_summary,
                 quench_summary=quench_summary,
+                microscope_profile=request.microscope_profile,
+                color_mode=str(
+                    getattr(
+                        request.synthesis_profile, "color_mode", "grayscale_nital"
+                    )
+                ),
             )
 
             prep = apply_prep_route(
@@ -810,7 +816,57 @@ class MetallographyPipelineV3:
 
         image_gray = _resize_gray_to(image_gray_internal, requested_resolution)
 
-        image_rgb = _to_rgb(image_gray)
+        # A10.0 — post-process colour palette. When a preset keeps
+        # ``color_mode="grayscale_nital"`` (the default for every
+        # existing v3 preset) the behaviour is byte-identical to the
+        # legacy ``_to_rgb`` stack. Any other mode dispatches into the
+        # ``apply_color_palette`` post-process, which reads the
+        # resized grayscale frame + phase masks and returns a real
+        # 3-channel RGB image.
+        _color_mode = str(
+            getattr(request.synthesis_profile, "color_mode", "grayscale_nital")
+            or "grayscale_nital"
+        )
+        if _color_mode == "grayscale_nital":
+            image_rgb = _to_rgb(image_gray)
+        else:
+            # Resize phase masks to the final resolution so they align
+            # with ``image_gray`` before the palette reads them.
+            _resized_phase_masks: dict[str, np.ndarray] = {}
+            for _phase_name, _mask in dict(morph["phase_masks"]).items():
+                if not isinstance(_mask, np.ndarray):
+                    continue
+                if _mask.shape == image_gray.shape:
+                    _resized_phase_masks[_phase_name] = _mask
+                else:
+                    _resized_phase_masks[_phase_name] = _resize_gray_to(
+                        _mask.astype(np.uint8), requested_resolution
+                    )
+            # Grain label map (A10.3). Only present for pure-ferrite
+            # renders in this iteration — DIC/polarised palette needs
+            # it; other modes silently work without it.
+            _raw_labels = morph.get("grain_labels")
+            _palette_labels: np.ndarray | None = None
+            if isinstance(_raw_labels, np.ndarray):
+                if _raw_labels.shape == image_gray.shape:
+                    _palette_labels = _raw_labels
+                else:
+                    # Nearest-neighbour resize of an int label map via
+                    # the generic ``_resize_gray_to`` helper, which
+                    # already uses Image.NEAREST for uint8 inputs.
+                    _palette_labels = _resize_gray_to(
+                        _raw_labels.astype(np.int32).astype(np.uint16),
+                        requested_resolution,
+                    ).astype(np.int32)
+            from core.metallography_v3.fe_c_color_palette import apply_color_palette
+
+            image_rgb = apply_color_palette(
+                image_gray=image_gray,
+                phase_masks=_resized_phase_masks,
+                color_mode=_color_mode,
+                seed=int(request.seed),
+                labels=_palette_labels,
+            )
         prep_maps = dict(prep["prep_maps"])
         if isinstance(etched.get("etch_maps"), dict):
             prep_maps.update(dict(etched["etch_maps"]))
