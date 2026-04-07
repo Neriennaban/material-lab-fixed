@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 from typing import Callable
 
 import numpy as np
@@ -218,6 +219,81 @@ def texture_bainite(size: tuple[int, int], seed: int) -> np.ndarray:
     return _blend([troostite, mart], [0.72, 0.28])
 
 
+def texture_bainite_upper(size: tuple[int, int], seed: int) -> np.ndarray:
+    """Upper bainite (350-550 °C): feathery packets of parallel ferrite
+    plates separated by Fe3C layers. Coarser than lower bainite.
+
+    Implementation: a Voronoi packet field with low elongation provides
+    the packet topology, then a sinusoidal lamellar pattern with a
+    relatively long period (~9 px) is overlaid for the feathery look.
+    """
+
+    h, w = size
+    # Packets: a few large grains with random orientation give the
+    # feathery direction.
+    packets = generate_grain_structure(
+        size=size,
+        seed=int(seed) + 91,
+        mean_grain_size_px=120.0,
+        grain_size_jitter=0.25,
+        equiaxed=0.55,
+        elongation=1.6,
+        orientation_deg=0.0,
+        boundary_width_px=1,
+        boundary_contrast=0.0,
+    )
+    labels = packets["labels"]
+    n_packets = int(labels.max()) + 1
+    rng = np.random.default_rng(int(seed) + 95)
+    theta = rng.uniform(0.0, math.pi, size=n_packets).astype(np.float32)
+    yy, xx = np.mgrid[0:h, 0:w]
+    theta_field = theta[labels]
+    projection = xx * np.cos(theta_field) + yy * np.sin(theta_field)
+    period = 9.0  # coarse upper-bainite spacing in pixels
+    lamella = np.sin((2.0 * math.pi / period) * projection)
+    base = np.full(size, 132.0, dtype=np.float32)
+    base += lamella * 18.0
+    base += _smooth_noise(int(seed) + 97, size=size, sigma=4.0) * 6.0
+    boundaries = np.zeros_like(labels, dtype=bool)
+    boundaries[:-1, :] |= labels[:-1, :] != labels[1:, :]
+    boundaries[:, :-1] |= labels[:, :-1] != labels[:, 1:]
+    base[boundaries] -= 22.0
+    if ndimage is not None:
+        base = ndimage.gaussian_filter(base, sigma=0.55)
+    return _ensure_u8(base)
+
+
+def texture_bainite_lower(size: tuple[int, int], seed: int) -> np.ndarray:
+    """Lower bainite (200-350 °C): needle-like ferrite laths with Fe3C
+    precipitates inside the laths at ~55-60° to the lath axis.
+
+    Implementation: blend a martensite-like needle field with a
+    higher-frequency sinusoidal "intra-lath carbide" overlay aligned
+    near the lath axis to suggest the inner-lath cementite particles.
+    """
+
+    h, w = size
+    needle_base = generate_martensite_structure(
+        size=size,
+        seed=int(seed) + 101,
+        needle_count=3000,
+        needle_length_px=(8, 60),
+        packet_spread_deg=10.0,
+    )["image"].astype(np.float32)
+    yy, xx = np.mgrid[0:h, 0:w]
+    rng = np.random.default_rng(int(seed) + 103)
+    angle = float(rng.uniform(0.0, math.pi))
+    cementite_overlay = np.sin(
+        (2.0 * math.pi / 3.5)
+        * (xx * math.cos(angle + math.pi / 3.2) + yy * math.sin(angle + math.pi / 3.2))
+    )
+    base = needle_base * 0.94 + cementite_overlay * 12.0 + 6.0
+    base += _smooth_noise(int(seed) + 107, size=size, sigma=2.0) * 3.0
+    if ndimage is not None:
+        base = ndimage.gaussian_filter(base, sigma=0.45)
+    return _ensure_u8(base)
+
+
 def texture_ledeburite(size: tuple[int, int], seed: int) -> np.ndarray:
     eut = generate_eutectic_al_si(
         size=size,
@@ -228,6 +304,35 @@ def texture_ledeburite(size: tuple[int, int], seed: int) -> np.ndarray:
     )["image"]
     pearlite = texture_pearlite_colonies(size=size, seed=seed + 83)
     return _blend([_ensure_u8(eut), pearlite], [0.58, 0.42])
+
+
+def texture_ledeburite_leopard(size: tuple[int, int], seed: int) -> np.ndarray:
+    """A2 — leopard texture for white cast iron ledeburite.
+
+    A bright cementite matrix is sprinkled with quasi-periodic dark
+    pearlite blobs. The blobs come from thresholding a multiscale
+    smooth noise field, which gives them a controlled mean size and a
+    near-uniform spacing.
+    """
+
+    h, w = size
+    rng = np.random.default_rng(int(seed) + 79)
+    matrix = np.full(size, 218.0, dtype=np.float32)  # bright cementite
+    matrix += _smooth_noise(int(seed) + 81, size=size, sigma=2.5) * 6.0
+
+    # Two-scale noise field for the dark pearlite blobs.
+    blob_field = _smooth_noise(int(seed) + 83, size=size, sigma=4.5)
+    blob_field += 0.4 * _smooth_noise(int(seed) + 85, size=size, sigma=9.0)
+    threshold = float(np.quantile(blob_field, 0.55))
+    blob_mask = blob_field > threshold
+
+    pearlite_tone = 60.0 + rng.uniform(-6.0, 6.0, size=size).astype(np.float32)
+    pearlite_tone += _smooth_noise(int(seed) + 87, size=size, sigma=1.6) * 6.0
+    matrix[blob_mask] = pearlite_tone[blob_mask]
+
+    if ndimage is not None:
+        matrix = ndimage.gaussian_filter(matrix, sigma=0.5)
+    return _ensure_u8(matrix)
 
 
 def texture_tempered_high(size: tuple[int, int], seed: int) -> np.ndarray:
@@ -244,12 +349,24 @@ def fe_c_texture_map() -> dict[str, Callable[[tuple[int, int], int], np.ndarray]
         "AUSTENITE": texture_austenite,
         "PEARLITE": texture_pearlite_colonies,
         "CEMENTITE": texture_cementite_network,
+        # A1 — primary cementite needles in hypereutectic white cast
+        # iron. Until the dedicated needle renderer (A1) lands the key
+        # is mapped to the existing cementite-network texture so the
+        # phase template at least has *some* renderer to fall back on.
+        "CEMENTITE_PRIMARY": texture_cementite_network,
         "MARTENSITE": texture_martensite_cubic,
         "MARTENSITE_TETRAGONAL": texture_martensite_tetragonal,
         "MARTENSITE_CUBIC": texture_martensite_cubic,
         "TROOSTITE": texture_troostite_temper,
         "SORBITE": texture_sorbite_temper,
         "BAINITE": texture_bainite,
+        "BAINITE_UPPER": texture_bainite_upper,
+        "BAINITE_LOWER": texture_bainite_lower,
         "LEDEBURITE": texture_ledeburite,
+        # A2 — leopard-style hierarchical cementite-with-pearlite-blobs
+        # texture for white cast iron. Existing presets continue to use
+        # the legacy "LEDEBURITE" key (which delegates to
+        # ``texture_ledeburite``) so the new identifier is opt-in.
+        "LEDEBURITE_LEOPARD": texture_ledeburite_leopard,
         "TEMPERED_MATRIX": texture_tempered_high,
     }

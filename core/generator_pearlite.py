@@ -52,6 +52,46 @@ def _draw_irregular_particles(
     return np.asarray(canvas, dtype=np.uint8)
 
 
+def _resolve_lamella_period_px(
+    *,
+    lamella_period_px: float,
+    um_per_px: float | None,
+    cooling_rate_c_per_s: float | None,
+) -> tuple[float, str, float]:
+    """Resolve the actual lamella period (in pixels) for the renderer.
+
+    When the caller provides ``um_per_px`` (microscope context, A0.2)
+    and a ``cooling_rate_c_per_s`` we apply the textbook formula
+    ``S0 = 8.3 / ΔT`` from §6.3 of the TZ to compute the physical
+    interlamellar spacing, then convert to pixels using the supplied
+    pixel pitch. The function reports both the chosen mode and the
+    physical S0 in micrometres so callers (and tests) can verify the
+    behaviour.
+
+    Returns ``(period_px, mode, s0_um)`` where ``mode`` is one of
+    ``"physical"``, ``"unresolved_uniform"`` or ``"legacy_fixed"``.
+    """
+    legacy_period = max(2.0, float(lamella_period_px))
+    if um_per_px is None or cooling_rate_c_per_s is None:
+        return legacy_period, "legacy_fixed", float("nan")
+
+    px_pitch = float(um_per_px)
+    rate = max(1e-3, float(cooling_rate_c_per_s))
+    # Approximate transformation undercooling: T_actual ≈ 727 - 80*log10(rate).
+    # ΔT = 727 - T_actual ≈ 80*log10(rate). Clamp at a small floor so
+    # very slow furnace cooling still produces a finite spacing.
+    delta_t = max(8.0, 80.0 * math.log10(max(1.0001, rate)))
+    s0_um = 8.3 / delta_t
+    period_px = s0_um / max(1e-3, px_pitch)
+    if period_px < 1.5:
+        # Lamellae too thin to resolve at this magnification → switch to
+        # the "uniform dark blob" rendering used at low magnification in
+        # the AISI reference series.
+        return legacy_period, "unresolved_uniform", float(s0_um)
+    period_px = max(2.0, period_px)
+    return period_px, "physical", float(s0_um)
+
+
 def generate_pearlite_structure(
     size: tuple[int, int],
     seed: int,
@@ -60,8 +100,27 @@ def generate_pearlite_structure(
     colony_size_px: float = 120.0,
     ferrite_brightness: int = 95,
     cementite_brightness: int = 175,
+    um_per_px: float | None = None,
+    cooling_rate_c_per_s: float | None = None,
 ) -> dict[str, Any]:
-    """Generate educational ferrite + pearlite structure."""
+    """Generate educational ferrite + pearlite structure.
+
+    Optional parameters ``um_per_px`` and ``cooling_rate_c_per_s``
+    enable A4 magnification-aware rendering. When both are supplied
+    the lamella spacing is computed from the textbook formula
+    ``S0 = 8.3 / ΔT`` and the renderer either draws explicit lamellae
+    (``physical`` mode) or falls back to a uniform dark blob when the
+    spacing cannot be resolved at the current pixel pitch
+    (``unresolved_uniform`` mode). When either argument is ``None`` the
+    legacy fixed-period behaviour is preserved so existing presets and
+    tests do not change byte-for-byte.
+    """
+
+    period, period_mode, s0_um = _resolve_lamella_period_px(
+        lamella_period_px=lamella_period_px,
+        um_per_px=um_per_px,
+        cooling_rate_c_per_s=cooling_rate_c_per_s,
+    )
 
     rng = np.random.default_rng(seed)
     height, width = size
@@ -82,18 +141,31 @@ def generate_pearlite_structure(
     is_pearlite = rng.random(colony_count) < float(np.clip(pearlite_fraction, 0.0, 1.0))
 
     yy, xx = np.mgrid[0:height, 0:width]
-    theta_field = theta[labels]
-    projection = xx * np.cos(theta_field) + yy * np.sin(theta_field)
-
-    period = max(2.0, float(lamella_period_px))
-    lamella = np.sin((2.0 * math.pi / period) * projection)
-    cementite_mask = (lamella > 0) & is_pearlite[labels]
     pearlite_mask = is_pearlite[labels]
 
     ferrite = np.full((height, width), int(ferrite_brightness), dtype=np.uint8)
     image = ferrite.copy()
-    image[pearlite_mask] = int((ferrite_brightness + cementite_brightness) * 0.5)
-    image[cementite_mask] = int(cementite_brightness)
+    blended_brightness = int((ferrite_brightness + cementite_brightness) * 0.5)
+    image[pearlite_mask] = blended_brightness
+
+    if period_mode == "unresolved_uniform":
+        # Uniform dark pearlite blob: skip the lamella sine wave
+        # entirely. Add a gentle multiscale modulation so the area
+        # does not look like a flat fill.
+        if ndimage is not None and pearlite_mask.any():
+            tex_seed = rng.normal(0.0, 1.0, size=(height, width)).astype(np.float32)
+            tex_low = ndimage.gaussian_filter(tex_seed, sigma=4.0)
+            tex_low = (tex_low - tex_low.mean()) / (tex_low.std() + 1e-6)
+            adjustment = (tex_low * 6.0).astype(np.float32)
+            modulated = image.astype(np.float32)
+            modulated[pearlite_mask] += adjustment[pearlite_mask]
+            image = np.clip(modulated, 0.0, 255.0).astype(np.uint8)
+    else:
+        theta_field = theta[labels]
+        projection = xx * np.cos(theta_field) + yy * np.sin(theta_field)
+        lamella = np.sin((2.0 * math.pi / period) * projection)
+        cementite_mask = (lamella > 0) & pearlite_mask
+        image[cementite_mask] = int(cementite_brightness)
 
     boundaries = np.zeros_like(labels, dtype=bool)
     boundaries[:-1, :] |= labels[:-1, :] != labels[1:, :]
@@ -110,6 +182,14 @@ def generate_pearlite_structure(
             "colony_count": colony_count,
             "pearlite_fraction": float(pearlite_mask.mean()),
             "lamella_period_px": float(period),
+            "lamella_mode": period_mode,
+            "s0_um": s0_um,
+            "um_per_px": float(um_per_px) if um_per_px is not None else None,
+            "cooling_rate_c_per_s": (
+                float(cooling_rate_c_per_s)
+                if cooling_rate_c_per_s is not None
+                else None
+            ),
         },
     }
 
