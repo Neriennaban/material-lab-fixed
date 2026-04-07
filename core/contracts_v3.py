@@ -322,6 +322,13 @@ class PhaseModelConfigV3:
     manual_override_weight: float = 0.35
     allow_custom_fallback: bool = True
     phase_balance_tolerance_pct: float = 20.0
+    # A0.1 — opt-in stage override. When set to one of the new
+    # specialised identifiers (``white_cast_iron_*`` or
+    # ``bainite_upper`` / ``bainite_lower``) the pipeline routes the
+    # render through the dedicated dispatcher in ``fe_c_unified``,
+    # bypassing the auto-resolver. Empty string and ``"auto"`` are
+    # treated as no override.
+    requested_stage: str = ""
 
     @classmethod
     def from_dict(cls, payload: dict[str, Any] | None) -> "PhaseModelConfigV3":
@@ -341,6 +348,7 @@ class PhaseModelConfigV3:
             manual_override_weight=float(data.get("manual_override_weight", 0.35)),
             allow_custom_fallback=bool(data.get("allow_custom_fallback", True)),
             phase_balance_tolerance_pct=float(data.get("phase_balance_tolerance_pct", 20.0)),
+            requested_stage=str(data.get("requested_stage", "") or ""),
         )
 
     def to_dict(self) -> dict[str, Any]:

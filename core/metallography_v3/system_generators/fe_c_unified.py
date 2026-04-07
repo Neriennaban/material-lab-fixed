@@ -289,6 +289,133 @@ def _pure_ferrite_render(
     return image_gray, phase_masks, rendered_layers, fragment_area, trace
 
 
+def _build_white_cast_iron_render(
+    *,
+    context: SystemGenerationContext,
+    stage: str,
+    phase_fractions: dict[str, float],
+    seed_split: dict[str, int],
+) -> tuple[np.ndarray, dict[str, np.ndarray], list[str], int, dict[str, Any]]:
+    """A1+A2+A3 dispatcher for white cast iron stages.
+
+    * ``white_cast_iron_eutectic`` → pure leopard ledeburite from A2.
+    * ``white_cast_iron_hypoeutectic`` → leopard ledeburite + dendrites
+      of primary austenite (now pearlite) from A3.
+    * ``white_cast_iron_hypereutectic`` → leopard ledeburite + primary
+      cementite needles from A1.
+    """
+    from core.metallography_v3.system_generators.fe_c_dendrites import (
+        render_fe_c_austenite_dendrites,
+    )
+    from core.metallography_v3.system_generators.fe_c_primary_cementite import (
+        render_primary_cementite_needles,
+    )
+    from core.metallography_v3.system_generators.fe_c_textures import (
+        texture_ledeburite_leopard,
+    )
+
+    size = context.size
+    seed = int(seed_split.get("seed_topology", context.seed))
+    c_wt = float((context.composition_wt or {}).get("C", 0.0))
+    cooling_rate = float(
+        (context.thermal_summary or {}).get("max_effective_cooling_rate_c_per_s", 5.0)
+    ) or 5.0
+
+    base = texture_ledeburite_leopard(size=size, seed=seed)
+    rendered_layers: list[str] = ["LEDEBURITE"]
+    morphology_trace: dict[str, Any] = {
+        "family": "white_cast_iron",
+        "stage": stage,
+        "leopard_seed": seed,
+    }
+    fragment_area = max(48, int(size[0] * size[1] * 0.04))
+    extra_mask: np.ndarray | None = None
+    extra_phase: str | None = None
+
+    if stage == "white_cast_iron_hypoeutectic":
+        out = render_fe_c_austenite_dendrites(
+            size=size,
+            seed=seed + 401,
+            c_wt=c_wt,
+            base_image=base,
+            cooling_rate_c_per_s=cooling_rate,
+        )
+        image_gray = out["image"]
+        extra_mask = out["dendrite_mask"]
+        extra_phase = "PEARLITE"  # primary austenite → pearlite at RT
+        morphology_trace.update(out["metadata"])
+        morphology_trace["family"] = "white_cast_iron_hypoeutectic"
+    elif stage == "white_cast_iron_hypereutectic":
+        out = render_primary_cementite_needles(
+            size=size,
+            seed=seed + 501,
+            c_wt=c_wt,
+            base_image=base,
+            cooling_rate_c_per_s=cooling_rate,
+        )
+        image_gray = out["image"]
+        extra_mask = out["needle_mask"]
+        extra_phase = "CEMENTITE_PRIMARY"
+        morphology_trace.update(out["metadata"])
+        morphology_trace["family"] = "white_cast_iron_hypereutectic"
+    else:  # eutectic — leopard only
+        image_gray = base
+        morphology_trace["family"] = "white_cast_iron_eutectic"
+
+    h, w = size
+    phase_masks: dict[str, np.ndarray] = {
+        "LEDEBURITE": np.ones((h, w), dtype=np.uint8),
+    }
+    if extra_mask is not None and extra_phase is not None:
+        binary_extra = (extra_mask > 0).astype(np.uint8)
+        phase_masks[extra_phase] = binary_extra
+        # Subtract from the ledeburite background.
+        phase_masks["LEDEBURITE"] = (1 - binary_extra).astype(np.uint8)
+        rendered_layers.append(extra_phase)
+
+    return image_gray, phase_masks, rendered_layers, fragment_area, morphology_trace
+
+
+def _build_bainitic_render_split(
+    *,
+    context: SystemGenerationContext,
+    stage: str,
+    phase_fractions: dict[str, float],
+    seed_split: dict[str, int],
+) -> tuple[np.ndarray, dict[str, np.ndarray], list[str], int, dict[str, Any]]:
+    """A6 dispatcher for explicit upper / lower bainite stages.
+
+    Unlike the legacy ``"bainite"`` stage which is routed through
+    ``_build_martensitic_render``, the upper / lower split uses the
+    dedicated ``texture_bainite_upper`` / ``texture_bainite_lower``
+    renderers introduced in the morphology commit.
+    """
+    from core.metallography_v3.system_generators.fe_c_textures import (
+        texture_bainite_lower,
+        texture_bainite_upper,
+    )
+
+    size = context.size
+    seed = int(seed_split.get("seed_topology", context.seed))
+    if stage == "bainite_upper":
+        image_gray = texture_bainite_upper(size=size, seed=seed + 311)
+        family = "upper_bainite_feathery"
+    elif stage == "bainite_lower":
+        image_gray = texture_bainite_lower(size=size, seed=seed + 313)
+        family = "lower_bainite_lath"
+    else:  # safety net
+        image_gray = texture_bainite_upper(size=size, seed=seed + 311)
+        family = "bainite_default"
+
+    h, w = size
+    phase_masks = {"BAINITE": np.ones((h, w), dtype=np.uint8)}
+    morphology_trace = {
+        "family": family,
+        "stage": stage,
+    }
+    return image_gray, phase_masks, ["BAINITE"], int(h * w * 0.05), morphology_trace
+
+
 def _canon_phase_name(value: str) -> str:
     key = str(value or "").strip().upper().replace("-", "_").replace(" ", "_")
     return _PHASE_ALIASES.get(key, key)
@@ -1047,14 +1174,23 @@ def _build_martensitic_render(
     image = image * (1.0 - 0.45 * recovery) + recovered_img * (0.45 * recovery)
 
     dominant = _dominant_structure(phase_fractions)
+    # A8 — retained austenite localisation. Default weight 0.72 keeps
+    # the snapshot baseline byte-identical; presets that opt in via
+    # ``context.ra_boundary_strength`` push the films harder onto
+    # the inter-lath boundaries (typically 0.85-0.92).
+    _ra_strength = float(
+        getattr(context, "ra_boundary_strength", None) or 0.72
+    )
+    _ra_strength = max(0.0, min(0.95, _ra_strength))
+    _ra_noise_weight = max(0.05, 1.0 - _ra_strength)
     ra_field = normalize01(
-        boundary_pref * 0.72
+        boundary_pref * _ra_strength
         + multiscale_noise(
             size=size,
             seed=seed_split["seed_noise"] + 11,
             scales=((9.0, 0.5), (2.0, 0.5)),
         )
-        * 0.28
+        * _ra_noise_weight
     )
     carbide_field = normalize01(
         edge_energy * 0.52
@@ -1418,6 +1554,32 @@ def render_fe_c_unified(context: SystemGenerationContext) -> SystemGenerationRes
         rendered_layers = sorted(list(phase_masks.keys()))
         fragment_area = int(
             max(36, morphology_trace.get("packet_size_px", 40.0) ** 2 * 0.18)
+        )
+    elif stage in _SPECIALIZED_CAST_IRON_STAGES:
+        (
+            image_gray,
+            phase_masks,
+            rendered_layers,
+            fragment_area,
+            morphology_trace,
+        ) = _build_white_cast_iron_render(
+            context=context,
+            stage=stage,
+            phase_fractions=normalized_fractions,
+            seed_split=seed_split,
+        )
+    elif stage in _SPECIALIZED_BAINITIC_STAGES:
+        (
+            image_gray,
+            phase_masks,
+            rendered_layers,
+            fragment_area,
+            morphology_trace,
+        ) = _build_bainitic_render_split(
+            context=context,
+            stage=stage,
+            phase_fractions=normalized_fractions,
+            seed_split=seed_split,
         )
     else:
         image_gray, phase_masks, rendered_layers, fragment_area = _generic_render(

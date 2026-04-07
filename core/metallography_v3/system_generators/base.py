@@ -46,6 +46,11 @@ class SystemGenerationContext:
     magnification: float = 200.0
     native_um_per_px: float = 0.5
     color_mode: str = "grayscale_nital"
+    # A8 — explicit override for the retained-austenite boundary bias
+    # in ``_build_martensitic_render``. ``None`` keeps the legacy
+    # 0.72 weight (snapshot baseline must stay byte identical), any
+    # higher value pushes the RA mask harder onto inter-lath films.
+    ra_boundary_strength: float | None = None
 
 
 @dataclass(slots=True)

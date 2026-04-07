@@ -609,6 +609,32 @@ class MetallographyPipelineV3:
             thermal_summary=thermal_summary,
             quench_summary=quench_summary,
         )
+        # A0.1 — honour the explicit ``phase_model.requested_stage``
+        # override, used by the new white_cast_iron_*/bainite_upper/lower
+        # presets to opt into the dedicated specialised renderers.
+        # Without this hop the orchestrator's auto-resolver returns
+        # the legacy ``ledeburite``/``bainite`` stages and the
+        # specialised dispatchers in fe_c_unified never run.
+        _requested_stage_override = str(
+            getattr(request.phase_model, "requested_stage", "") or ""
+        ).strip()
+        if _requested_stage_override and _requested_stage_override.lower() not in (
+            "auto",
+            "automatic",
+        ):
+            try:
+                from dataclasses import replace as _dataclass_replace
+
+                phase_bundle = _dataclass_replace(
+                    phase_bundle, stage=_requested_stage_override
+                )
+            except Exception:
+                # ``PhaseBundleV3`` may not be a dataclass in some
+                # builds; fall back to mutating the attribute directly.
+                try:
+                    phase_bundle.stage = _requested_stage_override  # type: ignore[attr-defined]
+                except Exception:
+                    pass
         hybrid_heat_treatment: dict[str, Any] = {}
         expected_properties_validation: dict[str, Any] = {}
         if supports_hybrid_properties(str(system), composition_norm):
@@ -827,7 +853,24 @@ class MetallographyPipelineV3:
             getattr(request.synthesis_profile, "color_mode", "grayscale_nital")
             or "grayscale_nital"
         )
-        if _color_mode == "grayscale_nital":
+        # C1.1 — when the pro-realistic path already produced an RGB
+        # frame (because the synthesis profile chose a colour mode
+        # that ``pipeline_pro`` could honour) reuse it directly so the
+        # post-process colourer is not applied twice.
+        _pro_image_rgb = morph.get("image_rgb") if isinstance(morph, dict) else None
+        if isinstance(_pro_image_rgb, np.ndarray) and _pro_image_rgb.ndim == 3:
+            if _pro_image_rgb.shape[:2] == image_gray.shape:
+                image_rgb = _pro_image_rgb
+            else:
+                # Fallback: resize each channel independently to the
+                # requested resolution. ``_resize_gray_to`` only
+                # accepts 2D arrays.
+                _resized_channels = [
+                    _resize_gray_to(_pro_image_rgb[..., c], requested_resolution)
+                    for c in range(3)
+                ]
+                image_rgb = np.stack(_resized_channels, axis=-1)
+        elif _color_mode == "grayscale_nital":
             image_rgb = _to_rgb(image_gray)
         else:
             # Resize phase masks to the final resolution so they align
