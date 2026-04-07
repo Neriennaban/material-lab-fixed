@@ -1,0 +1,125 @@
+{
+  "sample_id": "Fe_Armco_annealed",
+  "composition_wt": {
+    "Fe": 99.98,
+    "C": 0.02
+  },
+  "system_hint": "fe-c",
+  "prep_route": {
+    "roughness_target_um": 0.05,
+    "relief_mode": "hardness_coupled",
+    "contamination_level": 0.02,
+    "steps": [
+      {
+        "method": "grinding_800",
+        "duration_s": 90,
+        "abrasive_um": 18,
+        "load_n": 22,
+        "rpm": 180,
+        "coolant": "water"
+      },
+      {
+        "method": "polishing_3um",
+        "duration_s": 110,
+        "abrasive_um": 3,
+        "load_n": 14,
+        "rpm": 140,
+        "coolant": "alcohol"
+      },
+      {
+        "method": "polishing_1um",
+        "duration_s": 90,
+        "abrasive_um": 1,
+        "load_n": 10,
+        "rpm": 120,
+        "coolant": "alcohol"
+      }
+    ]
+  },
+  "etch_profile": {
+    "reagent": "nital_2",
+    "time_s": 9,
+    "temperature_c": 22,
+    "agitation": "gentle",
+    "overetch_factor": 1
+  },
+  "synthesis_profile": {
+    "profile_id": "fe_armco_annealed_v3",
+    "phase_topology_mode": "auto",
+    "contrast_target": 1.08,
+    "boundary_sharpness": 1.15,
+    "artifact_level": 0.2,
+    "composition_sensitivity_mode": "educational",
+    "generation_mode": "edu_engineering",
+    "phase_emphasis_style": "contrast_texture",
+    "phase_fraction_tolerance_pct": 20,
+    "system_generator_mode": "system_auto",
+    "color_mode": "grayscale_nital"
+  },
+  "microscope_profile": {
+    "simulate_preview": false,
+    "magnification": 200,
+    "focus": 0.95,
+    "brightness": 1,
+    "contrast": 1.1
+  },
+  "seed": 100210,
+  "resolution": [
+    1024,
+    1024
+  ],
+  "strict_validation": true,
+  "reference_profile_id": "steel_ref",
+  "phase_model": {
+    "engine": "explicit_rules_v3",
+    "phase_control_mode": "auto_with_override",
+    "manual_phase_fractions": {},
+    "manual_override_weight": 0.35,
+    "allow_custom_fallback": true,
+    "phase_balance_tolerance_pct": 20
+  },
+  "thermal_program": {
+    "points": [
+      {
+        "time_s": 0.0,
+        "temperature_c": 20.0,
+        "label": "Start",
+        "locked": true
+      },
+      {
+        "time_s": 720.0,
+        "temperature_c": 780.0,
+        "label": "Point 1",
+        "locked": false
+      },
+      {
+        "time_s": 2400.0,
+        "temperature_c": 780.0,
+        "label": "Point 2",
+        "locked": false
+      },
+      {
+        "time_s": 4560.0,
+        "temperature_c": 20.0,
+        "label": "Point 3",
+        "locked": false
+      }
+    ],
+    "quench": {
+      "medium_code": "air",
+      "quench_time_s": 0.0,
+      "bath_temperature_c": 25.0,
+      "sample_temperature_c": 840.0,
+      "custom_medium_name": "",
+      "custom_severity_factor": 1.0
+    },
+    "sampling_mode": "per_degree",
+    "degree_step_c": 1.0,
+    "max_frames": 320
+  },
+  "metadata": {
+    "source": "TZ §13 — standard steel grade preset",
+    "display_name_ru": "Армко-железо, отжиг",
+    "short_label_ru": "Armco"
+  }
+}
