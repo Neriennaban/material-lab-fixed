@@ -60,7 +60,32 @@ def texture_liquid(size: tuple[int, int], seed: int) -> np.ndarray:
     return _ensure_u8(image)
 
 
-def texture_ferrite(size: tuple[int, int], seed: int) -> np.ndarray:
+def texture_ferrite(
+    size: tuple[int, int],
+    seed: int,
+    *,
+    add_twins: bool = False,
+    anisotropic_etching: bool = False,
+) -> np.ndarray:
+    """Render polygonal ferrite grains with nital etching.
+
+    Optional refinements introduced in A7/A9:
+
+    * ``add_twins`` (A7) — with probability ~7 % per grain, draw a
+      single straight annealing twin band across the grain. The twin
+      tone is offset ±3 % from the host grain so it remains a subtle
+      feature rather than a full-contrast lamella.
+    * ``anisotropic_etching`` (A9) — modulate the per-grain base tone
+      with a low-frequency multiscale-noise field driven by the same
+      RNG used for grain orientation, so each grain has a slight
+      orientation-dependent contrast variation similar to real nital
+      etching of α-Fe.
+
+    Both flags default to ``False`` so the legacy ``texture_ferrite``
+    call remains byte-identical for backward compatibility (the
+    snapshot baseline test guards this).
+    """
+
     grain_data = generate_grain_structure(
         size=size,
         seed=int(seed) + 11,
@@ -75,7 +100,52 @@ def texture_ferrite(size: tuple[int, int], seed: int) -> np.ndarray:
     rng = np.random.default_rng(int(seed) + 12)
     n_grains = int(labels.max()) + 1
     grain_tones = rng.uniform(200.0, 230.0, size=n_grains).astype(np.float32)
+
+    if anisotropic_etching:
+        # Per-grain orientation surrogate (random angle in [0, π]) is
+        # mapped to a small tone offset via a smooth periodic function
+        # so adjacent grains with similar angles do not get identical
+        # contrast — this approximates the visible facet-by-facet
+        # variation of real nital-etched α-Fe.
+        orientation = rng.uniform(0.0, math.pi, size=n_grains).astype(np.float32)
+        anisotropy_offset = (np.sin(2.0 * orientation) * 6.0).astype(np.float32)
+        grain_tones = grain_tones + anisotropy_offset
+        np.clip(grain_tones, 188.0, 240.0, out=grain_tones)
+
     ferrite = grain_tones[labels]
+
+    if add_twins:
+        # Annealing twins — straight bands inside ~7 % of grains. The
+        # twin tone is offset by ±3 % from the host grain so it stays
+        # subtle (real twins are weak contrast features, not lamellae).
+        h, w = size
+        yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
+        twin_field = np.zeros(size, dtype=np.float32)
+        twin_rng = np.random.default_rng(int(seed) + 14)
+        for grain_id in range(n_grains):
+            if twin_rng.random() > 0.07:
+                continue
+            mask = labels == grain_id
+            if not mask.any():
+                continue
+            ys, xs = np.nonzero(mask)
+            cy = float(ys.mean())
+            cx = float(xs.mean())
+            angle = float(twin_rng.uniform(0.0, math.pi))
+            # Project pixels onto the perpendicular of the twin axis;
+            # a thin band of width ~2-4 px around the centre is the
+            # twin lamella.
+            proj = (xx - cx) * math.cos(angle) + (yy - cy) * math.sin(angle)
+            band_width = float(twin_rng.uniform(1.5, 3.0))
+            band = mask & (np.abs(proj) < band_width)
+            if not band.any():
+                continue
+            tone_shift = float(twin_rng.choice([-1.0, 1.0])) * float(
+                twin_rng.uniform(5.0, 9.0)
+            )
+            twin_field[band] += tone_shift
+        ferrite = ferrite + twin_field
+
     # Add subtle intra-grain noise for surface roughness
     ferrite += _smooth_noise(seed + 19, size=size, sigma=6.0) * 3.5
     # Darken grain boundaries
@@ -136,9 +206,44 @@ def texture_pearlite_colonies(size: tuple[int, int], seed: int) -> np.ndarray:
     return _ensure_u8(image)
 
 
-def texture_cementite_network(size: tuple[int, int], seed: int) -> np.ndarray:
-    # Cementite is NOT attacked by nital → brightest phase (~235-250).
-    # The network forms at prior austenite grain boundaries in hypereutectoid steel.
+def texture_cementite_network(
+    size: tuple[int, int],
+    seed: int,
+    *,
+    c_wt: float | None = None,
+    cooling_rate_c_per_s: float | None = None,
+) -> np.ndarray:
+    """Render the secondary cementite grain-boundary network.
+
+    Cementite is NOT attacked by nital → brightest phase (~235-250).
+    The network forms at prior austenite grain boundaries in
+    hypereutectoid steel.
+
+    A5 — when ``c_wt`` is supplied the boundary width scales linearly
+    from ~1.5 px at the eutectoid composition (0.77 % C) to ~7 px at
+    the steel-cast iron limit (2.14 % C). ``cooling_rate_c_per_s``
+    further widens the network for slow furnace cooling. Both
+    parameters default to ``None`` so existing presets and tests stay
+    byte-identical with the legacy fixed ``boundary_width_px=2``.
+    """
+    if c_wt is None:
+        boundary_width_px = 2
+    else:
+        # Linear interpolation between (0.77 %C → 1.5 px) and
+        # (2.14 %C → 7.0 px). Clamp so wildly out-of-range carbon
+        # contents (pure ferrite, cast iron) cannot generate runaway
+        # thicknesses.
+        c_normalised = max(0.77, min(2.14, float(c_wt)))
+        carbon_lerp = (c_normalised - 0.77) / (2.14 - 0.77)
+        target_width = 1.5 + carbon_lerp * (7.0 - 1.5)
+        if cooling_rate_c_per_s is not None:
+            # Slow cooling (furnace) → +1 px per 10× rate decrease
+            # below 1 °C/s. Fast cooling shrinks the network slightly.
+            rate_clamped = max(0.05, float(cooling_rate_c_per_s))
+            rate_factor = -math.log10(rate_clamped)  # >0 for slow, <0 for fast
+            target_width += max(-1.5, min(2.0, rate_factor * 0.8))
+        boundary_width_px = int(max(1, round(target_width)))
+
     base = np.full(size, 235.0, dtype=np.float32)
     base += _smooth_noise(seed + 31, size=size, sigma=3.2) * 5.0
     grains = generate_grain_structure(
@@ -146,7 +251,7 @@ def texture_cementite_network(size: tuple[int, int], seed: int) -> np.ndarray:
         seed=int(seed) + 37,
         mean_grain_size_px=84.0,
         grain_size_jitter=0.15,
-        boundary_width_px=2,
+        boundary_width_px=boundary_width_px,
         boundary_contrast=0.62,
     )
     boundaries = grains["boundaries"]
