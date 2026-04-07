@@ -1,0 +1,134 @@
+{
+  "sample_id": "Fe_armco_dic_polarized_v3",
+  "composition_wt": {
+    "Fe": 99.98,
+    "C": 0.02
+  },
+  "system_hint": "fe-c",
+  "prep_route": {
+    "roughness_target_um": 0.03,
+    "relief_mode": "hardness_coupled",
+    "contamination_level": 0.006,
+    "steps": [
+      {
+        "method": "grinding_800",
+        "duration_s": 75.0,
+        "abrasive_um": 18.0,
+        "load_n": 18.0,
+        "rpm": 150.0,
+        "coolant": "water"
+      },
+      {
+        "method": "polishing_3um",
+        "duration_s": 110.0,
+        "abrasive_um": 3.0,
+        "load_n": 12.0,
+        "rpm": 140.0,
+        "coolant": "alcohol",
+        "cloth_type": "napless"
+      },
+      {
+        "method": "polishing_1um",
+        "duration_s": 90.0,
+        "abrasive_um": 1.0,
+        "load_n": 8.0,
+        "rpm": 110.0,
+        "cloth_type": "napless",
+        "slurry_type": "colloidal_silica",
+        "cleaning_between_steps": true
+      }
+    ]
+  },
+  "etch_profile": {
+    "reagent": "nital_2",
+    "time_s": 8.0,
+    "temperature_c": 22.0,
+    "agitation": "gentle",
+    "overetch_factor": 1.0
+  },
+  "synthesis_profile": {
+    "profile_id": "fe_armco_dic_polarized_500x",
+    "phase_topology_mode": "auto",
+    "contrast_target": 1.00,
+    "boundary_sharpness": 1.35,
+    "artifact_level": 0.08,
+    "generation_mode": "edu_engineering",
+    "phase_emphasis_style": "contrast_texture",
+    "phase_fraction_tolerance_pct": 20.0,
+    "composition_sensitivity_mode": "educational",
+    "system_generator_mode": "system_auto",
+    "color_mode": "dic_polarized"
+  },
+  "microscope_profile": {
+    "simulate_preview": false,
+    "magnification": 500,
+    "focus": 0.95,
+    "brightness": 1.0,
+    "contrast": 1.15,
+    "optical_mode": "DIC"
+  },
+  "seed": 3101901,
+  "resolution": [
+    1024,
+    1024
+  ],
+  "strict_validation": true,
+  "reference_profile_id": "steel_ref",
+  "metadata": {
+    "source": "Reference sample 1 — tec-science.com, DIC polarized Fe-C microstructure",
+    "display_name_ru": "Армко-железо, DIC/поляризованный, цветная анизотропия зёрен",
+    "short_label_ru": "Armco DIC",
+    "color_mode_notes": "HSV per-grain coloring emulating DIC/Nomarski reflected polarized light",
+    "optical_guidance": {
+      "default_mode": "DIC",
+      "diagnostic_mode": "brightfield"
+    }
+  },
+  "phase_model": {
+    "engine": "explicit_rules_v3",
+    "phase_control_mode": "auto_with_override",
+    "manual_phase_fractions": {},
+    "manual_override_weight": 0.25,
+    "allow_custom_fallback": true,
+    "phase_balance_tolerance_pct": 20.0
+  },
+  "thermal_program": {
+    "points": [
+      {
+        "time_s": 0.0,
+        "temperature_c": 20.0,
+        "label": "Start",
+        "locked": true
+      },
+      {
+        "time_s": 600.0,
+        "temperature_c": 800.0,
+        "label": "Austenitize",
+        "locked": false
+      },
+      {
+        "time_s": 2400.0,
+        "temperature_c": 800.0,
+        "label": "Hold",
+        "locked": false
+      },
+      {
+        "time_s": 5400.0,
+        "temperature_c": 20.0,
+        "label": "Furnace cool",
+        "locked": false
+      }
+    ],
+    "quench": {
+      "medium_code": "furnace",
+      "quench_time_s": 0.0,
+      "bath_temperature_c": 25.0,
+      "sample_temperature_c": 800.0,
+      "custom_medium_name": "Furnace cool",
+      "custom_severity_factor": 0.1
+    },
+    "sampling_mode": "per_degree",
+    "degree_step_c": 1.0,
+    "max_frames": 320
+  }
+}

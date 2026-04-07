@@ -1,0 +1,146 @@
+{
+  "sample_id": "Steel_45_upper_bainite_klemm_v3",
+  "composition_wt": {
+    "Fe": 99.55,
+    "C": 0.45
+  },
+  "system_hint": "fe-c",
+  "prep_route": {
+    "roughness_target_um": 0.04,
+    "relief_mode": "hardness_coupled",
+    "contamination_level": 0.012,
+    "steps": [
+      {
+        "method": "grinding_800",
+        "duration_s": 90.0,
+        "abrasive_um": 18.0,
+        "load_n": 22.0,
+        "rpm": 180.0,
+        "coolant": "water"
+      },
+      {
+        "method": "polishing_3um",
+        "duration_s": 110.0,
+        "abrasive_um": 3.0,
+        "load_n": 14.0,
+        "rpm": 140.0,
+        "coolant": "alcohol",
+        "cloth_type": "napless"
+      },
+      {
+        "method": "polishing_1um",
+        "duration_s": 90.0,
+        "abrasive_um": 1.0,
+        "load_n": 10.0,
+        "rpm": 120.0,
+        "cloth_type": "napless",
+        "slurry_type": "colloidal_silica",
+        "cleaning_between_steps": true
+      }
+    ]
+  },
+  "etch_profile": {
+    "reagent": "klemm_1",
+    "time_s": 60.0,
+    "temperature_c": 22.0,
+    "agitation": "gentle",
+    "overetch_factor": 1.0
+  },
+  "synthesis_profile": {
+    "profile_id": "steel_45_upper_bainite_klemm_500x",
+    "phase_topology_mode": "auto",
+    "contrast_target": 1.10,
+    "boundary_sharpness": 1.20,
+    "artifact_level": 0.12,
+    "generation_mode": "edu_engineering",
+    "phase_emphasis_style": "contrast_texture",
+    "phase_fraction_tolerance_pct": 20.0,
+    "composition_sensitivity_mode": "educational",
+    "system_generator_mode": "system_auto",
+    "color_mode": "tint_etch_blue_yellow"
+  },
+  "microscope_profile": {
+    "simulate_preview": false,
+    "magnification": 500,
+    "focus": 0.95,
+    "brightness": 1.0,
+    "contrast": 1.18,
+    "optical_mode": "brightfield"
+  },
+  "seed": 4501077,
+  "resolution": [
+    1024,
+    1024
+  ],
+  "strict_validation": true,
+  "reference_profile_id": "steel_ref",
+  "metadata": {
+    "source": "Reference sample 3 — colored bainite, blue/yellow tint etch",
+    "display_name_ru": "Сталь 45, верхний бейнит, цветное травление Klemm I",
+    "short_label_ru": "St45 UpperBainite Klemm",
+    "color_mode_notes": "Klemm I tint etching: ferrite tints yellow, bainite plates tint blue",
+    "stage_override": "bainite_upper"
+  },
+  "phase_model": {
+    "engine": "explicit_rules_v3",
+    "phase_control_mode": "auto_with_override",
+    "manual_phase_fractions": {
+      "bainite": 0.78,
+      "cementite": 0.22
+    },
+    "manual_override_weight": 0.75,
+    "allow_custom_fallback": true,
+    "phase_balance_tolerance_pct": 20.0
+  },
+  "thermal_program": {
+    "points": [
+      {
+        "time_s": 0.0,
+        "temperature_c": 20.0,
+        "label": "Start",
+        "locked": true
+      },
+      {
+        "time_s": 600.0,
+        "temperature_c": 870.0,
+        "label": "Austenitize",
+        "locked": false
+      },
+      {
+        "time_s": 1200.0,
+        "temperature_c": 870.0,
+        "label": "Hold",
+        "locked": false
+      },
+      {
+        "time_s": 1320.0,
+        "temperature_c": 450.0,
+        "label": "Quench to bainite hold",
+        "locked": false
+      },
+      {
+        "time_s": 5400.0,
+        "temperature_c": 450.0,
+        "label": "Isothermal upper-bainite hold",
+        "locked": false
+      },
+      {
+        "time_s": 7800.0,
+        "temperature_c": 20.0,
+        "label": "Air cool",
+        "locked": false
+      }
+    ],
+    "quench": {
+      "medium_code": "bainite_upper",
+      "quench_time_s": 120.0,
+      "bath_temperature_c": 450.0,
+      "sample_temperature_c": 870.0,
+      "custom_medium_name": "Salt bath @ 450°C",
+      "custom_severity_factor": 0.5
+    },
+    "sampling_mode": "per_degree",
+    "degree_step_c": 1.0,
+    "max_frames": 320
+  }
+}
