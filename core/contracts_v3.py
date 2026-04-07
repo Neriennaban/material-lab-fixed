@@ -284,6 +284,14 @@ class SynthesisProfileV3:
     generation_mode: str = "edu_engineering"  # realistic_visual | edu_engineering | pro_realistic
     phase_emphasis_style: str = "contrast_texture"  # contrast_texture | max_contrast | morphology_only
     phase_fraction_tolerance_pct: float = 20.0
+    # A10.0 — colour mode selects the downstream palette that the
+    # post-process colourer applies to the final grayscale frame.
+    # Default ``"grayscale_nital"`` preserves the legacy one-channel
+    # output; other values (``nital_warm``, ``dic_polarized``,
+    # ``tint_etch_blue_yellow``) switch on RGB rendering in
+    # ``fe_c_color_palette.apply_color_palette``. Not supported when
+    # ``generation_mode == "pro_realistic"``.
+    color_mode: str = "grayscale_nital"
 
     @classmethod
     def from_dict(cls, payload: dict[str, Any] | None) -> "SynthesisProfileV3":
@@ -299,6 +307,7 @@ class SynthesisProfileV3:
             generation_mode=str(data.get("generation_mode", "edu_engineering")),
             phase_emphasis_style=str(data.get("phase_emphasis_style", "contrast_texture")),
             phase_fraction_tolerance_pct=float(data.get("phase_fraction_tolerance_pct", 20.0)),
+            color_mode=str(data.get("color_mode", "grayscale_nital")),
         )
 
     def to_dict(self) -> dict[str, Any]:

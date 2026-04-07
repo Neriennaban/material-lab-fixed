@@ -33,6 +33,9 @@ SYSTEM_STAGE_ORDER: dict[str, list[str]] = {
         "pearlite",
         "pearlite_cementite",
         "ledeburite",
+        "white_cast_iron_hypoeutectic",
+        "white_cast_iron_eutectic",
+        "white_cast_iron_hypereutectic",
         "martensite",
         "martensite_tetragonal",
         "martensite_cubic",
@@ -41,6 +44,8 @@ SYSTEM_STAGE_ORDER: dict[str, list[str]] = {
         "sorbite_quench",
         "sorbite_temper",
         "bainite",
+        "bainite_upper",
+        "bainite_lower",
         "tempered_low",
         "tempered_medium",
         "tempered_high",
@@ -124,6 +129,21 @@ _STAGE_ALIASES = {
     "sorbite_q": "sorbite_quench",
     "sorbite_t": "sorbite_temper",
     "бейнит": "bainite",
+    "upper_bainite": "bainite_upper",
+    "lower_bainite": "bainite_lower",
+    "верхний_бейнит": "bainite_upper",
+    "нижний_бейнит": "bainite_lower",
+    "bainite_u": "bainite_upper",
+    "bainite_l": "bainite_lower",
+    "white_cast_iron_hypo": "white_cast_iron_hypoeutectic",
+    "white_cast_iron_eut": "white_cast_iron_eutectic",
+    "white_cast_iron_hyper": "white_cast_iron_hypereutectic",
+    "белый_чугун_доэвт": "white_cast_iron_hypoeutectic",
+    "белый_чугун_эвт": "white_cast_iron_eutectic",
+    "белый_чугун_заэвт": "white_cast_iron_hypereutectic",
+    "hypoeutectic_white_cast_iron": "white_cast_iron_hypoeutectic",
+    "eutectic_white_cast_iron": "white_cast_iron_eutectic",
+    "hypereutectic_white_cast_iron": "white_cast_iron_hypereutectic",
 }
 
 
@@ -251,6 +271,14 @@ def resolve_fe_c_stage(c_wt: float, temperature_c: float, cooling_mode: str, req
     if mode in {"sorbite_quench", "sorbite"}:
         return "sorbite_quench"
     if mode.startswith("bain"):
+        # Explicit upper/lower bainite only if the cooling mode string
+        # mentions it ("bainite_upper", "bainite_lower", "upper_bainite",
+        # "lower_bainite"). Otherwise keep the legacy generic "bainite"
+        # stage so existing presets render unchanged.
+        if "upper" in mode:
+            return "bainite_upper"
+        if "lower" in mode or "нижний" in mode:
+            return "bainite_lower"
         return "bainite"
     if mode.startswith("temper"):
         if temp <= 250.0:
@@ -293,6 +321,13 @@ def resolve_fe_c_stage(c_wt: float, temperature_c: float, cooling_mode: str, req
         return "pearlite"
     if c <= 2.14:
         return "pearlite_cementite"
+    # Cast iron (C > 2.14 %). We keep the legacy "ledeburite" stage as the
+    # auto-resolved default so that existing presets (e.g. grey cast iron)
+    # render unchanged. The new split — ``white_cast_iron_hypoeutectic`` /
+    # ``white_cast_iron_eutectic`` / ``white_cast_iron_hypereutectic`` — is
+    # **opt-in**: a preset must request it explicitly via ``requested_stage``.
+    # The specialised render functions in ``fe_c_unified.py`` pick up the
+    # new stage names through the aliases in ``_STAGE_ALIASES``.
     return "ledeburite"
 
 

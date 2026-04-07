@@ -196,6 +196,10 @@ def _clone_topology_payload(payload: dict[str, Any]) -> dict[str, Any]:
         for k, v in dict(payload.get("feature_masks", {})).items()
         if isinstance(v, np.ndarray)
     }
+    raw_labels = payload.get("grain_labels")
+    grain_labels = (
+        np.array(raw_labels, copy=True) if isinstance(raw_labels, np.ndarray) else None
+    )
     return {
         "image_gray": np.array(payload.get("image_gray"), copy=True),
         "phase_masks": phase_masks,
@@ -211,6 +215,7 @@ def _clone_topology_payload(payload: dict[str, Any]) -> dict[str, Any]:
         "morphology_state": dict(payload.get("morphology_state", {})),
         "precipitation_state": dict(payload.get("precipitation_state", {})),
         "validation_against_rules": dict(payload.get("validation_against_rules", {})),
+        "grain_labels": grain_labels,
     }
 
 
@@ -296,7 +301,22 @@ def generate_phase_topology(
     phase_fraction_tolerance_pct: float = 20.0,
     thermal_summary: dict[str, Any] | None = None,
     quench_summary: dict[str, Any] | None = None,
+    microscope_profile: dict[str, Any] | None = None,
+    color_mode: str = "grayscale_nital",
 ) -> dict[str, Any]:
+    # Compute microscope-derived context (A0.2 magnification propagation).
+    # Default to 200× (0.5 µm/px) when no microscope profile is supplied so
+    # the behaviour matches the pre-A0.2 baseline for all existing presets.
+    _magnification = 200.0
+    if isinstance(microscope_profile, dict):
+        try:
+            raw_mag = float(microscope_profile.get("magnification", 200.0))
+        except Exception:
+            raw_mag = 200.0
+        if raw_mag > 0.0:
+            _magnification = raw_mag
+    _native_um_per_px = 1.0 / max(1e-3, _magnification / 100.0)
+
     cache_key = _topology_cache_key(
         size=size,
         seed=int(seed),
@@ -362,6 +382,7 @@ def generate_phase_topology(
     morphology_state: dict[str, Any] = {}
     precipitation_state: dict[str, Any] = {}
     validation_against_rules: dict[str, Any] = {}
+    grain_labels_from_meta: np.ndarray | None = None
     if not phases:
         fallback = generate_grain_structure(
             size=size, seed=seed, mean_grain_size_px=52.0
@@ -421,6 +442,9 @@ def generate_phase_topology(
                 )
             ),
             transformation_state=dict(transformation_state),
+            magnification=float(_magnification),
+            native_um_per_px=float(_native_um_per_px),
+            color_mode=str(color_mode),
         )
         generated, selection = _system_registry().generate(
             context=context,
@@ -433,6 +457,11 @@ def generate_phase_topology(
             if isinstance(mask, np.ndarray)
         }
         meta = dict(generated.metadata)
+        # A10.3 — surface the per-grain label map through the morph dict
+        # so the pipeline can hand it to ``apply_color_palette`` for
+        # DIC/polarised renderings. The array is never serialised into
+        # JSON metadata, it is only passed through in memory.
+        grain_labels_from_meta = meta.get("grain_labels") if isinstance(meta, dict) else None
         if isinstance(meta, dict):
             if isinstance(meta.get("composition_effect"), dict):
                 composition_effect = dict(meta["composition_effect"])
@@ -506,6 +535,13 @@ def generate_phase_topology(
         "morphology_state": morphology_state,
         "precipitation_state": precipitation_state,
         "validation_against_rules": validation_against_rules,
+        # A10.3 — in-memory label map for DIC / per-grain colouring.
+        # ``None`` when the underlying generator did not produce one.
+        "grain_labels": (
+            grain_labels_from_meta
+            if isinstance(grain_labels_from_meta, np.ndarray)
+            else None
+        ),
     }
     _TOPOLOGY_CACHE[cache_key] = _clone_topology_payload(result)
     while len(_TOPOLOGY_CACHE) > _TOPOLOGY_CACHE_MAX:

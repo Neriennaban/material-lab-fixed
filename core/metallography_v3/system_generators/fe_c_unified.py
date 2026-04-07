@@ -82,6 +82,21 @@ _STAGE_DEFAULT_FRACTIONS: dict[str, dict[str, float]] = {
     "pearlite": {"PEARLITE": 1.0},
     "pearlite_cementite": {"PEARLITE": 0.82, "CEMENTITE": 0.18},
     "ledeburite": {"LEDEBURITE": 0.62, "PEARLITE": 0.28, "CEMENTITE": 0.1},
+    # White cast iron variants (Fe-C 2.14-6.67 %, carbides not graphite).
+    # Hypoeutectic: primary austenite dendrites (now pearlite) in ledeburite matrix.
+    "white_cast_iron_hypoeutectic": {
+        "PEARLITE": 0.42,
+        "LEDEBURITE": 0.52,
+        "CEMENTITE": 0.06,
+    },
+    # Eutectic: mostly ledeburite, little free phase.
+    "white_cast_iron_eutectic": {"LEDEBURITE": 0.92, "CEMENTITE": 0.08},
+    # Hypereutectic: primary cementite needles in ledeburite matrix.
+    "white_cast_iron_hypereutectic": {
+        "CEMENTITE_PRIMARY": 0.28,
+        "LEDEBURITE": 0.64,
+        "CEMENTITE": 0.08,
+    },
     "martensite": {"MARTENSITE": 0.9, "CEMENTITE": 0.1},
     "martensite_tetragonal": {"MARTENSITE_TETRAGONAL": 0.9, "CEMENTITE": 0.1},
     "martensite_cubic": {"MARTENSITE_CUBIC": 0.94, "CEMENTITE": 0.06},
@@ -90,6 +105,12 @@ _STAGE_DEFAULT_FRACTIONS: dict[str, dict[str, float]] = {
     "sorbite_quench": {"SORBITE": 0.84, "CEMENTITE": 0.16},
     "sorbite_temper": {"SORBITE": 0.62, "CEMENTITE": 0.22, "FERRITE": 0.16},
     "bainite": {"BAINITE": 0.82, "CEMENTITE": 0.18},
+    # Upper bainite (350-550 °C): feathery packets of parallel ferrite
+    # plates with Fe3C between them. Slightly coarser, more carbide content.
+    "bainite_upper": {"BAINITE": 0.78, "CEMENTITE": 0.22},
+    # Lower bainite (200-350 °C): needle-like ferrite with Fe3C precipitates
+    # inside the laths at ~55-60°. Finer, harder, less free cementite.
+    "bainite_lower": {"BAINITE": 0.85, "CEMENTITE": 0.15},
     "tempered_low": {"MARTENSITE": 0.6, "TROOSTITE": 0.2, "CEMENTITE": 0.2},
     "tempered_medium": {
         "TROOSTITE": 0.5,
@@ -108,9 +129,14 @@ _TRANSITION_STAGES: set[str] = {
     "alpha_pearlite",
     "pearlite_cementite",
     "ledeburite",
+    "white_cast_iron_hypoeutectic",
+    "white_cast_iron_eutectic",
+    "white_cast_iron_hypereutectic",
     "troostite_temper",
     "sorbite_temper",
     "bainite",
+    "bainite_upper",
+    "bainite_lower",
     "tempered_low",
     "tempered_medium",
     "tempered_high",
@@ -130,6 +156,18 @@ _SPECIALIZED_MARTENSITIC_STAGES = {
     "tempered_medium",
     "tempered_high",
 }
+# New taxonomy for A0.1: white cast iron and explicit upper/lower bainite.
+# These sets are consulted by `render_fe_c_unified` to dispatch to new build
+# functions. In phase A0 the sets are declared but not yet wired — the
+# dispatch is added in phase A1/A6 when the specialised render functions
+# land. Until then, these stages fall through to `_generic_render`, which
+# uses the phase templates above.
+_SPECIALIZED_CAST_IRON_STAGES = {
+    "white_cast_iron_hypoeutectic",
+    "white_cast_iron_eutectic",
+    "white_cast_iron_hypereutectic",
+}
+_SPECIALIZED_BAINITIC_STAGES = {"bainite_upper", "bainite_lower"}
 
 
 def _composition_fraction(composition_wt: dict[str, float] | None, key: str) -> float:
@@ -243,6 +281,11 @@ def _pure_ferrite_render(
         "family": "pure_ferrite_power_voronoi",
         **dict(render.get("metadata", {})),
     }
+    # A10.3 — expose the per-grain label map so downstream palettes
+    # (DIC polarised, tint etching) can colour each grain individually.
+    raw_labels = render.get("labels")
+    if isinstance(raw_labels, np.ndarray):
+        trace["grain_labels"] = raw_labels.astype(np.int32)
     return image_gray, phase_masks, rendered_layers, fragment_area, trace
 
 
@@ -1487,6 +1530,13 @@ def render_fe_c_unified(context: SystemGenerationContext) -> SystemGenerationRes
             "pure_iron_baseline_applied": True,
             "pure_iron_target": "bright_ferritic_negative_control",
         }
+    # A10.3 — surface the per-grain label map at the top level of the
+    # metadata dict so downstream palettes (DIC polarised) can consume it
+    # without introspecting ``morphology_trace``. The key is ignored by
+    # the grayscale pipeline so backward compatibility is preserved.
+    grain_labels_raw = morphology_trace.get("grain_labels")
+    if isinstance(grain_labels_raw, np.ndarray):
+        metadata["grain_labels"] = grain_labels_raw.astype(np.int32)
     return SystemGenerationResult(
         image_gray=image_gray, phase_masks=phase_masks, metadata=metadata
     )

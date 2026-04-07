@@ -36,6 +36,16 @@ class SystemGenerationContext:
     phase_fraction_source: str = "default_formula"
     phase_calibration_mode: str = "default_formula"
     transformation_state: dict[str, Any] = field(default_factory=dict)
+    # A0.2 / A10.0 — microscope and color-mode context.
+    # ``magnification`` is the optical magnification of the preset
+    # (typically 100-1000×). ``native_um_per_px`` is the physical
+    # pixel pitch in micrometres computed as 1.0 / (magnification / 100)
+    # so that a 200× preset maps to 0.5 µm/px. ``color_mode`` selects
+    # the downstream palette used by the post-process colourer
+    # (``grayscale_nital`` keeps the legacy single-channel output).
+    magnification: float = 200.0
+    native_um_per_px: float = 0.5
+    color_mode: str = "grayscale_nital"
 
 
 @dataclass(slots=True)
