@@ -98,10 +98,13 @@ class PresetsTest(unittest.TestCase):
         ferrite_fraction = sample.info["phases"]["FERRITE"]
         self.assertGreater(ferrite_fraction, 0.5)
 
-    def test_white_cast_iron_preset_has_multiple_phases(self) -> None:
+    def test_white_cast_iron_preset_uses_specialised_dispatcher(self) -> None:
         sample = fm.presets.cast_iron_white_hypereutectic(width=96, height=96)
         phases = {n.upper() for n in sample.phase_masks.keys()}
-        self.assertGreaterEqual(len(phases), 3)
+        # The dedicated A1+A2 dispatcher returns the leopard ledeburite
+        # background plus a primary-cementite needle layer.
+        self.assertIn("LEDEBURITE", phases)
+        self.assertIn("CEMENTITE_PRIMARY", phases)
 
     def test_unknown_alias_raises(self) -> None:
         with self.assertRaises(AttributeError):

@@ -354,8 +354,33 @@ def generate_pro_realistic_fe_c(
         "boundary_phase_bias": float(continuous_state.proeutectoid_boundary_bias),
         "native_um_per_px": float(native_um_per_px),
     }
+    # C1.1 — apply the post-process colour palette here as well so
+    # the pro-realistic path supports ``color_mode != grayscale_nital``.
+    # When the synthesis profile keeps the default mode the value
+    # below stays ``None`` and ``pipeline_v3`` falls back to the
+    # legacy ``_to_rgb`` stack on its side.
+    _pro_image_gray = image_gray.astype(np.uint8)
+    _pro_color_mode = str(
+        getattr(synthesis_profile, "color_mode", "grayscale_nital")
+        or "grayscale_nital"
+    )
+    _pro_image_rgb: np.ndarray | None = None
+    if _pro_color_mode != "grayscale_nital":
+        try:
+            from core.metallography_v3.fe_c_color_palette import apply_color_palette
+
+            _pro_image_rgb = apply_color_palette(
+                image_gray=_pro_image_gray,
+                phase_masks=morphology_state.phase_masks,
+                color_mode=_pro_color_mode,
+                seed=int(seed),
+                labels=None,
+            )
+        except Exception:
+            _pro_image_rgb = None
     return {
-        "image_gray": image_gray.astype(np.uint8),
+        "image_gray": _pro_image_gray,
+        "image_rgb": _pro_image_rgb,
         "phase_masks": morphology_state.phase_masks,
         "feature_masks": dict(morphology_state.feature_maps),
         "prep_maps": {**prep_maps, **etch_maps},
