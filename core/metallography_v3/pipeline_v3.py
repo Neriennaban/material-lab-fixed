@@ -112,6 +112,11 @@ def _lift_small_dark_blobs(
     threshold: float = 40.0,
     max_pixels: int = 48,
 ) -> np.ndarray:
+    """Phase D.2 — vectorised twin of
+    ``morphology_engine._lift_small_dark_blobs``. Replaces the
+    O(K × N) per-component loop with ``np.bincount`` + ``np.isin``
+    so the cost scales linearly with image size (one of the two
+    2 s bottlenecks at 1024×1024)."""
     if ndimage is None:
         return image_gray.astype(np.uint8, copy=False)
     arr = image_gray.astype(np.float32, copy=False)
@@ -119,12 +124,18 @@ def _lift_small_dark_blobs(
     labels, count = ndimage.label(mask.astype(np.uint8))
     if int(count) <= 0:
         return image_gray.astype(np.uint8, copy=False)
+    sizes = np.bincount(labels.ravel())
+    tiny_ids = np.where(sizes <= int(max_pixels))[0]
+    if tiny_ids.size > 0 and tiny_ids[0] == 0:
+        tiny_ids = tiny_ids[1:]
+    if tiny_ids.size == 0:
+        return image_gray.astype(np.uint8, copy=False)
+    tiny_mask = np.isin(labels, tiny_ids, assume_unique=False)
+    if not tiny_mask.any():
+        return image_gray.astype(np.uint8, copy=False)
     local = ndimage.gaussian_filter(arr, sigma=1.05)
     out = arr.copy()
-    for label in range(1, int(count) + 1):
-        zone = labels == label
-        if int(zone.sum()) <= int(max_pixels):
-            out[zone] = 0.84 * local[zone] + 0.16 * out[zone]
+    out[tiny_mask] = 0.84 * local[tiny_mask] + 0.16 * out[tiny_mask]
     return np.clip(out, 0.0, 255.0).astype(np.uint8)
 
 
@@ -855,6 +866,31 @@ class MetallographyPipelineV3:
             ),
             pure_iron_baseline_applied=bool(pure_iron_baseline_applied),
         )
+
+        # Phase D.3 — in the hypereutectoid case (pearlite + boundary
+        # cementite network) every post-process pass upstream
+        # (prep, etch, optics, style, policy) flattens the bright
+        # Fe₃C network because its area fraction (6-11 %) is too
+        # small to pull the histogram stretch. We repaint the
+        # cementite mask to its target bright tone here, after all
+        # grayscale passes and before the optional RGB colourer, so
+        # the final frame actually shows the nital-inert "white
+        # grain-boundary network" that the user asked for.
+        _stage_for_repaint = str(phase_bundle.stage).strip().lower()
+        if _stage_for_repaint == "pearlite_cementite":
+            _cem_mask_internal = (
+                morph.get("phase_masks", {}).get("CEMENTITE")
+                if isinstance(morph, dict)
+                else None
+            )
+            if (
+                isinstance(_cem_mask_internal, np.ndarray)
+                and _cem_mask_internal.shape == image_gray_internal.shape
+                and np.any(_cem_mask_internal > 0)
+            ):
+                _cem_bool_internal = _cem_mask_internal > 0
+                image_gray_internal = image_gray_internal.copy()
+                image_gray_internal[_cem_bool_internal] = 240
 
         image_gray = _resize_gray_to(image_gray_internal, requested_resolution)
 

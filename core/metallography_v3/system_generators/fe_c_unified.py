@@ -1049,9 +1049,15 @@ def _build_pearlitic_render(
     ferrite_img += (noise - 0.5) * 4.0
     ferrite_img = np.clip(ferrite_img, 150.0, 240.0).astype(np.uint8)
 
-    # Проэвтектоидный цементит для учебного режима делаем тёмным и читаемым.
-    cementite_img = 70.0 + (noise - 0.5) * 12.0 - boundary_pref * 18.0
-    cementite_img = np.clip(cementite_img, 0.0, 255.0).astype(np.uint8)
+    # Phase D.3 — proeutectoid cementite is NOT attacked by nital
+    # and appears as the brightest phase in real micrographs. The
+    # previous tone (~70) was a learning-mode "readable" hack; now
+    # that the cementite sits in the boundary network (see below)
+    # we paint it white (235-250) so it reads as the etched
+    # hypereutectoid "white grain-boundary network" from §5.3.Б of
+    # the TZ.
+    cementite_img = 238.0 + (noise - 0.5) * 6.0 + boundary_pref * 6.0
+    cementite_img = np.clip(cementite_img, 225.0, 252.0).astype(np.uint8)
 
     proeutectoid = (
         "FERRITE"
@@ -1086,17 +1092,60 @@ def _build_pearlitic_render(
             "PEARLITE": (~ferr_mask).astype(np.uint8),
         }
     elif stage == "pearlite_cementite":
-        cem_field = normalize01(boundary_rank * 0.97 + low * 0.02 + noise * 0.01)
-        cem_pixel_mask = select_fraction_mask(
-            field=cem_field,
-            available=np.ones(size, dtype=bool),
-            fraction_total=float(max(0.0, proeutectoid_frac * 0.75)),
+        # Phase D.3 — hypereutectoid proeutectoid cementite forms a
+        # bright network along the *boundaries* of the prior
+        # austenite grains, not a scattering of whole grains. The
+        # grain interiors remain pearlite. We dilate the Voronoi
+        # boundary mask until its coverage matches the lever-rule
+        # cementite fraction; width scales with carbon content per
+        # TZ §5.3.Б (1-2 px at 0.9 %C → 5-8 px at 2.0 %C), so the
+        # network thickens visibly as C climbs.
+        target_pixels = int(
+            round(float(max(0.0, min(1.0, proeutectoid_frac))) * size[0] * size[1])
         )
-        cem_mask = _project_mask_to_grains(
-            labels=labels,
-            pixel_mask=cem_pixel_mask,
-            fraction_total=float(proeutectoid_frac),
-        )
+        cem_mask = np.zeros(size, dtype=bool)
+        if ndimage is not None and target_pixels > 0:
+            base_network = boundary_mask_from_labels(labels, width=1)
+            cem_mask = base_network > 0
+            # Target dilation radius from the carbon content, then
+            # widen one pixel at a time until we hit the target
+            # coverage — this gives continuous control rather than
+            # quantised jumps and never overshoots the lever-rule
+            # value dramatically.
+            c_clamped = float(max(0.77, min(2.14, c_wt)))
+            carbon_lerp = (c_clamped - 0.77) / (2.14 - 0.77)
+            target_width = 1 + int(round(carbon_lerp * 6.0))  # 1..7 px
+            max_iter = max(target_width + 2, 12)
+            for _ in range(max_iter):
+                if int(cem_mask.sum()) >= target_pixels:
+                    break
+                cem_mask = ndimage.binary_dilation(cem_mask, iterations=1)
+            # If we overshot, prune: keep the pixels with the
+            # largest ``boundary_pref`` score so the thinnest part
+            # of the network is sacrificed first.
+            cur = int(cem_mask.sum())
+            if cur > target_pixels:
+                scores = boundary_pref.astype(np.float32)
+                scores_in_net = np.where(cem_mask, scores, -1.0)
+                flat_scores = scores_in_net.ravel()
+                keep = np.argpartition(-flat_scores, target_pixels)[:target_pixels]
+                kept = np.zeros(flat_scores.size, dtype=bool)
+                kept[keep] = True
+                cem_mask = kept.reshape(size)
+        else:
+            # ndimage not available — fall back to the old grain-level
+            # allocation rather than crashing.
+            cem_field = normalize01(boundary_rank * 0.97 + low * 0.02 + noise * 0.01)
+            cem_pixel_mask = select_fraction_mask(
+                field=cem_field,
+                available=np.ones(size, dtype=bool),
+                fraction_total=float(max(0.0, proeutectoid_frac * 0.75)),
+            )
+            cem_mask = _project_mask_to_grains(
+                labels=labels,
+                pixel_mask=cem_pixel_mask,
+                fraction_total=float(proeutectoid_frac),
+            )
         phase_masks = {
             "CEMENTITE": cem_mask.astype(np.uint8),
             "PEARLITE": (~cem_mask).astype(np.uint8),
@@ -1132,7 +1181,16 @@ def _build_pearlitic_render(
         mask = phase_masks["CEMENTITE"] > 0
         canvas[mask] = cementite_img[mask].astype(np.float32)
 
-    canvas[boundaries] -= 6.0
+    # Grain-boundary darkening is skipped on cementite pixels so the
+    # bright proeutectoid network in hypereutectoid presets is not
+    # eroded — cementite is nital-inert and must stay light.
+    cementite_pixel_mask = (
+        phase_masks["CEMENTITE"] > 0 if "CEMENTITE" in phase_masks else None
+    )
+    boundary_darken_mask = boundaries.copy()
+    if cementite_pixel_mask is not None:
+        boundary_darken_mask &= ~cementite_pixel_mask
+    canvas[boundary_darken_mask] -= 6.0
     canvas += (
         multiscale_noise(
             size=size,
@@ -1150,6 +1208,16 @@ def _build_pearlitic_render(
         _suppress_small_inclusions(rescale_to_u8(canvas, lo=40.0, hi=245.0)),
         amount=0.38,
     )
+    # Phase D.3 — repaint the proeutectoid cementite network on top
+    # of the post-processed frame. The generic rescale + suppression
+    # + unsharp chain was flattening the bright cementite band to
+    # ~170 because its area fraction (6-11 %) is too small to pull
+    # the histogram stretch. We stamp the saved ``cementite_img``
+    # tone back onto the mask so the grain-boundary network always
+    # reads as nearly white (nital-inert Fe₃C) in the final image.
+    if cementite_pixel_mask is not None and cementite_pixel_mask.any():
+        image_gray = image_gray.copy()
+        image_gray[cementite_pixel_mask] = cementite_img[cementite_pixel_mask]
 
     boundary_bias = 0.0
     if (

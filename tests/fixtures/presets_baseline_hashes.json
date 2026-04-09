@@ -165,22 +165,22 @@
       "std": 34.36173382096072
     },
     "fe_armco_annealed_v3": {
-      "mean": 216.6328125,
-      "sha256_gray": "78a6608a5aded2fa822ad02ab3284c58fa5236028f40556ea560f4470edc39d7",
+      "mean": 226.5775146484375,
+      "sha256_gray": "9256b6843e4ef82c94477880da558020ca22a546a96234cd83a5699537a7f90a",
       "shape": [
         128,
         128
       ],
-      "std": 30.794212253291708
+      "std": 23.786872020965212
     },
     "fe_armco_dic_polarized_v3": {
-      "mean": 217.073486328125,
-      "sha256_gray": "fb00096fbe2e3b9278bb19fe0be879786778128f7ac61a164194f82572bc51ce",
+      "mean": 232.087890625,
+      "sha256_gray": "be4d3f6b8345f523499185d253aaa0d0f1f061e85773ed69fb30ed57bbb2005f",
       "shape": [
         128,
         128
       ],
-      "std": 37.16697135785789
+      "std": 29.301888568410348
     },
     "fe_c_eutectoid_high_mag_1000x_v3": {
       "mean": 78.5535888671875,
@@ -237,22 +237,22 @@
       "std": 17.348385296254918
     },
     "fe_c_hypereutectoid_pro_realistic": {
-      "mean": 146.91094970703125,
-      "sha256_gray": "0f7a2f09c026857e99baa09878873b852c987c469d95d0a0656d8e5e85cf00cf",
+      "mean": 161.80499267578125,
+      "sha256_gray": "b9fdc4e8b27e4167b13561fbb82612b355053675fb03a4733095211f5e61dd79",
       "shape": [
         128,
         128
       ],
-      "std": 59.55288478452243
+      "std": 54.86924596091404
     },
     "fe_c_hypereutectoid_textbook": {
-      "mean": 60.0360107421875,
-      "sha256_gray": "85f2d3a95267605a2156c07dcbf7e21b0f95bbb1b290d98448b18a37f26564ed",
+      "mean": 106.518310546875,
+      "sha256_gray": "00f7fd3485056fd86aec2464a999662202de549b80608ade4a96679065148ee8",
       "shape": [
         128,
         128
       ],
-      "std": 23.8397112631269
+      "std": 45.7103229553764
     },
     "fe_c_hypoeutectoid_pro_realistic": {
       "mean": 149.5089111328125,
@@ -273,13 +273,13 @@
       "std": 46.25110090272893
     },
     "fe_pure_armco_bw_v3": {
-      "mean": 199.17974853515625,
-      "sha256_gray": "3281f3a4ae9b5a1438f6b7b17d53ec65b64e5722884ecbef2d887661d5ae2b9a",
+      "mean": 217.35150146484375,
+      "sha256_gray": "c33d8fe59a23cc669cdaec0c774fc35104c6ce50d6d3ce76559985c245a00452",
       "shape": [
         128,
         128
       ],
-      "std": 38.452485043121115
+      "std": 31.85939866265517
     },
     "fe_pure_brightfield_v3": {
       "mean": 203.44097900390625,
@@ -363,85 +363,85 @@
       "std": 31.409379273705518
     },
     "steel_quenched_textbook": {
-      "mean": 62.92169189453125,
-      "sha256_gray": "c63eab8b1f4b6b555e30c7b582e0615a3c276ce104233aadc7c82179cddaf993",
+      "mean": 77.94952392578125,
+      "sha256_gray": "5a7b58c82cb7525bbdee90374ede1ce2e2ef45b6421dbff5b6142800c4af4567",
       "shape": [
         128,
         128
       ],
-      "std": 20.953766609508996
+      "std": 36.041147457816706
     },
     "steel_tempered_200_textbook": {
-      "mean": 62.92169189453125,
-      "sha256_gray": "c63eab8b1f4b6b555e30c7b582e0615a3c276ce104233aadc7c82179cddaf993",
+      "mean": 77.94952392578125,
+      "sha256_gray": "5a7b58c82cb7525bbdee90374ede1ce2e2ef45b6421dbff5b6142800c4af4567",
       "shape": [
         128,
         128
       ],
-      "std": 20.953766609508996
+      "std": 36.041147457816706
     },
     "steel_tempered_400_textbook": {
-      "mean": 62.92169189453125,
-      "sha256_gray": "c63eab8b1f4b6b555e30c7b582e0615a3c276ce104233aadc7c82179cddaf993",
+      "mean": 77.94952392578125,
+      "sha256_gray": "5a7b58c82cb7525bbdee90374ede1ce2e2ef45b6421dbff5b6142800c4af4567",
       "shape": [
         128,
         128
       ],
-      "std": 20.953766609508996
+      "std": 36.041147457816706
     },
     "steel_tempered_600_textbook": {
-      "mean": 62.92169189453125,
-      "sha256_gray": "c63eab8b1f4b6b555e30c7b582e0615a3c276ce104233aadc7c82179cddaf993",
+      "mean": 77.94952392578125,
+      "sha256_gray": "5a7b58c82cb7525bbdee90374ede1ce2e2ef45b6421dbff5b6142800c4af4567",
       "shape": [
         128,
         128
       ],
-      "std": 20.953766609508996
+      "std": 36.041147457816706
     },
     "steel_u10_annealed_v3": {
-      "mean": 59.46746826171875,
-      "sha256_gray": "343685712f6d4beb8a4eb195bc6ca2356674659add2081cf20b61566a341871e",
+      "mean": 83.95159912109375,
+      "sha256_gray": "65d602ccc6b1cce3ce7db7bf2f4caa94834e132151f22e20dadfd65a7ef77d50",
       "shape": [
         128,
         128
       ],
-      "std": 23.321570920536836
+      "std": 44.08409171365791
     },
     "steel_u12_annealed_v3": {
-      "mean": 57.30206298828125,
-      "sha256_gray": "3f7c489551b0c404f45c53565a638d474d435fa004732a31881c5bf06e4af3c8",
+      "mean": 92.53753662109375,
+      "sha256_gray": "d8aac448b9d9c5965fe538f04e4aeb2e35752728773fc9b1bc70217f0d4b5e1b",
       "shape": [
         128,
         128
       ],
-      "std": 22.31318398028012
+      "std": 49.39859065773868
     },
     "steel_u13_annealed_v3": {
-      "mean": 55.18927001953125,
-      "sha256_gray": "81d11c7a328b491a2aabc3b1120e0fc1863fd841a17d9bf567dab4d75e3ef8e6",
+      "mean": 96.5286865234375,
+      "sha256_gray": "c97b7eb82fb67ad3c7566c7db6c93368715c01e5e684d86879f4a15080b131af",
       "shape": [
         128,
         128
       ],
-      "std": 23.458592167660292
+      "std": 51.62149236469605
     },
     "steel_u8_tempered_v3": {
-      "mean": 59.68389892578125,
-      "sha256_gray": "cd1ce4ee3f1491f45048c2cacaa0096b27ba992270446f66bca80f05f3bdf1c1",
+      "mean": 85.45062255859375,
+      "sha256_gray": "036445ba2f5dfc2847860ba5829c37c2a32bf8193a162061763dec8d03c454c7",
       "shape": [
         128,
         128
       ],
-      "std": 21.908308781946097
+      "std": 35.290011206711775
     },
     "steel_u8_tool_textbook": {
-      "mean": 63.9169921875,
-      "sha256_gray": "29053b4d65e5bb9e41e72b4f0347ef1c40adeee54059b5bba5590c72caa4cb9f",
+      "mean": 95.59014892578125,
+      "sha256_gray": "3d290fff07254ef3af1bcd4f1beb30242082c6e64a227b6d74c9a5166d22f2fa",
       "shape": [
         128,
         128
       ],
-      "std": 19.490105270445923
+      "std": 42.10725357744486
     }
   },
   "resolution": [

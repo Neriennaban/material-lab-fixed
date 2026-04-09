@@ -60,6 +60,16 @@ def _lift_small_dark_blobs(
     threshold: float = 40.0,
     max_pixels: int = 48,
 ) -> np.ndarray:
+    """Lift dark blobs smaller than ``max_pixels`` toward the local mean.
+
+    Phase D.2 — the legacy implementation iterated over every
+    connected component and rebuilt a boolean mask with
+    ``labels == label`` inside the loop, giving an O(K × N) cost
+    that dominated the pipeline at 1K+ resolution (2.0 s of a 6 s
+    budget at 1024×1024). The vectorised version below processes
+    every blob in a single pass using ``np.bincount`` and
+    ``np.isin`` — O(N + K) instead of O(N × K).
+    """
     if ndimage is None:
         return image_gray.astype(np.uint8, copy=False)
     arr = image_gray.astype(np.float32, copy=False)
@@ -67,12 +77,20 @@ def _lift_small_dark_blobs(
     labels, count = ndimage.label(mask.astype(np.uint8))
     if int(count) <= 0:
         return image_gray.astype(np.uint8, copy=False)
+    # Component sizes in one pass (bincount includes background as 0).
+    sizes = np.bincount(labels.ravel())
+    tiny_ids = np.where(sizes <= int(max_pixels))[0]
+    # Drop the background label (0) which always wins the size check.
+    if tiny_ids.size > 0 and tiny_ids[0] == 0:
+        tiny_ids = tiny_ids[1:]
+    if tiny_ids.size == 0:
+        return image_gray.astype(np.uint8, copy=False)
+    tiny_mask = np.isin(labels, tiny_ids, assume_unique=False)
+    if not tiny_mask.any():
+        return image_gray.astype(np.uint8, copy=False)
     local = ndimage.gaussian_filter(arr, sigma=1.05)
     out = arr.copy()
-    for label in range(1, int(count) + 1):
-        zone = labels == label
-        if int(zone.sum()) <= int(max_pixels):
-            out[zone] = 0.84 * local[zone] + 0.16 * out[zone]
+    out[tiny_mask] = 0.84 * local[tiny_mask] + 0.16 * out[tiny_mask]
     return np.clip(out, 0.0, 255.0).astype(np.uint8)
 
 
@@ -457,11 +475,26 @@ def generate_phase_topology(
             if isinstance(mask, np.ndarray)
         }
         meta = dict(generated.metadata)
-        # A10.3 — surface the per-grain label map through the morph dict
-        # so the pipeline can hand it to ``apply_color_palette`` for
-        # DIC/polarised renderings. The array is never serialised into
-        # JSON metadata, it is only passed through in memory.
-        grain_labels_from_meta = meta.get("grain_labels") if isinstance(meta, dict) else None
+        # A10.3 — extract the per-grain label map through the morph
+        # dict so ``apply_color_palette`` can use it for DIC/polarised
+        # renderings. The value is stored under the private
+        # ``_grain_labels`` key so we can ``pop`` it immediately and
+        # keep ``metadata`` JSON-serialisable.
+        grain_labels_from_meta = None
+        if isinstance(meta, dict):
+            raw_labels = meta.pop("_grain_labels", None)
+            if isinstance(raw_labels, np.ndarray):
+                grain_labels_from_meta = raw_labels
+            # Also scrub the legacy key name in case older callers
+            # still stashed it there (defensive; should be a no-op).
+            meta.pop("grain_labels", None)
+            # Morphology trace may carry a copy of the same ndarray;
+            # strip it before the trace is handed to fe_c_phase_render.
+            fe_c_render_meta = meta.get("fe_c_phase_render")
+            if isinstance(fe_c_render_meta, dict):
+                mt = fe_c_render_meta.get("morphology_trace")
+                if isinstance(mt, dict):
+                    mt.pop("grain_labels", None)
         if isinstance(meta, dict):
             if isinstance(meta.get("composition_effect"), dict):
                 composition_effect = dict(meta["composition_effect"])

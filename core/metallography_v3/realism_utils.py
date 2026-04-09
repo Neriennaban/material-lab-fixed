@@ -17,10 +17,58 @@ def clamp(value: float, low: float, high: float) -> float:
 
 
 def smooth(field: np.ndarray, sigma: float) -> np.ndarray:
+    """Gaussian smoothing with a downsample/upsample fast path.
+
+    Phase D.2 — ``scipy.ndimage.gaussian_filter`` costs O(N · sigma)
+    per axis; when ``sigma`` is a meaningful fraction of the image
+    size (as in ``multiscale_noise`` with ``sigma=18..30`` on a
+    2K/4K/16K canvas) it becomes the top bottleneck of the pipeline.
+    For ``sigma >= 6`` we downsample the field to a buffer where
+    the effective sigma is ~3, run a small-sigma gaussian there,
+    and zoom-interpolate the result back to the original shape. The
+    output is visually indistinguishable from the full-resolution
+    pass (gaussian smoothing on a down-sampled grid produces the
+    same low-pass band) but scales linearly with output area.
+    """
     sigma = max(0.05, float(sigma))
-    if ndimage is not None:
+    if ndimage is None:
+        return field
+    # Small sigma — the classic path is already cheap enough and
+    # sub-pixel features matter, so no approximation.
+    h, w = field.shape[:2]
+    if sigma < 5.0 or max(h, w) < 512:
         return ndimage.gaussian_filter(field, sigma=sigma)
-    return field
+    factor = max(2, int(round(sigma / 2.5)))
+    small_h = max(8, h // factor)
+    small_w = max(8, w // factor)
+    zoom_down_y = float(small_h) / float(h)
+    zoom_down_x = float(small_w) / float(w)
+    small = ndimage.zoom(
+        field.astype(np.float32, copy=False),
+        (zoom_down_y, zoom_down_x),
+        order=1,
+        prefilter=False,
+    )
+    small = ndimage.gaussian_filter(small, sigma=max(0.5, sigma / factor))
+    zoom_up_y = float(h) / float(small.shape[0])
+    zoom_up_x = float(w) / float(small.shape[1])
+    upsampled = ndimage.zoom(
+        small,
+        (zoom_up_y, zoom_up_x),
+        order=1,
+        prefilter=False,
+    )
+    if upsampled.shape != field.shape:
+        trimmed = np.empty(field.shape, dtype=np.float32)
+        th = min(h, upsampled.shape[0])
+        tw = min(w, upsampled.shape[1])
+        trimmed[:th, :tw] = upsampled[:th, :tw]
+        if th < h:
+            trimmed[th:, :tw] = upsampled[-1:, :tw]
+        if tw < w:
+            trimmed[:, tw:] = trimmed[:, tw - 1 : tw]
+        upsampled = trimmed
+    return upsampled.astype(np.float32)
 
 
 def normalize01(field: np.ndarray) -> np.ndarray:
