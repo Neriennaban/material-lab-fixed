@@ -67,9 +67,14 @@ class PureFerriteBWPresetTest(unittest.TestCase):
         self.assertGreater(mean, 160.0, f"mean brightness {mean:.1f} too dark")
         self.assertLess(mean, 245.0, f"mean brightness {mean:.1f} too flat")
 
-        # Grain boundaries must produce a visible dark tail: at least a
-        # small fraction of pixels below 120 (etched boundary bands).
-        dark_fraction = float((gray < 120.0).mean())
+        # Grain boundaries must produce a visible darker tail. Phase D
+        # introduced a hard brightness floor at 120 (see
+        # ``_brighten_pure_ferrite_baseline``) so "dark" now means
+        # "dark gray" (120-150) rather than the pre-D black bands
+        # the legacy test expected. The assertion still guarantees a
+        # visible grain-boundary network without mandating specific
+        # pitch-black pixels.
+        dark_fraction = float((gray < 155.0).mean())
         self.assertGreater(
             dark_fraction,
             0.005,

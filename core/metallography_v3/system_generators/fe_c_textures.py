@@ -110,7 +110,7 @@ def texture_ferrite(
         orientation = rng.uniform(0.0, math.pi, size=n_grains).astype(np.float32)
         anisotropy_offset = (np.sin(2.0 * orientation) * 6.0).astype(np.float32)
         grain_tones = grain_tones + anisotropy_offset
-        np.clip(grain_tones, 188.0, 240.0, out=grain_tones)
+        np.clip(grain_tones, 190.0, 240.0, out=grain_tones)
 
     ferrite = grain_tones[labels]
 
@@ -148,12 +148,18 @@ def texture_ferrite(
 
     # Add subtle intra-grain noise for surface roughness
     ferrite += _smooth_noise(seed + 19, size=size, sigma=6.0) * 3.5
-    # Darken grain boundaries
+    # D1 — ferrite must stay bright across the entire grain field.
+    # Grain boundaries are darkened only slightly (−12 instead of −45)
+    # so they remain legible as light grooves, not as black cracks.
     boundaries = grain_data.get("boundaries")
     if boundaries is not None:
-        ferrite[boundaries] -= 45.0
+        ferrite[boundaries] -= 12.0
     if ndimage is not None:
         ferrite = ndimage.gaussian_filter(ferrite, sigma=0.35)
+    # D1 — keep thin grain boundaries visible (floor 120) while
+    # guaranteeing grain interiors stay bright (base tone 200-230
+    # minus a capped 12-unit boundary darkening ⇒ interior ≥ 188).
+    np.clip(ferrite, 120.0, 240.0, out=ferrite)
     return _ensure_u8(ferrite)
 
 

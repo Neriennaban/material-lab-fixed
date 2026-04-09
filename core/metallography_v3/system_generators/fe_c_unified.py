@@ -270,10 +270,17 @@ def _pure_ferrite_render(
         size_sigma=0.22,
         relax_iter=1,
         boundary_width_px=2.2,
-        boundary_depth=0.13,
+        boundary_depth=0.05,
         blur_sigma_px=0.6,
     )
-    image_gray = render["image_gray"].astype(np.uint8)
+    # D1 — floor 120 (dark gray, not black) at the generator exit.
+    # Thin grain boundaries need to remain visible for the
+    # brightfield test; grain interiors stay bright because the
+    # underlying grain-tone sampling sits near 200 and only the
+    # boundary bands dip down toward the floor.
+    image_gray = np.clip(render["image_gray"].astype(np.int16), 120, 240).astype(
+        np.uint8
+    )
     phase_masks = {"FERRITE": np.ones(context.size, dtype=np.uint8)}
     rendered_layers = ["FERRITE"]
     fragment_area = int(max(48.0, math.pi * (mean_eq_d_px * 0.5) ** 2))
@@ -825,6 +832,136 @@ def _dominant_structure(phase_fractions: dict[str, float]) -> str:
     )[0]
 
 
+def _select_grains_by_score(
+    *,
+    labels: np.ndarray,
+    field: np.ndarray,
+    fraction_total: float,
+) -> np.ndarray:
+    """D3 — grain-level allocation helper.
+
+    Pick whole Voronoi grains whose mean ``field`` score is highest
+    until the cumulative pixel coverage approaches ``fraction_total``
+    of the image area. Returns a boolean mask that covers the
+    selected grains *entirely* (every pixel belonging to a chosen
+    grain id is ``True``).
+
+    This keeps the ferrite/pearlite interface strictly along grain
+    boundaries instead of cutting through grain interiors the way
+    ``select_fraction_mask`` does at pixel level.
+    """
+    if labels.shape != field.shape:
+        raise ValueError(
+            f"labels and field shape mismatch: {labels.shape} vs {field.shape}"
+        )
+    total_pixels = int(labels.size)
+    target = int(round(max(0.0, min(1.0, float(fraction_total))) * total_pixels))
+    if target <= 0:
+        return np.zeros(labels.shape, dtype=bool)
+
+    flat_labels = labels.ravel()
+    flat_field = field.ravel().astype(np.float64)
+    n_grains = int(flat_labels.max()) + 1 if flat_labels.size else 0
+    if n_grains <= 0:
+        return np.zeros(labels.shape, dtype=bool)
+
+    grain_sum = np.bincount(flat_labels, weights=flat_field, minlength=n_grains)
+    grain_cnt = np.bincount(flat_labels, minlength=n_grains).astype(np.float64)
+    safe_cnt = np.where(grain_cnt > 0, grain_cnt, 1.0)
+    grain_score = grain_sum / safe_cnt
+    # Exclude empty grain ids from the ranking.
+    grain_score[grain_cnt <= 0] = -np.inf
+
+    order = np.argsort(-grain_score, kind="stable")
+    cumulative = 0
+    picked: list[int] = []
+    for gid in order:
+        cnt = int(grain_cnt[int(gid)])
+        if cnt <= 0:
+            continue
+        picked.append(int(gid))
+        cumulative += cnt
+        if cumulative >= target:
+            break
+
+    if not picked:
+        return np.zeros(labels.shape, dtype=bool)
+    picked_array = np.asarray(picked, dtype=np.int64)
+    return np.isin(labels, picked_array)
+
+
+def _project_mask_to_grains(
+    *,
+    labels: np.ndarray,
+    pixel_mask: np.ndarray,
+    fraction_total: float,
+) -> np.ndarray:
+    """D3 — project a pixel-level mask onto whole Voronoi grains.
+
+    Sort grains by their internal ``pixel_mask`` coverage in
+    descending order and pick whole grains one by one until the
+    cumulative pixel count reaches ``fraction_total * total_pixels``.
+    Grains with zero coverage are never picked.
+
+    The result is a clean grain-boundary-aligned mask that:
+
+    * keeps the final ferrite / pearlite fraction close to the
+      requested ``fraction_total`` (within one grain area of the
+      target), and
+    * preserves the boundary bias of the original pixel mask —
+      grains with the highest coverage are the ones whose interior
+      sits inside the high-score region of the ranking field, so the
+      resulting per-pixel mean of that field stays close to what
+      pixel-level allocation would have produced.
+    """
+    if labels.shape != pixel_mask.shape:
+        raise ValueError(
+            f"labels and pixel_mask shape mismatch: {labels.shape} vs {pixel_mask.shape}"
+        )
+    flat_labels = labels.ravel()
+    if flat_labels.size == 0:
+        return np.zeros(labels.shape, dtype=bool)
+    n_grains = int(flat_labels.max()) + 1
+    if n_grains <= 0:
+        return np.zeros(labels.shape, dtype=bool)
+
+    total_pixels = int(flat_labels.size)
+    target = int(round(max(0.0, min(1.0, float(fraction_total))) * total_pixels))
+    if target <= 0:
+        return np.zeros(labels.shape, dtype=bool)
+
+    hit_counts = np.bincount(
+        flat_labels,
+        weights=pixel_mask.ravel().astype(np.float64),
+        minlength=n_grains,
+    )
+    total_counts = np.bincount(flat_labels, minlength=n_grains).astype(np.float64)
+    safe_total = np.where(total_counts > 0, total_counts, 1.0)
+    coverage = hit_counts / safe_total
+    # Grains with zero size are sentinel — never pick them.
+    coverage[total_counts <= 0] = -1.0
+
+    order = np.argsort(-coverage, kind="stable")
+    cumulative = 0
+    picked: list[int] = []
+    for gid in order:
+        g = int(gid)
+        if coverage[g] <= 0.0:
+            break
+        cnt = int(total_counts[g])
+        if cnt <= 0:
+            continue
+        picked.append(g)
+        cumulative += cnt
+        if cumulative >= target:
+            break
+
+    if not picked:
+        return np.zeros(labels.shape, dtype=bool)
+    picked_array = np.asarray(picked, dtype=np.int64)
+    return np.isin(labels, picked_array)
+
+
 def _build_pearlitic_render(
     *,
     context: SystemGenerationContext,
@@ -900,11 +1037,17 @@ def _build_pearlitic_render(
         seed=seed_split["seed_boundary"],
         mean_grain_size_px=grain_scale * 0.9,
     )
-    # Проэвтектоидный феррит: светлый, с тёмными канавками по границам.
+    # D2 — proeutectoid ferrite stays bright in grain interiors.
+    # Boundary grooves keep their legibility (−12 instead of −40)
+    # and the final clamp to [150, 240] prevents any ferrite
+    # pixel from turning pitch-black while still leaving room for
+    # the etched boundary bands. The interior of a ferrite grain
+    # stays in [200, 240] because the base tone is 205 and only
+    # the boundary mask touches the lower tail.
     ferrite_img = ferrite_grain["image"].astype(np.float32) * 0.12 + 205.0
-    ferrite_img[boundaries] -= 40.0
-    ferrite_img += (noise - 0.5) * 8.0
-    ferrite_img = np.clip(ferrite_img, 0.0, 255.0).astype(np.uint8)
+    ferrite_img[boundaries] -= 12.0
+    ferrite_img += (noise - 0.5) * 4.0
+    ferrite_img = np.clip(ferrite_img, 150.0, 240.0).astype(np.uint8)
 
     # Проэвтектоидный цементит для учебного режима делаем тёмным и читаемым.
     cementite_img = 70.0 + (noise - 0.5) * 12.0 - boundary_pref * 18.0
@@ -917,11 +1060,26 @@ def _build_pearlitic_render(
     )
     proeutectoid_frac = float(phase_fractions.get(proeutectoid, 0.0)) if proeutectoid else 0.0
     if stage == "alpha_pearlite":
+        # D3 — ferrite/pearlite snap to whole Voronoi grains.
+        # Pipeline: (1) pixel-level ranking with a slightly shrunk
+        # target so the mask hugs the most boundary-biased pixels
+        # tightly, (2) projection selects grains in order of their
+        # internal coverage in that pixel mask until the cumulative
+        # grain size reaches the lever-rule target fraction.
+        # Grains with the highest coverage are the ones whose
+        # interior sits inside the high boundary_rank region, so
+        # ``boundary_phase_bias`` stays in the ≥0.60 band required
+        # by ``test_proeutectoid_phases_are_boundary_biased``.
         ferr_field = normalize01(boundary_rank * 0.95 + low * 0.03 + noise * 0.02)
-        ferr_mask = select_fraction_mask(
+        ferr_pixel_mask = select_fraction_mask(
             field=ferr_field,
             available=np.ones(size, dtype=bool),
-            fraction_total=proeutectoid_frac,
+            fraction_total=float(max(0.0, proeutectoid_frac * 0.75)),
+        )
+        ferr_mask = _project_mask_to_grains(
+            labels=labels,
+            pixel_mask=ferr_pixel_mask,
+            fraction_total=float(proeutectoid_frac),
         )
         phase_masks = {
             "FERRITE": ferr_mask.astype(np.uint8),
@@ -929,10 +1087,15 @@ def _build_pearlitic_render(
         }
     elif stage == "pearlite_cementite":
         cem_field = normalize01(boundary_rank * 0.97 + low * 0.02 + noise * 0.01)
-        cem_mask = select_fraction_mask(
+        cem_pixel_mask = select_fraction_mask(
             field=cem_field,
             available=np.ones(size, dtype=bool),
-            fraction_total=proeutectoid_frac,
+            fraction_total=float(max(0.0, proeutectoid_frac * 0.75)),
+        )
+        cem_mask = _project_mask_to_grains(
+            labels=labels,
+            pixel_mask=cem_pixel_mask,
+            fraction_total=float(proeutectoid_frac),
         )
         phase_masks = {
             "CEMENTITE": cem_mask.astype(np.uint8),
@@ -978,8 +1141,13 @@ def _build_pearlitic_render(
         )
         - 0.5
     ) * 4.0
+    # D2 — raise the lower rescale bound so the final normalisation
+    # does not stretch any stray dark pixels toward pure black. The
+    # pearlite tone remains clearly darker than the ferrite matrix
+    # (it sits ~70-95 pre-rescale) but loses the gritty black spots
+    # that the previous lo=25 created on ferrite-dominated frames.
     image_gray = soft_unsharp(
-        _suppress_small_inclusions(rescale_to_u8(canvas, lo=25.0, hi=245.0)),
+        _suppress_small_inclusions(rescale_to_u8(canvas, lo=40.0, hi=245.0)),
         amount=0.38,
     )
 
@@ -1692,13 +1860,16 @@ def render_fe_c_unified(context: SystemGenerationContext) -> SystemGenerationRes
             "pure_iron_baseline_applied": True,
             "pure_iron_target": "bright_ferritic_negative_control",
         }
-    # A10.3 — surface the per-grain label map at the top level of the
-    # metadata dict so downstream palettes (DIC polarised) can consume it
-    # without introspecting ``morphology_trace``. The key is ignored by
-    # the grayscale pipeline so backward compatibility is preserved.
-    grain_labels_raw = morphology_trace.get("grain_labels")
+    # A10.3 — surface the per-grain label map through a private
+    # ``_grain_labels`` key inside ``metadata``. ``morphology_engine``
+    # pops this key before any JSON serialisation happens so the
+    # ndarray never reaches ``metadata_json_safe``. The label map is
+    # *also* stripped from ``morphology_trace`` before it is attached
+    # to the metadata (see below) so the trace can still be rendered
+    # to JSON without errors.
+    grain_labels_raw = morphology_trace.pop("grain_labels", None)
     if isinstance(grain_labels_raw, np.ndarray):
-        metadata["grain_labels"] = grain_labels_raw.astype(np.int32)
+        metadata["_grain_labels"] = grain_labels_raw.astype(np.int32)
     return SystemGenerationResult(
         image_gray=image_gray, phase_masks=phase_masks, metadata=metadata
     )

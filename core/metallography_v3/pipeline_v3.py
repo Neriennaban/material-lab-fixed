@@ -136,7 +136,15 @@ def _brighten_pure_ferrite_baseline(image_gray: np.ndarray) -> np.ndarray:
     q05 = float(np.quantile(arr, 0.05))
     arr += max(0.0, 88.0 - q01)
     arr += max(0.0, 126.0 - q05) * 0.8
-    out = np.clip(arr, 0.0, 255.0).astype(np.uint8)
+    # D1 — pure ferrite must never expose a pitch-black pixel. The
+    # floor is 120 (dark gray) rather than 180 so that thin grain
+    # boundaries remain visible as darker grooves — raising the
+    # floor to 180 wipes them out and fails
+    # ``test_bright_mean_intensity_and_visible_boundaries``. Grain
+    # interiors still sit comfortably in the 200-240 band because
+    # the tone sampling starts at 200 and the boundary darkening
+    # is the only negative contribution.
+    out = np.clip(arr, 120.0, 240.0).astype(np.uint8)
     return _lift_small_dark_blobs(
         out,
         threshold=44.0,
@@ -165,19 +173,27 @@ def _apply_textbook_brightfield_policy(
 ) -> np.ndarray:
     if str(optical_mode or "brightfield").strip().lower() != "brightfield":
         return image_gray.astype(np.uint8, copy=False)
+
+    # D1 — pure-ferrite presets must *always* receive the brightening
+    # pass, regardless of generation_mode / profile_id. User-authored
+    # Armco presets like ``fe_pure_armco_bw_v3`` use custom profile
+    # ids and would otherwise skip the clamp, leaking prep/etch dark
+    # pixels into the ferrite grains.
+    if bool(pure_iron_baseline_applied):
+        return _brighten_pure_ferrite_baseline(image_gray).astype(
+            np.uint8, copy=False
+        )
+
     if str(generation_mode or "").strip().lower() != "edu_engineering":
         return image_gray.astype(np.uint8, copy=False)
     if str(profile_id or "").strip().lower() != "textbook_steel_bw":
         return image_gray.astype(np.uint8, copy=False)
 
-    out = _lift_small_dark_blobs(
+    return _lift_small_dark_blobs(
         image_gray,
         threshold=42.0,
         max_pixels=max(24, int(image_gray.size // 32768)),
-    )
-    if bool(pure_iron_baseline_applied):
-        out = _brighten_pure_ferrite_baseline(out)
-    return out.astype(np.uint8, copy=False)
+    ).astype(np.uint8, copy=False)
 
 
 def _build_optical_recommendation(
