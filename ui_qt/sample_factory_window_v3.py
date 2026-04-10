@@ -2412,29 +2412,58 @@ QTableWidget QLineEdit, QTableWidget QSpinBox, QTableWidget QDoubleSpinBox, QTab
         if pg is None or self.thermal_plot_widget is None:
             return
         vb = self.thermal_plot_widget.getViewBox()
+        scene = self.thermal_plot_widget.scene()
         if enabled:
-            # Disable default pan/zoom so mouse events go to our handler
             vb.setMouseEnabled(x=False, y=False)
-            # Use sigMouseClicked for press detection and sigMouseMoved
-            # for tracking. Use a proxy to intercept press/release.
-            self._thermal_mouse_proxy = pg.SignalProxy(
-                self.thermal_plot_widget.scene().sigMouseMoved,
-                rateLimit=30,
-                slot=self._thermal_drag_move,
-            )
-            self.thermal_plot_widget.scene().sigMouseClicked.connect(
-                self._thermal_drag_click
-            )
+            # Install event filter on the scene to intercept mouse
+            # press / move / release for hold-to-drag behaviour.
+            scene.installEventFilter(self)
         else:
             vb.setMouseEnabled(x=True, y=True)
-            self._thermal_mouse_proxy = None
-            try:
-                self.thermal_plot_widget.scene().sigMouseClicked.disconnect(
-                    self._thermal_drag_click
-                )
-            except Exception:
-                pass
+            scene.removeEventFilter(self)
         self._refresh_thermal_plot()
+
+    # -- event filter for press-hold-drag-release on thermal plot ------
+
+    def eventFilter(self, obj: Any, event: Any) -> bool:  # type: ignore[override]
+        """Intercept mouse events on the thermal plot scene."""
+        if (
+            not getattr(self, "_thermal_drag_enabled", False)
+            or pg is None
+            or self.thermal_plot_widget is None
+        ):
+            return super().eventFilter(obj, event)
+
+        from PyQt6.QtCore import QEvent
+
+        etype = event.type()
+
+        if etype == QEvent.Type.GraphicsSceneMousePress:
+            btn = event.button()
+            if btn == Qt.MouseButton.LeftButton:
+                pos = event.scenePos()
+                mp = self.thermal_plot_widget.getViewBox().mapSceneToView(pos)
+                idx = self._thermal_find_nearest_point(
+                    float(mp.x()), float(mp.y())
+                )
+                if idx >= 0:
+                    self._thermal_drag_index = idx
+                    return True  # consume the event
+
+        elif etype == QEvent.Type.GraphicsSceneMouseMove:
+            if self._thermal_drag_index >= 0:
+                pos = event.scenePos()
+                mp = self.thermal_plot_widget.getViewBox().mapSceneToView(pos)
+                self._thermal_apply_drag(float(mp.x()), float(mp.y()))
+                return True
+
+        elif etype == QEvent.Type.GraphicsSceneMouseRelease:
+            if self._thermal_drag_index >= 0:
+                self._thermal_drag_index = -1
+                self._refresh_thermal_plot()
+                return True
+
+        return super().eventFilter(obj, event)
 
     def _thermal_find_nearest_point(self, mx: float, my: float) -> int:
         """Return index of the nearest thermal point to (mx, my), or -1."""
@@ -2461,35 +2490,11 @@ QTableWidget QLineEdit, QTableWidget QSpinBox, QTableWidget QDoubleSpinBox, QTab
         except Exception:
             return -1
 
-    def _thermal_drag_click(self, event: Any) -> None:
-        """Toggle drag on/off for the nearest point on click."""
-        if pg is None or self.thermal_plot_widget is None:
-            return
+    def _thermal_apply_drag(self, new_x: float, new_y: float) -> None:
+        """Move the currently dragged point to (new_x, new_y)."""
         try:
-            pos = event.scenePos()
-            mouse_point = self.thermal_plot_widget.getViewBox().mapSceneToView(pos)
-            mx = float(mouse_point.x())
-            my = float(mouse_point.y())
-            if self._thermal_drag_index >= 0:
-                # Already dragging — release on click
-                self._thermal_drag_index = -1
-            else:
-                self._thermal_drag_index = self._thermal_find_nearest_point(mx, my)
-        except Exception:
-            self._thermal_drag_index = -1
-
-    def _thermal_drag_move(self, args: Any) -> None:
-        """Move the dragged point to the current mouse position."""
-        if self._thermal_drag_index < 0:
-            return
-        if pg is None or self.thermal_plot_widget is None:
-            return
-        try:
-            pos = args[0] if isinstance(args, (list, tuple)) else args
-            mouse_point = self.thermal_plot_widget.getViewBox().mapSceneToView(pos)
-            new_time = max(0.0, float(mouse_point.x()))
-            new_temp = max(0.0, min(2000.0, float(mouse_point.y())))
-
+            new_time = max(0.0, new_x)
+            new_temp = max(0.0, min(2000.0, new_y))
             row = self._thermal_drag_index
             table = self.thermal_points_table
             if row < table.rowCount():
