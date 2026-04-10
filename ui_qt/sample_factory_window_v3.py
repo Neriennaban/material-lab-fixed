@@ -1104,8 +1104,25 @@ class SampleFactoryWindowV3(QMainWindow, WindowModeMixin):
             self.thermal_plot_widget.setLabel("bottom", "Время, c")
             self.thermal_plot_widget.showGrid(x=True, y=True, alpha=0.25)
             plot_layout.addWidget(self.thermal_plot_widget, stretch=1)
+
+            # Draggable-points mode checkbox
+            self._thermal_drag_enabled = False
+            self._thermal_drag_index = -1
+            self._thermal_coord_labels: list = []
+            self.thermal_drag_check = QCheckBox(
+                "Перемещение точек мышью (отображать координаты)"
+            )
+            self.thermal_drag_check.setToolTip(
+                "Включить режим перетаскивания точек на графике.\n"
+                "При включении можно двигать контрольные точки мышью,\n"
+                "у каждой точки отображаются координаты (T, t)."
+            )
+            self.thermal_drag_check.setChecked(False)
+            self.thermal_drag_check.toggled.connect(self._toggle_thermal_drag_mode)
+            plot_layout.addWidget(self.thermal_drag_check)
         else:
             self.thermal_plot_widget = None
+            self.thermal_drag_check = None
             self.thermal_plot_placeholder = QLabel(
                 "График термообработки недоступен.\n\n"
                 "Данные можно экспортировать в CSV для анализа\n"
@@ -2353,6 +2370,8 @@ QTableWidget QLineEdit, QTableWidget QSpinBox, QTableWidget QDoubleSpinBox, QTab
             self.thermal_plot_widget.clear()
             pen_curve = pg.mkPen(color=(110, 190, 255), width=3)
             self.thermal_plot_widget.plot(line_x, line_y, pen=pen_curve)
+            drag_mode = getattr(self, "_thermal_drag_enabled", False)
+            point_size = 12 if drag_mode else 6
             pen_points = pg.mkPen(color=(210, 230, 255), width=1)
             self.thermal_plot_widget.plot(
                 xs,
@@ -2360,9 +2379,10 @@ QTableWidget QLineEdit, QTableWidget QSpinBox, QTableWidget QDoubleSpinBox, QTab
                 pen=None,
                 symbol="o",
                 symbolPen=pen_points,
-                symbolSize=6,
-                symbolBrush=(180, 225, 255),
+                symbolSize=point_size,
+                symbolBrush=(180, 225, 255) if not drag_mode else (255, 200, 80),
             )
+            self._thermal_coord_labels = []
             if xs and ys and line_y:
                 y_min = float(min(ys))
                 y_max = float(max(ys))
@@ -2372,11 +2392,114 @@ QTableWidget QLineEdit, QTableWidget QSpinBox, QTableWidget QDoubleSpinBox, QTab
                     code = self._curve_point_code(idx)
                     dy = y_offset if (idx % 2 == 0) else -y_offset
                     anchor = (0.5, 1.0) if dy > 0 else (0.5, 0.0)
+                    if drag_mode:
+                        label = f"{code}: {y_val:.0f}°C, {x_val:.1f}с"
+                    else:
+                        label = code
                     text_item = pg.TextItem(
-                        text=code, color=(225, 235, 250), anchor=anchor
+                        text=label, color=(225, 235, 250), anchor=anchor
                     )
                     text_item.setPos(float(x_val), float(y_val + dy))
                     self.thermal_plot_widget.addItem(text_item)
+                    self._thermal_coord_labels.append(text_item)
+        except Exception:
+            pass
+
+    def _toggle_thermal_drag_mode(self, enabled: bool) -> None:
+        """Toggle between pan/zoom mode and point-dragging mode."""
+        self._thermal_drag_enabled = bool(enabled)
+        self._thermal_drag_index = -1
+        if pg is None or self.thermal_plot_widget is None:
+            return
+        vb = self.thermal_plot_widget.getViewBox()
+        if enabled:
+            # Disable default pan/zoom so mouse events go to our handler
+            vb.setMouseEnabled(x=False, y=False)
+            # Use sigMouseClicked for press detection and sigMouseMoved
+            # for tracking. Use a proxy to intercept press/release.
+            self._thermal_mouse_proxy = pg.SignalProxy(
+                self.thermal_plot_widget.scene().sigMouseMoved,
+                rateLimit=30,
+                slot=self._thermal_drag_move,
+            )
+            self.thermal_plot_widget.scene().sigMouseClicked.connect(
+                self._thermal_drag_click
+            )
+        else:
+            vb.setMouseEnabled(x=True, y=True)
+            self._thermal_mouse_proxy = None
+            try:
+                self.thermal_plot_widget.scene().sigMouseClicked.disconnect(
+                    self._thermal_drag_click
+                )
+            except Exception:
+                pass
+        self._refresh_thermal_plot()
+
+    def _thermal_find_nearest_point(self, mx: float, my: float) -> int:
+        """Return index of the nearest thermal point to (mx, my), or -1."""
+        try:
+            program = self._collect_thermal_program()
+            pts = list(program.points or [])
+            pts.sort(key=lambda p: float(p.time_s))
+            if not pts:
+                return -1
+            vb = self.thermal_plot_widget.getViewBox()
+            view_range = vb.viewRange()
+            x_span = max(1.0, view_range[0][1] - view_range[0][0])
+            y_span = max(1.0, view_range[1][1] - view_range[1][0])
+            best_idx = -1
+            best_dist = float("inf")
+            for i, p in enumerate(pts):
+                dx = (float(p.time_s) - mx) / x_span
+                dy = (float(p.temperature_c) - my) / y_span
+                d = dx * dx + dy * dy
+                if d < best_dist:
+                    best_dist = d
+                    best_idx = i
+            return best_idx if best_dist < 0.004 else -1
+        except Exception:
+            return -1
+
+    def _thermal_drag_click(self, event: Any) -> None:
+        """Toggle drag on/off for the nearest point on click."""
+        if pg is None or self.thermal_plot_widget is None:
+            return
+        try:
+            pos = event.scenePos()
+            mouse_point = self.thermal_plot_widget.getViewBox().mapSceneToView(pos)
+            mx = float(mouse_point.x())
+            my = float(mouse_point.y())
+            if self._thermal_drag_index >= 0:
+                # Already dragging — release on click
+                self._thermal_drag_index = -1
+            else:
+                self._thermal_drag_index = self._thermal_find_nearest_point(mx, my)
+        except Exception:
+            self._thermal_drag_index = -1
+
+    def _thermal_drag_move(self, args: Any) -> None:
+        """Move the dragged point to the current mouse position."""
+        if self._thermal_drag_index < 0:
+            return
+        if pg is None or self.thermal_plot_widget is None:
+            return
+        try:
+            pos = args[0] if isinstance(args, (list, tuple)) else args
+            mouse_point = self.thermal_plot_widget.getViewBox().mapSceneToView(pos)
+            new_time = max(0.0, float(mouse_point.x()))
+            new_temp = max(0.0, min(2000.0, float(mouse_point.y())))
+
+            row = self._thermal_drag_index
+            table = self.thermal_points_table
+            if row < table.rowCount():
+                time_item = table.item(row, 0)
+                temp_item = table.item(row, 1)
+                if time_item is not None:
+                    time_item.setText(f"{new_time:.1f}")
+                if temp_item is not None:
+                    temp_item.setText(f"{new_temp:.0f}")
+                self._refresh_thermal_plot()
         except Exception:
             pass
 
@@ -3649,8 +3772,25 @@ QTableWidget QLineEdit, QTableWidget QSpinBox, QTableWidget QDoubleSpinBox, QTab
         quality = meta.get("quality_metrics", {})
         prep_summary = meta.get("prep_summary", {})
         props = meta.get("property_indicators", {})
+
+        # Resolve structure name and hardness so they appear at the top
+        # of the info panel in both preview and final render modes.
+        structure_name = self._resolve_student_structure_name(output)
+        hardness_str = "не определена"
+        hv_value = props.get("hv_estimate", props.get("hardness_hv_est", ""))
+        if hv_value:
+            hardness_str = f"HV {hv_value}"
+        else:
+            brinell = meta.get("brinell", {})
+            est = brinell.get("estimated", {}) if isinstance(brinell, dict) else {}
+            if isinstance(est, dict):
+                hbw_value = est.get("HBW", "")
+                if hbw_value:
+                    hardness_str = f"HBW {hbw_value}"
+
         lines = [
             f"Образец: {meta.get('sample_id', '')}",
+            f"Название: {structure_name}",
             f"Система: {_label_ru(str(meta.get('inferred_system', '')), SYSTEM_LABELS_RU)}",
             f"Финальная стадия: {meta.get('final_stage', '')}",
         ]
@@ -3666,6 +3806,7 @@ QTableWidget QLineEdit, QTableWidget QSpinBox, QTableWidget QDoubleSpinBox, QTab
                 )
             if bool(hi.get("enabled", False)):
                 lines.append(f"Режим high-res: апскейл {hi.get('upscale_method', '')}")
+        lines.append(f"Твердость: {hardness_str}")
         lines.extend(
             [
                 "",

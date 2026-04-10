@@ -52,23 +52,27 @@ def smooth(field: np.ndarray, sigma: float) -> np.ndarray:
     small = ndimage.gaussian_filter(small, sigma=max(0.5, sigma / factor))
     zoom_up_y = float(h) / float(small.shape[0])
     zoom_up_x = float(w) / float(small.shape[1])
+    # Upsample with cubic spline interpolation. Use ndimage.zoom with
+    # order=3 and then crop/pad to the exact target shape. The cubic
+    # spline eliminates the visible grid artifacts that bilinear
+    # produced at integer-pixel transitions of the downsampled buffer.
+    zoom_up_y = float(h) / float(small.shape[0])
+    zoom_up_x = float(w) / float(small.shape[1])
     upsampled = ndimage.zoom(
-        small,
-        (zoom_up_y, zoom_up_x),
-        order=1,
-        prefilter=False,
-    )
+        small, (zoom_up_y, zoom_up_x), order=3, prefilter=True,
+    ).astype(np.float32)
+    # Crop or pad by at most 1 pixel to match the exact target shape.
     if upsampled.shape != field.shape:
-        trimmed = np.empty(field.shape, dtype=np.float32)
+        out = np.empty(field.shape, dtype=np.float32)
         th = min(h, upsampled.shape[0])
         tw = min(w, upsampled.shape[1])
-        trimmed[:th, :tw] = upsampled[:th, :tw]
+        out[:th, :tw] = upsampled[:th, :tw]
         if th < h:
-            trimmed[th:, :tw] = upsampled[-1:, :tw]
+            out[th:, :] = out[th - 1 : th, :]
         if tw < w:
-            trimmed[:, tw:] = trimmed[:, tw - 1 : tw]
-        upsampled = trimmed
-    return upsampled.astype(np.float32)
+            out[:, tw:] = out[:, tw - 1 : tw]
+        upsampled = out
+    return upsampled
 
 
 def normalize01(field: np.ndarray) -> np.ndarray:
