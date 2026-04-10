@@ -2412,58 +2412,60 @@ QTableWidget QLineEdit, QTableWidget QSpinBox, QTableWidget QDoubleSpinBox, QTab
         if pg is None or self.thermal_plot_widget is None:
             return
         vb = self.thermal_plot_widget.getViewBox()
-        scene = self.thermal_plot_widget.scene()
         if enabled:
             vb.setMouseEnabled(x=False, y=False)
-            # Install event filter on the scene to intercept mouse
-            # press / move / release for hold-to-drag behaviour.
-            scene.installEventFilter(self)
+            # Override the ViewBox mouse handlers so pyqtgraph doesn't
+            # swallow the events before our code sees them.
+            self._vb_orig_press = vb.mousePressEvent
+            self._vb_orig_move = vb.mouseMoveEvent
+            self._vb_orig_release = vb.mouseReleaseEvent
+            vb.mousePressEvent = self._thermal_vb_press
+            vb.mouseMoveEvent = self._thermal_vb_move
+            vb.mouseReleaseEvent = self._thermal_vb_release
         else:
             vb.setMouseEnabled(x=True, y=True)
-            scene.removeEventFilter(self)
+            # Restore the original handlers.
+            if hasattr(self, "_vb_orig_press"):
+                vb.mousePressEvent = self._vb_orig_press
+                vb.mouseMoveEvent = self._vb_orig_move
+                vb.mouseReleaseEvent = self._vb_orig_release
         self._refresh_thermal_plot()
 
-    # -- event filter for press-hold-drag-release on thermal plot ------
+    # -- press-hold-drag-release handlers on the ViewBox ---------------
 
-    def eventFilter(self, obj: Any, event: Any) -> bool:  # type: ignore[override]
-        """Intercept mouse events on the thermal plot scene."""
-        if (
-            not getattr(self, "_thermal_drag_enabled", False)
-            or pg is None
-            or self.thermal_plot_widget is None
-        ):
-            return super().eventFilter(obj, event)
+    def _thermal_vb_press(self, event: Any) -> None:
+        if event.button() == Qt.MouseButton.LeftButton:
+            pos = event.pos()
+            mp = self.thermal_plot_widget.getViewBox().mapToView(pos)
+            idx = self._thermal_find_nearest_point(
+                float(mp.x()), float(mp.y())
+            )
+            if idx >= 0:
+                self._thermal_drag_index = idx
+                event.accept()
+                return
+        # Not near a point — let default panning through.
+        if hasattr(self, "_vb_orig_press"):
+            self._vb_orig_press(event)
 
-        from PyQt6.QtCore import QEvent
+    def _thermal_vb_move(self, event: Any) -> None:
+        if self._thermal_drag_index >= 0:
+            pos = event.pos()
+            mp = self.thermal_plot_widget.getViewBox().mapToView(pos)
+            self._thermal_apply_drag(float(mp.x()), float(mp.y()))
+            event.accept()
+            return
+        if hasattr(self, "_vb_orig_move"):
+            self._vb_orig_move(event)
 
-        etype = event.type()
-
-        if etype == QEvent.Type.GraphicsSceneMousePress:
-            btn = event.button()
-            if btn == Qt.MouseButton.LeftButton:
-                pos = event.scenePos()
-                mp = self.thermal_plot_widget.getViewBox().mapSceneToView(pos)
-                idx = self._thermal_find_nearest_point(
-                    float(mp.x()), float(mp.y())
-                )
-                if idx >= 0:
-                    self._thermal_drag_index = idx
-                    return True  # consume the event
-
-        elif etype == QEvent.Type.GraphicsSceneMouseMove:
-            if self._thermal_drag_index >= 0:
-                pos = event.scenePos()
-                mp = self.thermal_plot_widget.getViewBox().mapSceneToView(pos)
-                self._thermal_apply_drag(float(mp.x()), float(mp.y()))
-                return True
-
-        elif etype == QEvent.Type.GraphicsSceneMouseRelease:
-            if self._thermal_drag_index >= 0:
-                self._thermal_drag_index = -1
-                self._refresh_thermal_plot()
-                return True
-
-        return super().eventFilter(obj, event)
+    def _thermal_vb_release(self, event: Any) -> None:
+        if self._thermal_drag_index >= 0:
+            self._thermal_drag_index = -1
+            self._refresh_thermal_plot()
+            event.accept()
+            return
+        if hasattr(self, "_vb_orig_release"):
+            self._vb_orig_release(event)
 
     def _thermal_find_nearest_point(self, mx: float, my: float) -> int:
         """Return index of the nearest thermal point to (mx, my), or -1."""
@@ -2491,20 +2493,53 @@ QTableWidget QLineEdit, QTableWidget QSpinBox, QTableWidget QDoubleSpinBox, QTab
             return -1
 
     def _thermal_apply_drag(self, new_x: float, new_y: float) -> None:
-        """Move the currently dragged point to (new_x, new_y)."""
+        """Move the currently dragged point to (new_x, new_y).
+
+        During active drag we update the table cells and move the
+        corresponding scatter dot + coordinate label directly — without
+        calling ``_refresh_thermal_plot()`` which would do a full
+        clear → resample → rebuild that is too heavy for 30 Hz mouse
+        events and also flickers.  A full refresh happens on release.
+        """
         try:
             new_time = max(0.0, new_x)
             new_temp = max(0.0, min(2000.0, new_y))
             row = self._thermal_drag_index
             table = self.thermal_points_table
             if row < table.rowCount():
+                # Block table signals to avoid recursive refresh
+                table.blockSignals(True)
                 time_item = table.item(row, 0)
                 temp_item = table.item(row, 1)
                 if time_item is not None:
                     time_item.setText(f"{new_time:.1f}")
                 if temp_item is not None:
                     temp_item.setText(f"{new_temp:.0f}")
-                self._refresh_thermal_plot()
+                table.blockSignals(False)
+
+                # Move the coordinate label in-place (no full redraw).
+                coord_labels = getattr(self, "_thermal_coord_labels", [])
+                if row < len(coord_labels) and coord_labels[row] is not None:
+                    code = self._curve_point_code(row)
+                    coord_labels[row].setText(
+                        f"{code}: {new_temp:.0f}°C, {new_time:.1f}с"
+                    )
+                    coord_labels[row].setPos(float(new_time), float(new_temp))
+
+                # Move the scatter dot visually — update the backing
+                # PlotDataItem data in-place for the points series.
+                # The points plot is the second item added after the
+                # curve line in _refresh_thermal_plot.
+                items = self.thermal_plot_widget.listDataItems()
+                if len(items) >= 2:
+                    pts_item = items[1]
+                    xd, yd = pts_item.getData()
+                    if xd is not None and row < len(xd):
+                        xd = list(xd)
+                        yd = list(yd)
+                        xd[row] = float(new_time)
+                        yd[row] = float(new_temp)
+                        pts_item.setData(xd, yd)
         except Exception:
             pass
 
