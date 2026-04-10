@@ -313,7 +313,7 @@ def resolve_fe_c_stage(c_wt: float, temperature_c: float, cooling_mode: str, req
             return "gamma_cementite"
         return "ledeburite"
 
-    if c <= 0.02:
+    if c <= 0.022:
         return "ferrite"
     if c < 0.77:
         return "alpha_pearlite"
@@ -541,12 +541,11 @@ def _generate_fe_c(
     if stage in {"alpha_pearlite", "pearlite", "pearlite_cementite"}:
         if stage == "alpha_pearlite":
             # Lever rule: P = (C - 0.02) / (0.77 - 0.02).  The old
-            # formula ``c / 0.82`` with a floor of 0.08 forced at least
-            # 8% pearlite even at C=0.03%, creating a jarring visual
-            # jump from the pure-ferrite renderer.  The correct lever
-            # rule gives ~1.3% pearlite at C=0.03%, which keeps the
-            # image almost entirely ferritic at low carbon.
-            pearlite_fraction = _clamp((c - 0.02) / 0.75, 0.0, 0.95)
+            # Lever rule: P = (C - C_α) / (C_eut - C_α).
+            # C_α = 0.022 wt% (max solubility of C in α-Fe at 727°C).
+            # C_eut = 0.76 wt% (eutectoid composition).
+            # At C=0.03%: ~1.1% pearlite; at C=0.10%: ~10.6%.
+            pearlite_fraction = _clamp((c - 0.022) / 0.738, 0.0, 0.95)
         elif stage == "pearlite":
             pearlite_fraction = 0.96
         else:

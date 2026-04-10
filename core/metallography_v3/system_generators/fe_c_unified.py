@@ -299,22 +299,44 @@ def _pure_ferrite_render(
     if pearlite_frac > 0.005 and isinstance(labels, np.ndarray) and ndimage is not None:
         boundary = boundary_mask_from_labels(labels, width=1)
         dist = ndimage.distance_transform_edt(~boundary).astype(np.float32)
-        # Triple-junction score: pixels near boundary intersections
-        boundary_pref = np.exp(-((dist / 3.5) ** 2)).astype(np.float32)
+
+        # Triple-junction detection: count how many boundary pixels
+        # exist in each pixel's 7×7 neighbourhood. True triple
+        # junctions (where ≥3 grains meet) have a dense cluster of
+        # boundary pixels converging from multiple directions, so the
+        # local boundary density is much higher than along a plain
+        # two-grain boundary.
+        boundary_density = ndimage.uniform_filter(
+            boundary.astype(np.float32), size=7
+        )
+        # Also detect where ≥3 distinct labels meet: if the label
+        # range (max−min) in a 5×5 window spans more values than a
+        # simple two-grain boundary, it's a junction.
+        lmax = ndimage.maximum_filter(labels, size=5)
+        lmin = ndimage.minimum_filter(labels, size=5)
+        label_span = (lmax - lmin).astype(np.float32)
+        label_span = normalize01(label_span)
+
+        # Combine: triple-junction score = boundary proximity ×
+        # local density × label diversity.
+        boundary_pref = np.exp(-((dist / 4.0) ** 2)).astype(np.float32)
+        junction_score = normalize01(
+            boundary_pref * 0.35
+            + normalize01(boundary_density) * 0.40
+            + label_span * 0.25
+        )
         rng = np.random.default_rng(seed_split["seed_topology"] + 9999)
         noise_field = rng.normal(0.0, 1.0, size=context.size).astype(np.float32)
-        if ndimage is not None:
-            noise_field = ndimage.gaussian_filter(noise_field, sigma=5.0)
-        combined = normalize01(boundary_pref * 0.7 + normalize01(noise_field) * 0.3)
+        noise_field = ndimage.gaussian_filter(noise_field, sigma=5.0)
+        combined = normalize01(junction_score * 0.75 + normalize01(noise_field) * 0.25)
         threshold = float(np.quantile(combined, 1.0 - pearlite_frac))
         pearlite_mask = combined >= threshold
-        if ndimage is not None:
-            pearlite_mask = ndimage.binary_opening(pearlite_mask, iterations=1)
+        pearlite_mask = ndimage.binary_opening(pearlite_mask, iterations=1)
         # Paint pearlite spots as dark grey (80-100)
         img_f = image_gray.astype(np.float32)
-        img_f[pearlite_mask] = 80.0 + rng.uniform(0, 20, size=int(pearlite_mask.sum())).astype(np.float32)
-        if ndimage is not None:
-            # Slight blur on pearlite edges for natural look
+        n_pearl = int(pearlite_mask.sum())
+        if n_pearl > 0:
+            img_f[pearlite_mask] = 80.0 + rng.uniform(0, 20, size=n_pearl).astype(np.float32)
             blend = ndimage.gaussian_filter(img_f, sigma=0.5)
             img_f[pearlite_mask] = blend[pearlite_mask]
         image_gray = np.clip(img_f, 0.0, 255.0).astype(np.uint8)
@@ -1248,7 +1270,7 @@ def _build_pearlitic_render(
     # (it sits ~70-95 pre-rescale) but loses the gritty black spots
     # that the previous lo=25 created on ferrite-dominated frames.
     image_gray = soft_unsharp(
-        _suppress_small_inclusions(rescale_to_u8(canvas, lo=40.0, hi=245.0)),
+        _suppress_small_inclusions(rescale_to_u8(canvas, lo=40.0, hi=245.0, dither_seed=seed_split.get("seed_noise", 0))),
         amount=0.38,
     )
     # Phase D.3 — repaint the proeutectoid cementite network on top
@@ -1602,7 +1624,7 @@ def _build_martensitic_render(
     if ndimage is not None:
         image = ndimage.gaussian_filter(image, sigma=0.4 + 0.45 * recovery)
     image_gray = soft_unsharp(
-        _suppress_small_inclusions(rescale_to_u8(image, lo=35.0, hi=210.0)),
+        _suppress_small_inclusions(rescale_to_u8(image, lo=35.0, hi=210.0, dither_seed=seed_split.get("seed_noise", 0))),
         amount=max(0.16, 0.42 - 0.18 * recovery),
     )
 

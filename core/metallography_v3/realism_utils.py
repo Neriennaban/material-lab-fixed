@@ -102,6 +102,15 @@ def multiscale_noise(
     for sigma, weight in scales:
         layer = rng.normal(0.0, 1.0, size=size).astype(np.float32)
         layer = smooth(layer, sigma=max(0.3, float(sigma)))
+        # Rotate each noise layer by a small random angle to break
+        # axis-aligned artifacts from the Gaussian kernel's separable
+        # structure.  The rotation destroys any horizontal/vertical
+        # regularity without changing the spatial statistics.
+        if ndimage is not None:
+            angle_deg = float(rng.uniform(5.0, 40.0))
+            layer = ndimage.rotate(
+                layer, angle_deg, reshape=False, order=1, mode="reflect",
+            ).astype(np.float32)
         out += layer * float(weight)
     return normalize01(out)
 
@@ -234,7 +243,12 @@ def blur_mask(mask: np.ndarray, sigma: float) -> np.ndarray:
     return normalize01(smooth(mask.astype(np.float32), sigma=max(0.2, float(sigma))))
 
 
-def rescale_to_u8(image: np.ndarray, lo: float | None = None, hi: float | None = None) -> np.ndarray:
+def rescale_to_u8(
+    image: np.ndarray,
+    lo: float | None = None,
+    hi: float | None = None,
+    dither_seed: int | None = None,
+) -> np.ndarray:
     arr = image.astype(np.float32)
     if lo is None:
         lo = float(np.quantile(arr, 0.01))
@@ -243,7 +257,15 @@ def rescale_to_u8(image: np.ndarray, lo: float | None = None, hi: float | None =
     if hi <= lo + 1e-9:
         return np.clip(arr, 0.0, 255.0).astype(np.uint8)
     arr = (arr - float(lo)) / (float(hi) - float(lo))
-    return np.clip(arr * 255.0, 0.0, 255.0).astype(np.uint8)
+    arr = arr * 255.0
+    # Stochastic dithering: add uniform noise in [-0.5, 0.5] before
+    # truncation to uint8. This breaks visible banding on smooth
+    # gradients where adjacent float values map to the same integer
+    # level, producing a 1-pixel-wide stripe of identical brightness.
+    if dither_seed is not None:
+        rng = np.random.default_rng(int(dither_seed))
+        arr = arr + rng.uniform(-0.5, 0.5, size=arr.shape).astype(np.float32)
+    return np.clip(arr, 0.0, 255.0).astype(np.uint8)
 
 
 def low_frequency_field(size: tuple[int, int], seed: int, sigma: float = 24.0) -> np.ndarray:
