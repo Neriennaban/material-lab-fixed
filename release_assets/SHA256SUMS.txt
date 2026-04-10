@@ -1,0 +1,2 @@
+2dea7dd94bce1778749a7af93286fc885da9a20111fa8e57499b22bd045b6957 *ferro_micro_generator.exe
+3070de6a5f48a09872403b8bea6bb65154bbd29d64d2b11940dfcd61c442e5d9 *ferro_micro_microscope.exe
