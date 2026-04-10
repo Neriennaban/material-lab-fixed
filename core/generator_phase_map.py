@@ -540,7 +540,13 @@ def _generate_fe_c(
 
     if stage in {"alpha_pearlite", "pearlite", "pearlite_cementite"}:
         if stage == "alpha_pearlite":
-            pearlite_fraction = _clamp(c / 0.82, 0.08, 0.9)
+            # Lever rule: P = (C - 0.02) / (0.77 - 0.02).  The old
+            # formula ``c / 0.82`` with a floor of 0.08 forced at least
+            # 8% pearlite even at C=0.03%, creating a jarring visual
+            # jump from the pure-ferrite renderer.  The correct lever
+            # rule gives ~1.3% pearlite at C=0.03%, which keeps the
+            # image almost entirely ferritic at low carbon.
+            pearlite_fraction = _clamp((c - 0.02) / 0.75, 0.0, 0.95)
         elif stage == "pearlite":
             pearlite_fraction = 0.96
         else:

@@ -70,11 +70,20 @@ def _fast_low_frequency_field(
                 out[:, tw:] = out[:, tw - 1 : tw]
             upsampled = out
         return upsampled
-    # Scipy missing — repeat the buffer to the output shape.
-    ry = (h + buf - 1) // buf
-    rx = (w + buf - 1) // buf
-    tiled = np.tile(low, (ry, rx))[:h, :w]
-    return tiled.astype(np.float32)
+    # Scipy missing — bilinear upsample via pure numpy.  The old
+    # ``np.tile`` path repeated the buffer verbatim, producing visible
+    # periodic horizontal/vertical stripes at every ``buf``-th row.
+    row_idx = np.linspace(0, buf - 1, h).astype(np.float32)
+    col_idx = np.linspace(0, buf - 1, w).astype(np.float32)
+    r0 = np.clip(np.floor(row_idx).astype(int), 0, buf - 2)
+    c0 = np.clip(np.floor(col_idx).astype(int), 0, buf - 2)
+    ry_frac = row_idx - r0.astype(np.float32)
+    cx_frac = col_idx - c0.astype(np.float32)
+    # 2D bilinear: interpolate rows first, then columns.
+    top = low[r0][:, c0] * (1.0 - cx_frac[None, :]) + low[r0][:, c0 + 1] * cx_frac[None, :]
+    bot = low[r0 + 1][:, c0] * (1.0 - cx_frac[None, :]) + low[r0 + 1][:, c0 + 1] * cx_frac[None, :]
+    upsampled = top * (1.0 - ry_frac[:, None]) + bot * ry_frac[:, None]
+    return upsampled.astype(np.float32)
 
 
 def _init_jittered_points(
