@@ -25,7 +25,7 @@ def _fast_low_frequency_field(
     *,
     rng: np.random.Generator,
     shape: tuple[int, int],
-    buffer_size: int = 128,
+    buffer_size: int = 256,
 ) -> np.ndarray:
     """Phase D.2 — generate a low-frequency random field in O(N).
 
@@ -50,22 +50,26 @@ def _fast_low_frequency_field(
     # Bilinear upsample via ``scipy.ndimage.zoom`` (order=1). Falls
     # back to cheap nearest-neighbour tiling if scipy is missing.
     if ndi is not None and (h, w) != (buf, buf):
+        # Cubic spline upsample (order=3) from the small buffer to
+        # the target shape. Eliminates the horizontal banding that
+        # bilinear (order=1) produced at integer-pixel transitions.
         zoom_y = float(h) / float(buf)
         zoom_x = float(w) / float(buf)
-        upsampled = ndi.zoom(low, (zoom_y, zoom_x), order=1, prefilter=False)
-        # ``zoom`` occasionally produces off-by-one output shapes due
-        # to floating-point rounding — crop or pad to match exactly.
+        upsampled = ndi.zoom(
+            low, (zoom_y, zoom_x), order=3, prefilter=True,
+        ).astype(np.float32)
+        # Crop or pad by at most 1 pixel for exact shape match.
         if upsampled.shape != (h, w):
-            trimmed = np.empty((h, w), dtype=np.float32)
+            out = np.empty((h, w), dtype=np.float32)
             th = min(h, upsampled.shape[0])
             tw = min(w, upsampled.shape[1])
-            trimmed[:th, :tw] = upsampled[:th, :tw]
+            out[:th, :tw] = upsampled[:th, :tw]
             if th < h:
-                trimmed[th:, :] = upsampled[-1, :tw][None, :]
+                out[th:, :] = out[th - 1 : th, :]
             if tw < w:
-                trimmed[:, tw:] = trimmed[:, tw - 1 : tw]
-            upsampled = trimmed
-        return upsampled.astype(np.float32)
+                out[:, tw:] = out[:, tw - 1 : tw]
+            upsampled = out
+        return upsampled
     # Scipy missing — repeat the buffer to the output shape.
     ry = (h + buf - 1) // buf
     rx = (w + buf - 1) // buf
@@ -263,12 +267,16 @@ def generate_pure_ferrite_micrograph(
     eq_d_px = mean_eq_d_px * np.exp(float(size_sigma) * rng.standard_normal(n_grains))
     r_px = 0.5 * eq_d_px
     weights = 0.35 * (r_px**2 - np.mean(r_px**2))
+    # Skip Lloyd relaxation for large images — the jittered grid is
+    # already regular enough and each relaxation step costs a full
+    # KDTree rebuild + scan of the image.
+    actual_relax = int(relax_iter) if h * w < 4_000_000 else 0
     labels, _points = _lloyd_relax_power(
         h,
         w,
         points,
         weights.astype(np.float32),
-        n_iter=int(relax_iter),
+        n_iter=actual_relax,
         rng=rng,
         tile=tile,
     )

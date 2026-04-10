@@ -161,11 +161,25 @@ def generate_pearlite_structure(
             modulated[pearlite_mask] += adjustment[pearlite_mask]
             image = np.clip(modulated, 0.0, 255.0).astype(np.uint8)
     else:
-        theta_field = theta[labels]
+        theta_field = theta[labels].astype(np.float32)
+        # Smooth the orientation field near colony boundaries to
+        # remove the sharp phase-discontinuity that causes wavy
+        # glitch artifacts where adjacent colonies meet.
+        if ndimage is not None:
+            cos_field = ndimage.gaussian_filter(np.cos(theta_field), sigma=1.8)
+            sin_field = ndimage.gaussian_filter(np.sin(theta_field), sigma=1.8)
+            theta_field = np.arctan2(sin_field, cos_field).astype(np.float32)
         projection = xx * np.cos(theta_field) + yy * np.sin(theta_field)
         lamella = np.sin((2.0 * math.pi / period) * projection)
-        cementite_mask = (lamella > 0) & pearlite_mask
-        image[cementite_mask] = int(cementite_brightness)
+        # Soft transition instead of hard binary threshold — avoids
+        # aliased wavy edges on the cementite/ferrite interface.
+        lamella_weight = np.clip(lamella * 2.0, -1.0, 1.0) * 0.5 + 0.5
+        pearlite_img = image.astype(np.float32)
+        pearlite_img[pearlite_mask] = (
+            float(ferrite_brightness) * (1.0 - lamella_weight[pearlite_mask])
+            + float(cementite_brightness) * lamella_weight[pearlite_mask]
+        )
+        image = np.clip(pearlite_img, 0.0, 255.0).astype(np.uint8)
 
     boundaries = np.zeros_like(labels, dtype=bool)
     boundaries[:-1, :] |= labels[:-1, :] != labels[1:, :]

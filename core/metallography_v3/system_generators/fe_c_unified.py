@@ -202,11 +202,18 @@ def _is_pure_iron_like(
     fe_pct = _composition_fraction(composition_wt, "Fe")
     c_pct = _composition_fraction(composition_wt, "C")
     si_pct = _composition_fraction(composition_wt, "Si")
+    # Accept both "ferrite" and "alpha_pearlite" stages when carbon is
+    # very low — the phase orchestrator switches from "ferrite" to
+    # "alpha_pearlite" at C≈0.02%, but at these near-zero pearlite
+    # fractions the micrograph should still look like pure ferrite
+    # with perhaps a handful of dark spots, not a completely different
+    # rendering style.
+    stage_ok = stage_name in ("ferrite", "alpha_pearlite")
     return bool(
-        stage_name == "ferrite"
-        and ferritic_fraction >= 0.95
-        and fe_pct >= 99.8
-        and c_pct <= 0.03
+        stage_ok
+        and ferritic_fraction >= 0.90
+        and fe_pct >= 99.5
+        and c_pct <= 0.06
         and si_pct <= 0.25
     )
 
@@ -234,20 +241,24 @@ def _lift_small_dark_defects(
 def _brighten_pure_ferrite_baseline(image_gray: np.ndarray) -> np.ndarray:
     arr = image_gray.astype(np.float32)
     if ndimage is not None:
-        arr = ndimage.gaussian_filter(arr, sigma=0.35)
+        arr = ndimage.gaussian_filter(arr, sigma=0.3)
     lo = float(np.quantile(arr, 0.02))
     hi = float(np.quantile(arr, 0.985))
     if hi > lo + 1e-6:
         arr = (arr - lo) / (hi - lo)
-        arr = arr * 76.0 + 152.0
+        # Wider dynamic range so grain boundaries stay visible after
+        # the normalisation pass.
+        arr = arr * 90.0 + 148.0
     dark_floor = float(np.quantile(arr, 0.07))
     arr += max(0.0, 138.0 - dark_floor)
     arr = np.clip(arr, 132.0, 246.0)
     bright = ensure_u8(arr)
     bright = _lift_small_dark_defects(bright, max_pixels=20)
     if ndimage is not None:
-        smooth = ndimage.gaussian_filter(bright.astype(np.float32), sigma=1.0)
-        bright = ensure_u8(smooth + (bright.astype(np.float32) - smooth) * 0.10)
+        smooth = ndimage.gaussian_filter(bright.astype(np.float32), sigma=0.8)
+        # Keep 40% of the high-frequency detail (boundaries) instead
+        # of the previous 10% which was washing them out.
+        bright = ensure_u8(smooth + (bright.astype(np.float32) - smooth) * 0.40)
     return bright
 
 
@@ -255,6 +266,7 @@ def _pure_ferrite_render(
     *,
     context: SystemGenerationContext,
     seed_split: dict[str, int],
+    pearlite_fraction: float = 0.0,
 ) -> tuple[np.ndarray, dict[str, np.ndarray], list[str], int, dict[str, Any]]:
     morph = (
         dict(context.transformation_state.get("morphology_state", {}))
@@ -269,27 +281,57 @@ def _pure_ferrite_render(
         mean_eq_d_px=float(mean_eq_d_px),
         size_sigma=0.22,
         relax_iter=1,
-        boundary_width_px=2.2,
-        boundary_depth=0.05,
-        blur_sigma_px=0.6,
+        boundary_width_px=2.0,
+        boundary_depth=0.12,
+        blur_sigma_px=0.5,
     )
-    # D1 — floor 120 (dark gray, not black) at the generator exit.
-    # Thin grain boundaries need to remain visible for the
-    # brightfield test; grain interiors stay bright because the
-    # underlying grain-tone sampling sits near 200 and only the
-    # boundary bands dip down toward the floor.
     image_gray = np.clip(render["image_gray"].astype(np.int16), 120, 240).astype(
         np.uint8
     )
-    phase_masks = {"FERRITE": np.ones(context.size, dtype=np.uint8)}
-    rendered_layers = ["FERRITE"]
+
+    # When called for a near-pure-iron composition that still has a
+    # small pearlite fraction (e.g. C=0.03%, pearlite≈1-3%), scatter
+    # a few dark pearlite spots on grain triple-junctions so the
+    # transition from pure ferrite to ferrite+pearlite is gradual
+    # rather than a hard switch to a completely different renderer.
+    pearlite_frac = max(0.0, min(0.15, float(pearlite_fraction)))
+    labels = render.get("labels")
+    if pearlite_frac > 0.005 and isinstance(labels, np.ndarray) and ndimage is not None:
+        boundary = boundary_mask_from_labels(labels, width=1)
+        dist = ndimage.distance_transform_edt(~boundary).astype(np.float32)
+        # Triple-junction score: pixels near boundary intersections
+        boundary_pref = np.exp(-((dist / 3.5) ** 2)).astype(np.float32)
+        rng = np.random.default_rng(seed_split["seed_topology"] + 9999)
+        noise_field = rng.normal(0.0, 1.0, size=context.size).astype(np.float32)
+        if ndimage is not None:
+            noise_field = ndimage.gaussian_filter(noise_field, sigma=5.0)
+        combined = normalize01(boundary_pref * 0.7 + normalize01(noise_field) * 0.3)
+        threshold = float(np.quantile(combined, 1.0 - pearlite_frac))
+        pearlite_mask = combined >= threshold
+        if ndimage is not None:
+            pearlite_mask = ndimage.binary_opening(pearlite_mask, iterations=1)
+        # Paint pearlite spots as dark grey (80-100)
+        img_f = image_gray.astype(np.float32)
+        img_f[pearlite_mask] = 80.0 + rng.uniform(0, 20, size=int(pearlite_mask.sum())).astype(np.float32)
+        if ndimage is not None:
+            # Slight blur on pearlite edges for natural look
+            blend = ndimage.gaussian_filter(img_f, sigma=0.5)
+            img_f[pearlite_mask] = blend[pearlite_mask]
+        image_gray = np.clip(img_f, 0.0, 255.0).astype(np.uint8)
+        phase_masks = {
+            "FERRITE": (~pearlite_mask).astype(np.uint8),
+            "PEARLITE": pearlite_mask.astype(np.uint8),
+        }
+        rendered_layers = ["FERRITE", "PEARLITE"]
+    else:
+        phase_masks = {"FERRITE": np.ones(context.size, dtype=np.uint8)}
+        rendered_layers = ["FERRITE"]
+
     fragment_area = int(max(48.0, math.pi * (mean_eq_d_px * 0.5) ** 2))
     trace = {
         "family": "pure_ferrite_power_voronoi",
         **dict(render.get("metadata", {})),
     }
-    # A10.3 — expose the per-grain label map so downstream palettes
-    # (DIC polarised, tint etching) can colour each grain individually.
     raw_labels = render.get("labels")
     if isinstance(raw_labels, np.ndarray):
         trace["grain_labels"] = raw_labels.astype(np.int32)
@@ -1032,22 +1074,23 @@ def _build_pearlitic_render(
         lamella_period_px=lamella_period,
         colony_size_px=colony_size_px,
     )
-    ferrite_grain = _grain_map(
+    # Use the same Power Voronoi ferrite renderer as _pure_ferrite_render
+    # so the ferrite grains look identical regardless of whether the
+    # composition is pure iron or a low-carbon steel with a few %
+    # pearlite. This eliminates the jarring visual transition at C≈0.03%.
+    ferrite_render = generate_pure_ferrite_micrograph(
         size=size,
         seed=seed_split["seed_boundary"],
-        mean_grain_size_px=grain_scale * 0.9,
+        mean_eq_d_px=float(grain_scale * 0.9),
+        size_sigma=0.22,
+        relax_iter=1,
+        boundary_width_px=2.0,
+        boundary_depth=0.12,
+        blur_sigma_px=0.5,
     )
-    # D2 — proeutectoid ferrite stays bright in grain interiors.
-    # Boundary grooves keep their legibility (−12 instead of −40)
-    # and the final clamp to [150, 240] prevents any ferrite
-    # pixel from turning pitch-black while still leaving room for
-    # the etched boundary bands. The interior of a ferrite grain
-    # stays in [200, 240] because the base tone is 205 and only
-    # the boundary mask touches the lower tail.
-    ferrite_img = ferrite_grain["image"].astype(np.float32) * 0.12 + 205.0
-    ferrite_img[boundaries] -= 12.0
-    ferrite_img += (noise - 0.5) * 4.0
-    ferrite_img = np.clip(ferrite_img, 150.0, 240.0).astype(np.uint8)
+    ferrite_img = np.clip(
+        ferrite_render["image_gray"].astype(np.float32), 150.0, 240.0
+    ).astype(np.uint8)
 
     # Phase D.3 — proeutectoid cementite is NOT attacked by nital
     # and appears as the brightest phase in real micrographs. The
@@ -1761,11 +1804,15 @@ def render_fe_c_unified(context: SystemGenerationContext) -> SystemGenerationRes
     rendered_layers: list[str] = list(normalized_fractions.keys())
     morphology_trace: dict[str, Any] = {"family": "generic"}
     fragment_area = max(1, int(context.size[0] * context.size[1] // 55))
-    if pure_iron_like and stage == "ferrite":
+    if pure_iron_like:
+        # Pass the pearlite fraction so near-pure compositions (C≈0.02-0.05%)
+        # get a few dark pearlite spots instead of a hard visual switch.
+        pearlite_frac_for_render = float(normalized_fractions.get("PEARLITE", 0.0))
         image_gray, phase_masks, rendered_layers, fragment_area, morphology_trace = (
             _pure_ferrite_render(
                 context=context,
                 seed_split=seed_split,
+                pearlite_fraction=pearlite_frac_for_render,
             )
         )
     elif stage in _SPECIALIZED_PEARLITIC_STAGES:
