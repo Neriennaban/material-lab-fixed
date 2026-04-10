@@ -49,26 +49,21 @@ def _fast_low_frequency_field(
         low = ndi.gaussian_filter(low, sigma=0.10 * buf)
     # Bilinear upsample via ``scipy.ndimage.zoom`` (order=1). Falls
     # back to cheap nearest-neighbour tiling if scipy is missing.
-    if ndi is not None and (h, w) != (buf, buf):
-        # Cubic spline upsample (order=3) from the small buffer to
-        # the target shape. Eliminates the horizontal banding that
-        # bilinear (order=1) produced at integer-pixel transitions.
-        zoom_y = float(h) / float(buf)
-        zoom_x = float(w) / float(buf)
-        upsampled = ndi.zoom(
-            low, (zoom_y, zoom_x), order=3, prefilter=True,
-        ).astype(np.float32)
-        # Crop or pad by at most 1 pixel for exact shape match.
-        if upsampled.shape != (h, w):
-            out = np.empty((h, w), dtype=np.float32)
-            th = min(h, upsampled.shape[0])
-            tw = min(w, upsampled.shape[1])
-            out[:th, :tw] = upsampled[:th, :tw]
-            if th < h:
-                out[th:, :] = out[th - 1 : th, :]
-            if tw < w:
-                out[:, tw:] = out[:, tw - 1 : tw]
-            upsampled = out
+    if (h, w) != (buf, buf):
+        # PIL BILINEAR resize — guarantees the exact output shape
+        # with no ringing (unlike ndimage.zoom order=3) and no
+        # off-by-one row replication. Works without SciPy too.
+        from PIL import Image as _PILImage
+
+        lo_val = float(low.min())
+        hi_val = float(low.max())
+        span = hi_val - lo_val
+        if span < 1e-12:
+            return np.full((h, w), lo_val, dtype=np.float32)
+        norm = ((low - lo_val) / span).astype(np.float32)
+        pil_img = _PILImage.fromarray(norm, mode="F")
+        resized = pil_img.resize((w, h), _PILImage.BILINEAR)
+        upsampled = np.asarray(resized, dtype=np.float32) * span + lo_val
         return upsampled
     # Scipy missing — bilinear upsample via pure numpy.  The old
     # ``np.tile`` path repeated the buffer verbatim, producing visible

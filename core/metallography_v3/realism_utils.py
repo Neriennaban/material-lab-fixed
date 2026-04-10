@@ -16,25 +16,38 @@ def clamp(value: float, low: float, high: float) -> float:
     return float(max(low, min(high, value)))
 
 
+def _pil_upsample(small: np.ndarray, target_h: int, target_w: int) -> np.ndarray:
+    """Upsample a 2D float32 array via PIL BILINEAR resize.
+
+    PIL guarantees the exact output shape (no off-by-one) and
+    bilinear interpolation produces no ringing/overshoot unlike
+    cubic splines (ndimage.zoom order=3). This eliminates horizontal
+    white lines, rectangular banding, and row-replication artifacts.
+    """
+    # PIL operates on uint8/16/float images. Convert to a normalised
+    # 0-1 float range, resize, and convert back.
+    lo = float(small.min())
+    hi = float(small.max())
+    span = hi - lo
+    if span < 1e-12:
+        return np.full((target_h, target_w), lo, dtype=np.float32)
+    norm = ((small - lo) / span).astype(np.float32)
+    pil_img = Image.fromarray(norm, mode="F")
+    resized = pil_img.resize((target_w, target_h), Image.BILINEAR)
+    result = np.asarray(resized, dtype=np.float32) * span + lo
+    return result
+
+
 def smooth(field: np.ndarray, sigma: float) -> np.ndarray:
     """Gaussian smoothing with a downsample/upsample fast path.
 
-    Phase D.2 — ``scipy.ndimage.gaussian_filter`` costs O(N · sigma)
-    per axis; when ``sigma`` is a meaningful fraction of the image
-    size (as in ``multiscale_noise`` with ``sigma=18..30`` on a
-    2K/4K/16K canvas) it becomes the top bottleneck of the pipeline.
-    For ``sigma >= 6`` we downsample the field to a buffer where
-    the effective sigma is ~3, run a small-sigma gaussian there,
-    and zoom-interpolate the result back to the original shape. The
-    output is visually indistinguishable from the full-resolution
-    pass (gaussian smoothing on a down-sampled grid produces the
-    same low-pass band) but scales linearly with output area.
+    For ``sigma >= 5`` we downsample the field, run a small-sigma
+    gaussian there, and upsample via PIL (guaranteed exact shape,
+    no ringing) back to the original resolution.
     """
     sigma = max(0.05, float(sigma))
     if ndimage is None:
         return field
-    # Small sigma — the classic path is already cheap enough and
-    # sub-pixel features matter, so no approximation.
     h, w = field.shape[:2]
     if sigma < 5.0 or max(h, w) < 512:
         return ndimage.gaussian_filter(field, sigma=sigma)
@@ -50,29 +63,7 @@ def smooth(field: np.ndarray, sigma: float) -> np.ndarray:
         prefilter=False,
     )
     small = ndimage.gaussian_filter(small, sigma=max(0.5, sigma / factor))
-    zoom_up_y = float(h) / float(small.shape[0])
-    zoom_up_x = float(w) / float(small.shape[1])
-    # Upsample with cubic spline interpolation. Use ndimage.zoom with
-    # order=3 and then crop/pad to the exact target shape. The cubic
-    # spline eliminates the visible grid artifacts that bilinear
-    # produced at integer-pixel transitions of the downsampled buffer.
-    zoom_up_y = float(h) / float(small.shape[0])
-    zoom_up_x = float(w) / float(small.shape[1])
-    upsampled = ndimage.zoom(
-        small, (zoom_up_y, zoom_up_x), order=3, prefilter=True,
-    ).astype(np.float32)
-    # Crop or pad by at most 1 pixel to match the exact target shape.
-    if upsampled.shape != field.shape:
-        out = np.empty(field.shape, dtype=np.float32)
-        th = min(h, upsampled.shape[0])
-        tw = min(w, upsampled.shape[1])
-        out[:th, :tw] = upsampled[:th, :tw]
-        if th < h:
-            out[th:, :] = out[th - 1 : th, :]
-        if tw < w:
-            out[:, tw:] = out[:, tw - 1 : tw]
-        upsampled = out
-    return upsampled
+    return _pil_upsample(small, h, w)
 
 
 def normalize01(field: np.ndarray) -> np.ndarray:
