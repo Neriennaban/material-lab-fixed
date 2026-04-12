@@ -45,9 +45,10 @@ class SendCodexPendingScriptTests(unittest.TestCase):
         }
         state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
 
+        ps_cmd = "pwsh" if shutil.which("pwsh") else "powershell"
         proc = subprocess.run(
             [
-                "powershell",
+                ps_cmd,
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",
@@ -82,9 +83,10 @@ class SendCodexPendingScriptTests(unittest.TestCase):
         }
         state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
 
+        ps_cmd = "pwsh" if shutil.which("pwsh") else "powershell"
         proc = subprocess.run(
             [
-                "powershell",
+                ps_cmd,
                 "-ExecutionPolicy",
                 "Bypass",
                 "-File",

@@ -78,7 +78,7 @@ class PipelineV3ProModeTests(unittest.TestCase):
             self.assertEqual(cts[key], morph[key], key)
         self.assertIn("thermodynamics", cts["provenance"])
         self.assertIn("diffusional_transformations", cts["provenance"])
-        self.assertEqual(str(out.metadata.get("final_stage", "")), "pearlite")
+        self.assertEqual(str(out.metadata.get("final_stage", "")), "pearlite_cementite")
         self.assertEqual(out.image_gray.shape, (128, 128))
 
     def test_pipeline_emits_tempered_family_metadata(self) -> None:

@@ -509,7 +509,7 @@ def _resolve_fe_c_stage_from_thermal(
         temper_hold_s = max(0.0, hold_s)
 
     # Tempered variants first if curve contains explicit temper region.
-    if has_temper and has_quench and t_max >= austenitize_min and (
+    if has_temper and has_quench and t_max >= austenitize_min and float(c_wt) <= 2.14 and (
         temper_hold_s >= temper_hold_min or temper_peak_t >= temper_min_t
     ):
         if temper_band_detected == "low":
@@ -543,26 +543,29 @@ def _resolve_fe_c_stage_from_thermal(
     if has_quench or quench_effect_applied:
         effective_severity = float(quench_severity + medium_bias.get(quench_medium, 0.0))
     if t_max >= austenitize_min and (effective_severity > 0.0 or has_quench) and has_quench:
-        if (
+        if float(c_wt) > 2.14:
+            pass # Cast irons and pure cementite do not form martensite entirely like steels, retain their base structures or use specific ledeburite logic
+        elif (
             float(c_wt) >= _rule_float(m_tetra, "c_min_wt", 0.6)
+            and float(c_wt) <= 2.14
             and cooling_rate >= _rule_float(m_tetra, "cooling_rate_min_c_per_s", 20.0)
             and effective_severity >= _rule_float(m_tetra, "severity_min", 0.7)
         ):
             return "martensite_tetragonal"
-        if (
+        elif (
             float(c_wt) <= _rule_float(m_cubic, "c_max_wt", 0.6)
             and cooling_rate >= _rule_float(m_cubic, "cooling_rate_min_c_per_s", 20.0)
             and effective_severity >= _rule_float(m_cubic, "severity_min", 0.55)
         ):
             return "martensite_cubic"
-        if (
+        elif (
             effective_severity >= _rule_float(troostite_q, "severity_min", 0.42)
             and effective_severity <= _rule_float(troostite_q, "severity_max", 0.75)
             and cooling_rate >= _rule_float(troostite_q, "cooling_rate_min_c_per_s", 10.0)
             and cooling_rate <= _rule_float(troostite_q, "cooling_rate_max_c_per_s", 28.0)
         ):
             return "troostite_quench"
-        if (
+        elif (
             effective_severity >= _rule_float(sorbite_q, "severity_min", 0.2)
             and effective_severity <= _rule_float(sorbite_q, "severity_max", 0.55)
             and cooling_rate >= _rule_float(sorbite_q, "cooling_rate_min_c_per_s", 4.0)
@@ -878,6 +881,8 @@ def estimate_auto_phase_fractions(
             return _norm_dict({"SORBITE": 0.42, "FERRITE": ferrite, "CEMENTITE": carb, "MARTENSITE": 0.01})
         if stage_l == "ledeburite":
             return {"CEMENTITE": 0.45, "PEARLITE": 0.3, "AUSTENITE": 0.25}
+        if stage_l == "cementite":
+            return {"CEMENTITE": 1.0}
         return {"FERRITE": 1.0}
 
     if sys_name == "al-si":

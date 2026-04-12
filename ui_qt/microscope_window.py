@@ -709,7 +709,7 @@ class MicroscopeWindow(QMainWindow, WindowModeMixin):
 
     def __init__(self, samples_dir: str | Path | None = None) -> None:
         super().__init__()
-        self.samples_dir = Path(samples_dir) if samples_dir else Path("")
+        self.samples_dir = Path(samples_dir) if samples_dir else Path("examples") / "factory_v3_output"
 
         self.current_image_path: Path | None = None
         self.current_meta_path: Path | None = None
@@ -806,7 +806,8 @@ class MicroscopeWindow(QMainWindow, WindowModeMixin):
         left_scroll = QScrollArea()
         self.left_scroll = left_scroll
         left_scroll.setWidgetResizable(True)
-        left_scroll.setMinimumWidth(340)
+        left_scroll.setMinimumWidth(430)
+
         left = QWidget()
         left.setObjectName("leftNavCard")
         left_scroll.setWidget(left)

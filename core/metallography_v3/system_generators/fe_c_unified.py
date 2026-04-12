@@ -97,6 +97,7 @@ _STAGE_DEFAULT_FRACTIONS: dict[str, dict[str, float]] = {
         "LEDEBURITE": 0.64,
         "CEMENTITE": 0.08,
     },
+    "cementite": {"CEMENTITE": 1.0},
     "martensite": {"MARTENSITE": 0.9, "CEMENTITE": 0.1},
     "martensite_tetragonal": {"MARTENSITE_TETRAGONAL": 0.9, "CEMENTITE": 0.1},
     "martensite_cubic": {"MARTENSITE_CUBIC": 0.94, "CEMENTITE": 0.06},

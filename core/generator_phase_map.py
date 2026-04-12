@@ -264,28 +264,29 @@ def resolve_fe_c_stage(c_wt: float, temperature_c: float, cooling_mode: str, req
     temp = float(temperature_c)
     mode = cooling_mode.strip().lower()
 
-    if mode in {"quench", "quenched", "water_quench", "oil_quench"} and temp <= 260.0:
-        return "martensite"
-    if mode in {"troostite_quench", "troostite"}:
-        return "troostite_quench"
-    if mode in {"sorbite_quench", "sorbite"}:
-        return "sorbite_quench"
-    if mode.startswith("bain"):
-        # Explicit upper/lower bainite only if the cooling mode string
-        # mentions it ("bainite_upper", "bainite_lower", "upper_bainite",
-        # "lower_bainite"). Otherwise keep the legacy generic "bainite"
-        # stage so existing presets render unchanged.
-        if "upper" in mode:
-            return "bainite_upper"
-        if "lower" in mode or "нижний" in mode:
-            return "bainite_lower"
-        return "bainite"
-    if mode.startswith("temper"):
-        if temp <= 250.0:
-            return "tempered_low"
-        if temp <= 450.0:
-            return "tempered_medium"
-        return "tempered_high"
+    if c <= 2.14:
+        if mode in {"quench", "quenched", "water_quench", "oil_quench"} and temp <= 260.0:
+            return "martensite"
+        if mode in {"troostite_quench", "troostite"}:
+            return "troostite_quench"
+        if mode in {"sorbite_quench", "sorbite"}:
+            return "sorbite_quench"
+        if mode.startswith("bain"):
+            # Explicit upper/lower bainite only if the cooling mode string
+            # mentions it ("bainite_upper", "bainite_lower", "upper_bainite",
+            # "lower_bainite"). Otherwise keep the legacy generic "bainite"
+            # stage so existing presets render unchanged.
+            if "upper" in mode:
+                return "bainite_upper"
+            if "lower" in mode or "нижний" in mode:
+                return "bainite_lower"
+            return "bainite"
+        if mode.startswith("temper"):
+            if temp <= 250.0:
+                return "tempered_low"
+            if temp <= 450.0:
+                return "tempered_medium"
+            return "tempered_high"
 
     liquidus = 1538.0 - 83.0 * min(c, 4.3)
     solidus = 1493.0 - 58.0 * c if c <= 2.14 else 1147.0 + (4.3 - min(c, 4.3)) * 38.0
@@ -321,6 +322,10 @@ def resolve_fe_c_stage(c_wt: float, temperature_c: float, cooling_mode: str, req
         return "pearlite"
     if c <= 2.14:
         return "pearlite_cementite"
+
+    if c >= 6.67:
+        return "cementite"
+
     # Cast iron (C > 2.14 %). We keep the legacy "ledeburite" stage as the
     # auto-resolved default so that existing presets (e.g. grey cast iron)
     # render unchanged. The new split — ``white_cast_iron_hypoeutectic`` /
