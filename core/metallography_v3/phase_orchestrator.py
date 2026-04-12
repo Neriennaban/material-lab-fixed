@@ -878,6 +878,8 @@ def estimate_auto_phase_fractions(
             return _norm_dict({"SORBITE": 0.42, "FERRITE": ferrite, "CEMENTITE": carb, "MARTENSITE": 0.01})
         if stage_l == "ledeburite":
             return {"CEMENTITE": 0.45, "PEARLITE": 0.3, "AUSTENITE": 0.25}
+        if stage_l == "cementite":
+            return {"CEMENTITE": 1.0}
         return {"FERRITE": 1.0}
 
     if sys_name == "al-si":

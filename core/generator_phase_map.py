@@ -321,6 +321,10 @@ def resolve_fe_c_stage(c_wt: float, temperature_c: float, cooling_mode: str, req
         return "pearlite"
     if c <= 2.14:
         return "pearlite_cementite"
+
+    if c >= 6.67:
+        return "cementite"
+
     # Cast iron (C > 2.14 %). We keep the legacy "ledeburite" stage as the
     # auto-resolved default so that existing presets (e.g. grey cast iron)
     # render unchanged. The new split — ``white_cast_iron_hypoeutectic`` /

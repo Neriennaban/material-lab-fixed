@@ -46,8 +46,8 @@ class ThemeTokensMireaTests(unittest.TestCase):
 
     def test_web_reference_colors_are_used(self) -> None:
         light = theme_tokens("light")
-        self.assertEqual(light.get("primary"), "#003D82")
-        self.assertEqual(light.get("accent"), "#00A3E0")
+        self.assertEqual(light.get("primary"), "#0369A1")
+        self.assertEqual(light.get("header_grad_start"), "#0369A1")
 
 
 if __name__ == "__main__":

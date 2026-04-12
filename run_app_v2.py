@@ -11,7 +11,7 @@ from ui_qt.microscope_window import MicroscopeWindow
 from ui_qt.spinbox_wheel_filter import SpinBoxWheelFilter
 
 
-DEFAULT_SAMPLES_DIR = Path("")
+DEFAULT_SAMPLES_DIR = Path("examples") / "factory_v3_output"
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
