@@ -805,6 +805,7 @@ class MicroscopeWindow(QMainWindow, WindowModeMixin):
 
         left_scroll = QScrollArea()
         self.left_scroll = left_scroll
+        left_scroll.setWidgetResizable(True)
         left_scroll.setMinimumWidth(430)
 
         left = QWidget()
