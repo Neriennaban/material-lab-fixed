@@ -1,6 +1,7 @@
 ﻿from __future__ import annotations
 
 import inspect
+from functools import lru_cache
 from typing import Any, Callable
 
 import numpy as np
@@ -26,9 +27,13 @@ GeneratorHandler = Callable[
 
 
 def _call_with_allowed(func: Callable[..., dict[str, Any]], kwargs: dict[str, Any]) -> dict[str, Any]:
-    sig = inspect.signature(func)
-    allowed = {k: v for k, v in kwargs.items() if k in sig.parameters}
+    allowed = {k: v for k, v in kwargs.items() if k in _allowed_parameters(func)}
     return func(**allowed)
+
+
+@lru_cache(maxsize=None)
+def _allowed_parameters(func: Callable[..., dict[str, Any]]) -> frozenset[str]:
+    return frozenset(inspect.signature(func).parameters)
 
 
 def _to_rgb(gray: np.ndarray) -> np.ndarray:

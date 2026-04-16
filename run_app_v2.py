@@ -7,6 +7,11 @@ from typing import Sequence
 
 from PySide6.QtWidgets import QApplication
 
+from runtime_patches import apply_runtime_patches, apply_ui_runtime_patches
+
+apply_runtime_patches()
+apply_ui_runtime_patches()
+
 from ui_qt.microscope_window import MicroscopeWindow
 from ui_qt.spinbox_wheel_filter import SpinBoxWheelFilter
 

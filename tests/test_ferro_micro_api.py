@@ -6,14 +6,23 @@ These tests focus on the public surface only — the underlying
 
 from __future__ import annotations
 
+import json
+import tempfile
+import time
 import unittest
+from pathlib import Path
 
 import numpy as np
 
 from core.metallography_v3 import ferro_micro_api as fm
+from core.metallography_v3.pipeline_v3 import MetallographyPipelineV3
 
 
 class GenerateTest(unittest.TestCase):
+    def setUp(self) -> None:
+        if hasattr(fm, "_get_pipeline"):
+            fm._get_pipeline.cache_clear()
+
     def test_default_call_returns_rgb_with_phases(self) -> None:
         sample = fm.generate(
             carbon=0.45,
@@ -77,6 +86,10 @@ class GenerateTest(unittest.TestCase):
 
 
 class PresetsTest(unittest.TestCase):
+    def setUp(self) -> None:
+        if hasattr(fm, "_get_pipeline"):
+            fm._get_pipeline.cache_clear()
+
     def test_alias_list_contains_known_grades(self) -> None:
         aliases = fm.presets.list_aliases()
         self.assertIn("armco", aliases)
@@ -117,6 +130,43 @@ class PresetsTest(unittest.TestCase):
         rgb = sample.image
         # DIC palette must produce a chromatic frame.
         self.assertFalse(np.array_equal(rgb[..., 0], rgb[..., 2]))
+
+
+class RuntimeCachingTest(unittest.TestCase):
+    def setUp(self) -> None:
+        if hasattr(fm, "_get_pipeline"):
+            fm._get_pipeline.cache_clear()
+
+    def test_runtime_pipeline_cache_reuses_instance(self) -> None:
+        if not hasattr(fm, "_get_pipeline"):
+            self.skipTest("runtime pipeline cache shim is unavailable")
+        presets_dir = str(fm.DEFAULT_PRESETS_DIR.resolve())
+        profiles_dir = str(fm.DEFAULT_PROFILES_DIR.resolve())
+        first = fm._get_pipeline(presets_dir, profiles_dir)
+        second = fm._get_pipeline(presets_dir, profiles_dir)
+        self.assertIs(first, second)
+
+    def test_pipeline_load_preset_invalidates_on_file_change(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            presets_dir = Path(tmpdir)
+            preset_path = presets_dir / "demo.json"
+            preset_path.write_text(
+                json.dumps({"seed": 1, "resolution": [64, 64]}),
+                encoding="utf-8",
+            )
+            pipeline = MetallographyPipelineV3(
+                presets_dir=presets_dir,
+                profiles_dir=fm.DEFAULT_PROFILES_DIR,
+            )
+            first = pipeline.load_preset("demo")
+            time.sleep(0.02)
+            preset_path.write_text(
+                json.dumps({"seed": 2, "resolution": [64, 64]}),
+                encoding="utf-8",
+            )
+            second = pipeline.load_preset("demo")
+            self.assertEqual(first["seed"], 1)
+            self.assertEqual(second["seed"], 2)
 
 
 if __name__ == "__main__":

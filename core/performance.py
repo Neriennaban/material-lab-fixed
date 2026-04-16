@@ -1,9 +1,362 @@
 from __future__ import annotations
 
+import hashlib
+import json
+import pickle
 import time
+from collections import OrderedDict
 from contextlib import contextmanager
 from functools import wraps
+from pathlib import Path
 from typing import Any, Callable
+
+
+class CacheEntry:
+    """Cache entry with metadata"""
+
+    def __init__(
+        self,
+        key: str,
+        value: Any,
+        ttl: int | None = None,
+        *,
+        created_at: float | None = None,
+    ):
+        self.key = key
+        self.value = value
+        self.created_at = (
+            float(created_at) if created_at is not None else time.time()
+        )
+        self.ttl = ttl
+        self.access_count = 0
+        self.last_accessed = self.created_at
+
+    def is_expired(self) -> bool:
+        """Check if cache entry is expired"""
+        if self.ttl is None:
+            return False
+        return time.time() - self.created_at > self.ttl
+
+    def access(self) -> Any:
+        """Access cache entry and update metadata"""
+        self.access_count += 1
+        self.last_accessed = time.time()
+        return self.value
+
+
+class AdvancedCache:
+    """Advanced caching system with TTL, LRU, and persistence"""
+
+    def __init__(
+        self,
+        cache_dir: str | Path | None = None,
+        max_memory_items: int = 1000,
+        default_ttl: int | None = None,
+        enable_disk: bool = True,
+    ):
+        self.cache_dir = Path(cache_dir) if cache_dir else None
+        self.max_memory_items = max_memory_items
+        self.default_ttl = default_ttl
+        self.enable_disk = enable_disk
+
+        self._memory: OrderedDict[str, CacheEntry] = OrderedDict()
+        self._stats = {
+            "hits": 0,
+            "misses": 0,
+            "evictions": 0,
+            "disk_reads": 0,
+            "disk_writes": 0,
+        }
+
+        if self.cache_dir and self.enable_disk:
+            self.cache_dir.mkdir(parents=True, exist_ok=True)
+
+    def _make_key(self, key: str | dict[str, Any]) -> str:
+        """Generate cache key from string or dict"""
+        if isinstance(key, dict):
+            data = json.dumps(
+                key,
+                ensure_ascii=False,
+                sort_keys=True,
+                separators=(",", ":"),
+                default=str,
+            )
+            return hashlib.sha256(data.encode("utf-8")).hexdigest()
+        return str(key)
+
+    def _evict_lru(self) -> None:
+        """Evict least recently used item"""
+        if not self._memory:
+            return
+        self._memory.popitem(last=False)
+        self._stats["evictions"] += 1
+
+    def _touch_memory(self, cache_key: str) -> CacheEntry | None:
+        entry = self._memory.get(cache_key)
+        if entry is None:
+            return None
+        self._memory.move_to_end(cache_key)
+        return entry
+
+    def _metadata_path(self, cache_key: str) -> Path | None:
+        if not self.cache_dir or not self.enable_disk:
+            return None
+        return self.cache_dir / f"{cache_key}.meta.json"
+
+    def _delete_disk_files(self, cache_key: str) -> None:
+        if not self.cache_dir or not self.enable_disk:
+            return
+        for path in [
+            self.cache_dir / f"{cache_key}.json",
+            self.cache_dir / f"{cache_key}.pkl",
+            self.cache_dir / f"{cache_key}.meta.json",
+        ]:
+            if path.exists():
+                try:
+                    path.unlink()
+                except Exception:
+                    pass
+
+    def _load_metadata(self, cache_key: str) -> dict[str, Any] | None:
+        meta_path = self._metadata_path(cache_key)
+        if meta_path is None or not meta_path.exists():
+            return None
+        try:
+            payload = json.loads(meta_path.read_text(encoding="utf-8"))
+        except Exception:
+            return None
+        return payload if isinstance(payload, dict) else None
+
+    def _save_metadata(
+        self,
+        cache_key: str,
+        *,
+        storage: str,
+        ttl: int | None,
+        created_at: float,
+    ) -> None:
+        meta_path = self._metadata_path(cache_key)
+        if meta_path is None:
+            return
+        payload = {
+            "storage": str(storage),
+            "ttl": None if ttl is None else int(ttl),
+            "created_at": float(created_at),
+        }
+        try:
+            meta_path.write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+        except Exception:
+            pass
+
+    def _memory_store(
+        self,
+        cache_key: str,
+        value: Any,
+        *,
+        ttl: int | None,
+        created_at: float | None = None,
+    ) -> None:
+        if cache_key in self._memory:
+            del self._memory[cache_key]
+        elif len(self._memory) >= self.max_memory_items:
+            self._evict_lru()
+        self._memory[cache_key] = CacheEntry(
+            cache_key,
+            value,
+            ttl,
+            created_at=created_at,
+        )
+        self._memory.move_to_end(cache_key)
+
+    def _load_from_disk(
+        self,
+        cache_key: str,
+    ) -> tuple[Any, int | None, float | None] | None:
+        """Load value from disk cache"""
+        if not self.cache_dir or not self.enable_disk:
+            return None
+
+        json_path = self.cache_dir / f"{cache_key}.json"
+        pkl_path = self.cache_dir / f"{cache_key}.pkl"
+        metadata = self._load_metadata(cache_key)
+        ttl = metadata.get("ttl") if isinstance(metadata, dict) else None
+        if ttl is not None:
+            try:
+                ttl = int(ttl)
+            except Exception:
+                ttl = None
+        created_at = metadata.get("created_at") if isinstance(metadata, dict) else None
+        if created_at is not None:
+            try:
+                created_at = float(created_at)
+            except Exception:
+                created_at = None
+        if ttl is not None and created_at is not None:
+            if time.time() - created_at > ttl:
+                self._delete_disk_files(cache_key)
+                return None
+
+        if json_path.exists():
+            try:
+                data = json.loads(json_path.read_text(encoding="utf-8"))
+                self._stats["disk_reads"] += 1
+                return data, ttl, created_at
+            except Exception:
+                pass
+
+        if pkl_path.exists():
+            try:
+                with open(pkl_path, "rb") as handle:
+                    data = pickle.load(handle)
+                self._stats["disk_reads"] += 1
+                return data, ttl, created_at
+            except Exception:
+                pass
+
+        return None
+
+    def _save_to_disk(
+        self,
+        cache_key: str,
+        value: Any,
+        *,
+        ttl: int | None,
+        created_at: float,
+    ) -> None:
+        """Save value to disk cache"""
+        if not self.cache_dir or not self.enable_disk:
+            return
+
+        try:
+            json_path = self.cache_dir / f"{cache_key}.json"
+            json_path.write_text(
+                json.dumps(value, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            self._save_metadata(
+                cache_key,
+                storage="json",
+                ttl=ttl,
+                created_at=created_at,
+            )
+            self._stats["disk_writes"] += 1
+            return
+        except (TypeError, ValueError):
+            pass
+
+        try:
+            pkl_path = self.cache_dir / f"{cache_key}.pkl"
+            with open(pkl_path, "wb") as handle:
+                pickle.dump(value, handle)
+            self._save_metadata(
+                cache_key,
+                storage="pickle",
+                ttl=ttl,
+                created_at=created_at,
+            )
+            self._stats["disk_writes"] += 1
+        except Exception:
+            pass
+
+    def get(self, key: str | dict[str, Any], default: Any = None) -> Any:
+        """Get value from cache"""
+        cache_key = self._make_key(key)
+
+        entry = self._touch_memory(cache_key)
+        if entry is not None:
+            if entry.is_expired():
+                self.delete(cache_key)
+                self._stats["misses"] += 1
+                return default
+            self._stats["hits"] += 1
+            return entry.access()
+
+        loaded = self._load_from_disk(cache_key)
+        if loaded is not None:
+            value, ttl, created_at = loaded
+            self._memory_store(
+                cache_key,
+                value,
+                ttl=ttl,
+                created_at=created_at,
+            )
+            self._stats["hits"] += 1
+            return value
+
+        self._stats["misses"] += 1
+        return default
+
+    def set(self, key: str | dict[str, Any], value: Any, ttl: int | None = None) -> None:
+        """Set value in cache"""
+        cache_key = self._make_key(key)
+        ttl = ttl if ttl is not None else self.default_ttl
+        created_at = time.time()
+        self._memory_store(
+            cache_key,
+            value,
+            ttl=ttl,
+            created_at=created_at,
+        )
+        self._save_to_disk(
+            cache_key,
+            value,
+            ttl=ttl,
+            created_at=created_at,
+        )
+
+    def delete(self, key: str | dict[str, Any]) -> None:
+        """Delete value from cache"""
+        cache_key = self._make_key(key)
+        if cache_key in self._memory:
+            del self._memory[cache_key]
+        self._delete_disk_files(cache_key)
+
+    def clear(self) -> None:
+        """Clear all cache"""
+        self._memory.clear()
+
+        if self.cache_dir and self.enable_disk:
+            for path in self.cache_dir.glob("*"):
+                if path.is_file():
+                    try:
+                        path.unlink()
+                    except Exception:
+                        pass
+
+    def get_or_compute(
+        self,
+        key: str | dict[str, Any],
+        compute_fn: Callable[[], Any],
+        ttl: int | None = None,
+    ) -> Any:
+        """Get value from cache or compute if not present"""
+        value = self.get(key)
+        if value is None:
+            value = compute_fn()
+            self.set(key, value, ttl)
+        return value
+
+    def stats(self) -> dict[str, Any]:
+        """Get cache statistics"""
+        total_requests = self._stats["hits"] + self._stats["misses"]
+        hit_rate = self._stats["hits"] / total_requests if total_requests > 0 else 0
+
+        return {
+            **self._stats,
+            "memory_items": len(self._memory),
+            "hit_rate": hit_rate,
+            "total_requests": total_requests,
+        }
+
+    def cleanup_expired(self) -> int:
+        """Remove expired entries from memory cache"""
+        expired_keys = [k for k, v in self._memory.items() if v.is_expired()]
+        for key in expired_keys:
+            del self._memory[key]
+        return len(expired_keys)
 
 
 class PerformanceMonitor:

@@ -1251,6 +1251,30 @@ def _build_pearlitic_render(
         _suppress_small_inclusions(rescale_to_u8(canvas, lo=40.0, hi=245.0)),
         amount=0.38,
     )
+    if stage == "alpha_pearlite" and "FERRITE" in phase_masks:
+        ferrite_mask = phase_masks["FERRITE"] > 0
+        ferrite_boundary_core = (
+            boundary_mask_from_labels(labels, width=1) > 0
+        ) & ferrite_mask
+        if np.any(ferrite_boundary_core):
+            image_gray = image_gray.copy()
+            image_gray[ferrite_boundary_core] = np.clip(
+                image_gray[ferrite_boundary_core].astype(np.int16) - 22,
+                0,
+                255,
+            ).astype(np.uint8)
+            if ndimage is not None:
+                ferrite_boundary_halo = (
+                    ndimage.binary_dilation(ferrite_boundary_core, iterations=1)
+                    & ferrite_mask
+                    & ~ferrite_boundary_core
+                )
+                if np.any(ferrite_boundary_halo):
+                    image_gray[ferrite_boundary_halo] = np.clip(
+                        image_gray[ferrite_boundary_halo].astype(np.int16) - 10,
+                        0,
+                        255,
+                    ).astype(np.uint8)
     # Phase D.3 — repaint the proeutectoid cementite network on top
     # of the post-processed frame. The generic rescale + suppression
     # + unsharp chain was flattening the bright cementite band to

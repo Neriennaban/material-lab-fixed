@@ -2,6 +2,10 @@ from __future__ import annotations
 
 from importlib import import_module
 
+from runtime_patches import apply_runtime_patches
+
+apply_runtime_patches()
+
 __all__ = ["MetallographyPipelineV3", "BatchResultV3"]
 
 

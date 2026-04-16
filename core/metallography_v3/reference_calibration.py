@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -45,10 +46,10 @@ def load_builtin_profiles(profiles_root: str | Path | None = None) -> dict[str, 
     path = root / "metallography_profiles.json"
     if not path.exists():
         return {"profiles": {}}
-    try:
-        return json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
+    cache_key = _path_signature(path)
+    if cache_key is None:
         return {"profiles": {}}
+    return dict(_load_builtin_profiles_cached(*cache_key))
 
 
 def resolve_reference_style(
@@ -93,8 +94,45 @@ def load_reference_profile(
     path = root / "reference_profiles" / f"{profile_id}.json"
     if not path.exists():
         return None
+    cache_key = _path_signature(path)
+    if cache_key is None:
+        return None
+    cached = _load_reference_profile_cached(*cache_key)
+    return None if cached is None else dict(cached)
+
+
+def _path_signature(path: Path) -> tuple[str, int, int] | None:
     try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
+        resolved = path.resolve()
+        stat = resolved.stat()
+    except OSError:
+        return None
+    return str(resolved), int(stat.st_mtime_ns), int(stat.st_size)
+
+
+@lru_cache(maxsize=8)
+def _load_builtin_profiles_cached(
+    path_str: str,
+    mtime_ns: int,
+    file_size: int,
+) -> dict[str, Any]:
+    del mtime_ns, file_size
+    try:
+        payload = json.loads(Path(path_str).read_text(encoding="utf-8"))
+    except Exception:
+        return {"profiles": {}}
+    return payload if isinstance(payload, dict) else {"profiles": {}}
+
+
+@lru_cache(maxsize=64)
+def _load_reference_profile_cached(
+    path_str: str,
+    mtime_ns: int,
+    file_size: int,
+) -> dict[str, Any] | None:
+    del mtime_ns, file_size
+    try:
+        payload = json.loads(Path(path_str).read_text(encoding="utf-8"))
     except Exception:
         return None
     if not isinstance(payload, dict):

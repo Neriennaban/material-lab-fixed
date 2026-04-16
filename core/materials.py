@@ -1,9 +1,19 @@
 from __future__ import annotations
 
 import json
+import sys
+from copy import deepcopy
 from dataclasses import dataclass, field
+from functools import lru_cache
+from importlib import import_module
 from pathlib import Path
 from typing import Any
+
+
+try:
+    sys.modules.setdefault("core.cache_manager", import_module("core.performance"))
+except Exception:
+    pass
 
 
 @dataclass(slots=True)
@@ -61,13 +71,39 @@ class MaterialPreset:
 
 def load_preset(path: str | Path) -> MaterialPreset:
     preset_path = Path(path)
-    with preset_path.open("r", encoding="utf-8") as handle:
-        payload = json.load(handle)
-    return MaterialPreset.from_dict(payload)
+    cached = _load_preset_cached(*_path_signature(preset_path))
+    return MaterialPreset.from_dict(deepcopy(cached))
 
 
 def list_presets(directory: str | Path) -> list[Path]:
     base = Path(directory)
     if not base.exists():
         return []
-    return sorted(p for p in base.glob("*.json") if p.is_file())
+    return list(_list_presets_cached(*_path_signature(base)))
+
+
+def _path_signature(path: Path) -> tuple[str, int, int]:
+    resolved = path.resolve()
+    stat = resolved.stat()
+    return str(resolved), int(stat.st_mtime_ns), int(stat.st_size)
+
+
+@lru_cache(maxsize=128)
+def _load_preset_cached(path_str: str, mtime_ns: int, file_size: int) -> dict[str, Any]:
+    del mtime_ns, file_size
+    with Path(path_str).open("r", encoding="utf-8") as handle:
+        payload = json.load(handle)
+    if not isinstance(payload, dict):
+        raise ValueError(f"Preset payload must be object: {path_str}")
+    return payload
+
+
+@lru_cache(maxsize=32)
+def _list_presets_cached(
+    path_str: str,
+    mtime_ns: int,
+    file_size: int,
+) -> tuple[Path, ...]:
+    del mtime_ns, file_size
+    base = Path(path_str)
+    return tuple(sorted(p for p in base.glob("*.json") if p.is_file()))
