@@ -1,0 +1,41 @@
+{
+  "id": "delta_ferrite",
+  "name_ru": "δ-Феррит",
+  "name_en": "Delta-ferrite",
+  "reference_section": "§1.5",
+  "reference_sources": [
+    "Гуляев А.П. Металловедение. 1986",
+    "Krauss G. Steels: Processing, Structure, and Performance. ASM Int., 2015"
+  ],
+  "phase_composition": { "DELTA_FERRITE": 0.15, "AUSTENITE": 0.85 },
+  "rgb_tones": {
+    "nital": {
+      "matrix_austenite": [230, 228, 222],
+      "delta_islands": [150, 145, 135],
+      "boundaries": [90, 85, 80]
+    },
+    "murakami": {
+      "delta_islands": [110, 90, 75]
+    }
+  },
+  "morphology": {
+    "delta_island_fraction": { "min": 0.02, "max": 0.15 },
+    "island_length_um": { "min": 100, "max": 500 },
+    "island_width_um": { "min": 5, "max": 30 },
+    "aspect_ratio": { "mean": 10, "min": 5, "max": 20 },
+    "anisotropy_ratio": 3.0,
+    "notes": "В литой структуре — вермикулярные (червеобразные) островки, образующие каркас. Границы сильно изогнутые, без прямых отрезков."
+  },
+  "composition_triggers": {
+    "c_wt_range": [0.0, 0.51],
+    "temperature_c_range": [1394, 1538]
+  },
+  "generation_hints": {
+    "texture_method": "anisotropic_simplex",
+    "stretch_x": 3.0,
+    "threshold": 0.65,
+    "scales": [[26.0, 0.7], [9.0, 0.3]],
+    "octaves": 4,
+    "persistence": 0.6
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "id": "alpha_gamma",
+  "name_ru": "Переход α ↔ γ (смесь феррита и аустенита)",
+  "name_en": "Alpha-gamma transition",
+  "reference_section": "§1.4 / §1.1",
+  "reference_sources": [
+    "Гуляев А.П. Металловедение. 1986"
+  ],
+  "phase_composition": { "FERRITE": 0.55, "AUSTENITE": 0.45 },
+  "rgb_tones": {
+    "nital": {
+      "ferrite": [225, 222, 215],
+      "austenite": [230, 228, 222],
+      "boundaries": [90, 85, 80]
+    }
+  },
+  "morphology": {
+    "grain_size_um": { "mean": 35, "min": 15, "max": 80 },
+    "triple_junction_angle_deg": 120,
+    "notes": "Смесь α+γ в узком температурном интервале. Феррит как тонкая сетка/отдельные зёрна вокруг аустенитных. На оптическом масштабе слабо различимы."
+  },
+  "composition_triggers": {
+    "c_wt_range": [0.02, 0.77],
+    "temperature_c_range": [727, 912]
+  },
+  "generation_hints": {
+    "voronoi_relax_iter": 3,
+    "ferrite_on_boundary_bias": true
+  }
+}
