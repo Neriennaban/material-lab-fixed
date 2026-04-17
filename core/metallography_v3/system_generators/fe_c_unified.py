@@ -1219,13 +1219,12 @@ def _fallback_render(
     seed = int(seed_split.get("seed_noise", context.seed))
 
     dominant = _dominant_structure(normalized_fractions)
-    labels = _labels_from_fractions(
+    # _labels_from_fractions возвращает tuple (labels_array, names_list).
+    label_arr, phase_names = _labels_from_fractions(
         size=size,
         seed=seed,
         fractions=normalized_fractions,
     )
-    phase_names = [n for n in labels["names"]]
-    label_arr = labels["labels"]
 
     canvas = np.full(size, 128.0, dtype=np.float32)
     phase_masks: dict[str, np.ndarray] = {}
