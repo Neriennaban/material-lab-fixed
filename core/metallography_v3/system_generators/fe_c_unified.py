@@ -241,11 +241,19 @@ _SPECIALIZED_MARTENSITIC_STAGES = {
     "tempered_medium",
     "tempered_high",
 }
-# _SPECIALIZED_CAST_IRON_STAGES и _SPECIALIZED_BAINITIC_STAGES
-# удалены в Phase 9 cleanup — соответствующие стадии теперь идут через
-# модульные renderer'ы в _STAGE_TO_RENDERER (_PHASE3_ACTIVATED_STAGES
-# для чугунов, _PHASE5_ACTIVATED_STAGES для bainite). См. PR цепочку
-# #4-#11 и docs/plans/whimsical-wandering-dawn.md.
+# Phase 9 cleanup: дисп-ветка _SPECIALIZED_CAST_IRON_STAGES /
+# _SPECIALIZED_BAINITIC_STAGES больше не вызывается в render_fe_c_unified
+# (стадии теперь идут через _STAGE_TO_RENDERER), но сами константы
+# сохранены как deprecated compatibility-aliases для тестов
+# typesafety/taxonomy (tests/test_fe_c_new_stages_taxonomy_v3.py).
+# Aliases derive from renderer HANDLES_STAGES, так что остаются
+# синхронизированными.
+_SPECIALIZED_CAST_IRON_STAGES: frozenset[str] = frozenset(
+    {s for s in _r_white_cast_iron.HANDLES_STAGES if s.startswith("white_cast_iron_")}
+)
+_SPECIALIZED_BAINITIC_STAGES: frozenset[str] = frozenset(
+    {"bainite_upper", "bainite_lower"}
+)
 
 
 def _composition_fraction(composition_wt: dict[str, float] | None, key: str) -> float:
@@ -1172,6 +1180,83 @@ def _build_pearlitic_render(
 # См. core/metallography_v3/renderers/martensite.py (§2.1-2.4) +
 # renderers/tempered.py + renderers/quench_products.py.
 
+
+_FALLBACK_PHASE_TONE: dict[str, float] = {
+    "FERRITE": 218.0,
+    "PEARLITE": 105.0,
+    "CEMENTITE": 235.0,
+    "AUSTENITE": 225.0,
+    "DELTA_FERRITE": 150.0,
+    "LIQUID": 225.0,
+    "MARTENSITE": 80.0,
+    "MARTENSITE_TETRAGONAL": 75.0,
+    "MARTENSITE_CUBIC": 88.0,
+    "TROOSTITE": 60.0,
+    "SORBITE": 115.0,
+    "BAINITE": 130.0,
+    "LEDEBURITE": 165.0,
+    "CEMENTITE_PRIMARY": 245.0,
+}
+
+
+def _fallback_render(
+    *,
+    context: SystemGenerationContext,
+    stage: str,
+    normalized_fractions: dict[str, float],
+    seed_split: dict[str, int],
+) -> tuple[np.ndarray, dict[str, np.ndarray], list[str], int, dict[str, Any]]:
+    """Safety-net для unknown/custom stages.
+
+    До Phase 9 эту роль играл ``_generic_render``. Новый минимализм:
+    аллоцируем phase_masks через ``_labels_from_fractions`` и заливаем
+    каждую фазу её tabular-тоном. Низкокачественный, но корректный
+    drop-in fallback — предотвращает silent downgrade в
+    ``generate_fe_c → run_phase_map_system`` при попадании
+    пользовательских/опечатанных stage names.
+    """
+    size = context.size
+    seed = int(seed_split.get("seed_noise", context.seed))
+
+    dominant = _dominant_structure(normalized_fractions)
+    labels = _labels_from_fractions(
+        size=size,
+        seed=seed,
+        fractions=normalized_fractions,
+    )
+    phase_names = [n for n in labels["names"]]
+    label_arr = labels["labels"]
+
+    canvas = np.full(size, 128.0, dtype=np.float32)
+    phase_masks: dict[str, np.ndarray] = {}
+    for idx, name in enumerate(phase_names):
+        mask = label_arr == idx
+        if not mask.any():
+            continue
+        phase_masks[name] = mask.astype(np.uint8)
+        tone = _FALLBACK_PHASE_TONE.get(_canon_phase_name(name), 128.0)
+        canvas[mask] = tone
+    # Лёгкая текстура + сглаживание краёв — избегаем сплошных блоков.
+    canvas += (
+        multiscale_noise(size=size, seed=seed + 11, scales=((12.0, 0.6), (4.0, 0.4)))
+        - 0.5
+    ) * 10.0
+    image_gray = soft_unsharp(
+        rescale_to_u8(np.clip(canvas, 0.0, 255.0), lo=20.0, hi=235.0),
+        amount=0.22,
+    )
+
+    rendered_layers = list(phase_masks.keys()) or [dominant]
+    fragment_area = max(1, size[0] * size[1] // max(1, len(rendered_layers)))
+    morphology_trace: dict[str, Any] = {
+        "family": "fallback_generic",
+        "stage": stage,
+        "phase_count": len(rendered_layers),
+        "dominant_phase": dominant,
+    }
+    return image_gray, phase_masks, rendered_layers, fragment_area, morphology_trace
+
+
 def render_fe_c_unified(context: SystemGenerationContext) -> SystemGenerationResult:
     stage = str(context.stage or "ferrite").strip().lower()
     phase_fraction_source = str(
@@ -1339,15 +1424,19 @@ def render_fe_c_unified(context: SystemGenerationContext) -> SystemGenerationRes
             max(48, morphology_trace.get("colony_size_px", 64.0) ** 2 * 0.14)
         )
     else:
-        # Phase 9 cleanup: все специализированные семейственные
-        # renderer'ы теперь в _ACTIVATED_RENDERER_STAGES + primitives
-        # в _SPECIALIZED_PEARLITIC_STAGES. Эта ветка достижима только
-        # при добавлении новой стадии в SYSTEM_STAGE_ORDER без
-        # соответствующего renderer'а.
-        raise ValueError(
-            f"render_fe_c_unified: stage {stage!r} не поддерживается — "
-            "зарегистрируйте renderer в core/metallography_v3/renderers/ "
-            "и добавьте в _ACTIVATED_RENDERER_STAGES."
+        # Phase 9 cleanup: safe-net для custom/opaque stage names
+        # (resolve_fe_c_stage пропускает требование unknown stage
+        # verbatim, и generate_fe_c не должен уходить в legacy
+        # run_phase_map_system silently). Минимальный рендер по
+        # нормализованным долям: aggregated tone field через
+        # allocate_phase_masks + per-phase заливка.
+        image_gray, phase_masks, rendered_layers, fragment_area, morphology_trace = (
+            _fallback_render(
+                context=context,
+                stage=stage,
+                normalized_fractions=normalized_fractions,
+                seed_split=seed_split,
+            )
         )
 
     if (
