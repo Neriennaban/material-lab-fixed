@@ -1,0 +1,36 @@
+{
+  "id": "tempered_low",
+  "name_ru": "Отпущенный мартенсит низкого отпуска",
+  "name_en": "Tempered martensite (low temper, 150-250°C)",
+  "reference_section": "§2.11",
+  "reference_sources": [
+    "Krauss G. Steels: Processing, Structure, and Performance. ASM Int., 2015",
+    "Гуляев А.П. Металловедение. 1986"
+  ],
+  "phase_composition": { "MARTENSITE": 0.92, "CEMENTITE": 0.08 },
+  "rgb_tones": {
+    "nital": {
+      "matrix": [50, 40, 35],
+      "matrix_250c": [45, 38, 32]
+    }
+  },
+  "morphology": {
+    "epsilon_carbide_size_nm": { "min": 3, "max": 10 },
+    "epsilon_carbide_density_per_m3": { "min": 1e22, "max": 1e23 },
+    "carbide_orientation_deg_to_lath_axis": 60,
+    "c_over_a_ratio": { "min": 1.01, "max": 1.02, "note": "значительно падает vs закалочного" },
+    "lath_geometry_preserved": true,
+    "retained_austenite_decomposed_above_c": 200,
+    "notes": "Реечная геометрия сохраняется, но общий цвет темнее на 20-30% (лучше травится). Выход С в ε-карбид (Fe2.4C, гекс.) — пластины 3-10 нм. 0.4%C 200°C ≈ 580 HV; 0.8%C 200°C ≈ 680 HV."
+  },
+  "composition_triggers": {
+    "c_wt_range": [0.3, 0.8],
+    "temper_temperature_c_range": [150, 250]
+  },
+  "generation_hints": {
+    "base_brightness_multiplier": 0.72,
+    "warm_rgb_shift": [2, -3, -5],
+    "carbide_poisson_density_per_px2": 0.005,
+    "carbide_hatch_angle_deg_to_lath": 60
+  }
+}

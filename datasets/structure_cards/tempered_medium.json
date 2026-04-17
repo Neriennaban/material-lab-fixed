@@ -1,0 +1,37 @@
+{
+  "id": "tempered_medium",
+  "name_ru": "Троостит отпуска (350-500°C)",
+  "name_en": "Tempered troostite (medium temper)",
+  "reference_section": "§2.12",
+  "reference_sources": [
+    "Krauss G. Steels: Processing, Structure, and Performance. ASM Int., 2015"
+  ],
+  "phase_composition": { "TROOSTITE": 0.70, "CEMENTITE": 0.20, "FERRITE": 0.10 },
+  "rgb_tones": {
+    "nital": {
+      "matrix": [70, 60, 52],
+      "interior": [95, 82, 72],
+      "tem_carbide_points": [30, 25, 22]
+    }
+  },
+  "morphology": {
+    "subblock_size_um": { "min": 0.5, "max": 2.0 },
+    "dislocation_density_per_m2": { "min": 1e13, "max": 1e14 },
+    "carbide_size_nm": { "min": 50, "max": 200 },
+    "carbide_density_per_m3": { "min": 1e20, "max": 1e21 },
+    "former_lath_boundaries_visible": true,
+    "matrix_appearance": "fine_velvet",
+    "notes": "Матрица — частично рекристаллизованный феррит с сохранёнными реечными стенками. Карбиды Fe₃C 50-200 нм на границе оптического разрешения. HRC 35-50, применение — пружинные стали."
+  },
+  "composition_triggers": {
+    "c_wt_range": [0.3, 0.8],
+    "temper_temperature_c_range": [350, 500]
+  },
+  "generation_hints": {
+    "blur_sigma_px": 1.0,
+    "high_freq_perlin_scale_px": 3,
+    "high_freq_perlin_octaves": 4,
+    "high_freq_perlin_amplitude_rgb": 15,
+    "carbide_on_former_lath_boundary_probability": 0.6
+  }
+}
