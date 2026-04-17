@@ -39,13 +39,10 @@ from .base import (
 from core.metallography_v3.transformation_state import (
     metadata_blocks_from_transformation_state,
 )
-from .fe_c_textures import (
-    fe_c_texture_map,
-    texture_sorbite_quench,
-    texture_sorbite_temper,
-    texture_troostite_quench,
-    texture_troostite_temper,
-)
+# Phase 9 cleanup: все текстуры (texture_sorbite_*, texture_troostite_*,
+# fe_c_texture_map) больше не нужны в fe_c_unified — они использовались
+# только внутри удалённого _generic_render. Модульные renderer'ы имеют
+# свои импорты.
 
 # Phase 1 редизайна (см. docs/plans/whimsical-wandering-dawn.md):
 # модульные renderer'ы семейств микроструктур зарегистрированы в
@@ -244,18 +241,19 @@ _SPECIALIZED_MARTENSITIC_STAGES = {
     "tempered_medium",
     "tempered_high",
 }
-# New taxonomy for A0.1: white cast iron and explicit upper/lower bainite.
-# These sets are consulted by `render_fe_c_unified` to dispatch to new build
-# functions. In phase A0 the sets are declared but not yet wired — the
-# dispatch is added in phase A1/A6 when the specialised render functions
-# land. Until then, these stages fall through to `_generic_render`, which
-# uses the phase templates above.
-_SPECIALIZED_CAST_IRON_STAGES = {
-    "white_cast_iron_hypoeutectic",
-    "white_cast_iron_eutectic",
-    "white_cast_iron_hypereutectic",
-}
-_SPECIALIZED_BAINITIC_STAGES = {"bainite_upper", "bainite_lower"}
+# Phase 9 cleanup: дисп-ветка _SPECIALIZED_CAST_IRON_STAGES /
+# _SPECIALIZED_BAINITIC_STAGES больше не вызывается в render_fe_c_unified
+# (стадии теперь идут через _STAGE_TO_RENDERER), но сами константы
+# сохранены как deprecated compatibility-aliases для тестов
+# typesafety/taxonomy (tests/test_fe_c_new_stages_taxonomy_v3.py).
+# Aliases derive from renderer HANDLES_STAGES, так что остаются
+# синхронизированными.
+_SPECIALIZED_CAST_IRON_STAGES: frozenset[str] = frozenset(
+    {s for s in _r_white_cast_iron.HANDLES_STAGES if s.startswith("white_cast_iron_")}
+)
+_SPECIALIZED_BAINITIC_STAGES: frozenset[str] = frozenset(
+    {"bainite_upper", "bainite_lower"}
+)
 
 
 def _composition_fraction(composition_wt: dict[str, float] | None, key: str) -> float:
@@ -426,131 +424,11 @@ def _pure_ferrite_render(
     return image_gray, phase_masks, rendered_layers, fragment_area, trace
 
 
-def _build_white_cast_iron_render(
-    *,
-    context: SystemGenerationContext,
-    stage: str,
-    phase_fractions: dict[str, float],
-    seed_split: dict[str, int],
-) -> tuple[np.ndarray, dict[str, np.ndarray], list[str], int, dict[str, Any]]:
-    """A1+A2+A3 dispatcher for white cast iron stages.
-
-    * ``white_cast_iron_eutectic`` → pure leopard ledeburite from A2.
-    * ``white_cast_iron_hypoeutectic`` → leopard ledeburite + dendrites
-      of primary austenite (now pearlite) from A3.
-    * ``white_cast_iron_hypereutectic`` → leopard ledeburite + primary
-      cementite needles from A1.
-    """
-    from core.metallography_v3.system_generators.fe_c_dendrites import (
-        render_fe_c_austenite_dendrites,
-    )
-    from core.metallography_v3.system_generators.fe_c_primary_cementite import (
-        render_primary_cementite_needles,
-    )
-    from core.metallography_v3.system_generators.fe_c_textures import (
-        texture_ledeburite_leopard,
-    )
-
-    size = context.size
-    seed = int(seed_split.get("seed_topology", context.seed))
-    c_wt = float((context.composition_wt or {}).get("C", 0.0))
-    cooling_rate = float(
-        (context.thermal_summary or {}).get("max_effective_cooling_rate_c_per_s", 5.0)
-    ) or 5.0
-
-    base = texture_ledeburite_leopard(size=size, seed=seed)
-    rendered_layers: list[str] = ["LEDEBURITE"]
-    morphology_trace: dict[str, Any] = {
-        "family": "white_cast_iron",
-        "stage": stage,
-        "leopard_seed": seed,
-    }
-    fragment_area = max(48, int(size[0] * size[1] * 0.04))
-    extra_mask: np.ndarray | None = None
-    extra_phase: str | None = None
-
-    if stage == "white_cast_iron_hypoeutectic":
-        out = render_fe_c_austenite_dendrites(
-            size=size,
-            seed=seed + 401,
-            c_wt=c_wt,
-            base_image=base,
-            cooling_rate_c_per_s=cooling_rate,
-        )
-        image_gray = out["image"]
-        extra_mask = out["dendrite_mask"]
-        extra_phase = "PEARLITE"  # primary austenite → pearlite at RT
-        morphology_trace.update(out["metadata"])
-        morphology_trace["family"] = "white_cast_iron_hypoeutectic"
-    elif stage == "white_cast_iron_hypereutectic":
-        out = render_primary_cementite_needles(
-            size=size,
-            seed=seed + 501,
-            c_wt=c_wt,
-            base_image=base,
-            cooling_rate_c_per_s=cooling_rate,
-        )
-        image_gray = out["image"]
-        extra_mask = out["needle_mask"]
-        extra_phase = "CEMENTITE_PRIMARY"
-        morphology_trace.update(out["metadata"])
-        morphology_trace["family"] = "white_cast_iron_hypereutectic"
-    else:  # eutectic — leopard only
-        image_gray = base
-        morphology_trace["family"] = "white_cast_iron_eutectic"
-
-    h, w = size
-    phase_masks: dict[str, np.ndarray] = {
-        "LEDEBURITE": np.ones((h, w), dtype=np.uint8),
-    }
-    if extra_mask is not None and extra_phase is not None:
-        binary_extra = (extra_mask > 0).astype(np.uint8)
-        phase_masks[extra_phase] = binary_extra
-        # Subtract from the ledeburite background.
-        phase_masks["LEDEBURITE"] = (1 - binary_extra).astype(np.uint8)
-        rendered_layers.append(extra_phase)
-
-    return image_gray, phase_masks, rendered_layers, fragment_area, morphology_trace
-
-
-def _build_bainitic_render_split(
-    *,
-    context: SystemGenerationContext,
-    stage: str,
-    phase_fractions: dict[str, float],
-    seed_split: dict[str, int],
-) -> tuple[np.ndarray, dict[str, np.ndarray], list[str], int, dict[str, Any]]:
-    """A6 dispatcher for explicit upper / lower bainite stages.
-
-    Unlike the legacy ``"bainite"`` stage which is routed through
-    ``_build_martensitic_render``, the upper / lower split uses the
-    dedicated ``texture_bainite_upper`` / ``texture_bainite_lower``
-    renderers introduced in the morphology commit.
-    """
-    from core.metallography_v3.system_generators.fe_c_textures import (
-        texture_bainite_lower,
-        texture_bainite_upper,
-    )
-
-    size = context.size
-    seed = int(seed_split.get("seed_topology", context.seed))
-    if stage == "bainite_upper":
-        image_gray = texture_bainite_upper(size=size, seed=seed + 311)
-        family = "upper_bainite_feathery"
-    elif stage == "bainite_lower":
-        image_gray = texture_bainite_lower(size=size, seed=seed + 313)
-        family = "lower_bainite_lath"
-    else:  # safety net
-        image_gray = texture_bainite_upper(size=size, seed=seed + 311)
-        family = "bainite_default"
-
-    h, w = size
-    phase_masks = {"BAINITE": np.ones((h, w), dtype=np.uint8)}
-    morphology_trace = {
-        "family": family,
-        "stage": stage,
-    }
-    return image_gray, phase_masks, ["BAINITE"], int(h * w * 0.05), morphology_trace
+# Phase 9 cleanup: _build_white_cast_iron_render и
+# _build_bainitic_render_split удалены — соответствующие стадии теперь
+# обслуживаются модульными renderer'ами:
+#   white_cast_iron  → core/metallography_v3/renderers/white_cast_iron.py
+#   bainite_upper/lower/CFB → core/metallography_v3/renderers/bainite.py
 
 
 def _canon_phase_name(value: str) -> str:
@@ -818,32 +696,6 @@ def _suppress_small_inclusions(image_gray: np.ndarray) -> np.ndarray:
     return ensure_u8(arr)
 
 
-def _texture_for_phase(
-    *,
-    phase_name: str,
-    stage_name: str,
-    size: tuple[int, int],
-    seed: int,
-    textures: dict[str, Any],
-) -> np.ndarray:
-    phase = _canon_phase_name(phase_name)
-    stage = str(stage_name).strip().lower()
-    if phase == "TROOSTITE":
-        return (
-            texture_troostite_quench(size=size, seed=seed)
-            if stage == "troostite_quench"
-            else texture_troostite_temper(size=size, seed=seed)
-        )
-    if phase == "SORBITE":
-        return (
-            texture_sorbite_quench(size=size, seed=seed)
-            if stage == "sorbite_quench"
-            else texture_sorbite_temper(size=size, seed=seed)
-        )
-    fn = textures.get(phase) or textures.get("FERRITE")
-    return ensure_u8(fn(size, int(seed)))
-
-
 def _grain_map(
     size: tuple[int, int], seed: int, mean_grain_size_px: float, elongation: float = 1.0
 ) -> dict[str, Any]:
@@ -962,64 +814,6 @@ def _dominant_structure(phase_fractions: dict[str, float]) -> str:
         phase_fractions.items(),
         key=lambda item: (float(item[1]), _structural_rank(item[0])),
     )[0]
-
-
-def _select_grains_by_score(
-    *,
-    labels: np.ndarray,
-    field: np.ndarray,
-    fraction_total: float,
-) -> np.ndarray:
-    """D3 — grain-level allocation helper.
-
-    Pick whole Voronoi grains whose mean ``field`` score is highest
-    until the cumulative pixel coverage approaches ``fraction_total``
-    of the image area. Returns a boolean mask that covers the
-    selected grains *entirely* (every pixel belonging to a chosen
-    grain id is ``True``).
-
-    This keeps the ferrite/pearlite interface strictly along grain
-    boundaries instead of cutting through grain interiors the way
-    ``select_fraction_mask`` does at pixel level.
-    """
-    if labels.shape != field.shape:
-        raise ValueError(
-            f"labels and field shape mismatch: {labels.shape} vs {field.shape}"
-        )
-    total_pixels = int(labels.size)
-    target = int(round(max(0.0, min(1.0, float(fraction_total))) * total_pixels))
-    if target <= 0:
-        return np.zeros(labels.shape, dtype=bool)
-
-    flat_labels = labels.ravel()
-    flat_field = field.ravel().astype(np.float64)
-    n_grains = int(flat_labels.max()) + 1 if flat_labels.size else 0
-    if n_grains <= 0:
-        return np.zeros(labels.shape, dtype=bool)
-
-    grain_sum = np.bincount(flat_labels, weights=flat_field, minlength=n_grains)
-    grain_cnt = np.bincount(flat_labels, minlength=n_grains).astype(np.float64)
-    safe_cnt = np.where(grain_cnt > 0, grain_cnt, 1.0)
-    grain_score = grain_sum / safe_cnt
-    # Exclude empty grain ids from the ranking.
-    grain_score[grain_cnt <= 0] = -np.inf
-
-    order = np.argsort(-grain_score, kind="stable")
-    cumulative = 0
-    picked: list[int] = []
-    for gid in order:
-        cnt = int(grain_cnt[int(gid)])
-        if cnt <= 0:
-            continue
-        picked.append(int(gid))
-        cumulative += cnt
-        if cumulative >= target:
-            break
-
-    if not picked:
-        return np.zeros(labels.shape, dtype=bool)
-    picked_array = np.asarray(picked, dtype=np.int64)
-    return np.isin(labels, picked_array)
 
 
 def _project_mask_to_grains(
@@ -1382,395 +1176,84 @@ def _build_pearlitic_render(
     return image_gray, phase_masks, trace
 
 
-def _build_martensitic_render(
-    *,
-    context: SystemGenerationContext,
-    stage: str,
-    phase_fractions: dict[str, float],
-    seed_split: dict[str, int],
-    retained_austenite_used: float,
-) -> tuple[np.ndarray, dict[str, np.ndarray], dict[str, Any]]:
-    size = context.size
-    c_wt = float(context.composition_wt.get("C", 0.0))
-    morphology_state = dict(context.transformation_state.get("morphology_state", {}))
-    precipitation_state = dict(
-        context.transformation_state.get("precipitation_state", {})
-    )
-    style = str(morphology_state.get("martensite_style", _martensite_style(c_wt)))
-    cool_idx = cooling_index(getattr(context.processing, "cooling_mode", "equilibrium"))
-
-    prior_grain_scale = clamp(
-        float(
-            morphology_state.get(
-                "prior_austenite_grain_size_px",
-                92.0 + 12.0 * max(0.0, c_wt - 0.4) - 28.0 * cool_idx,
-            )
-        ),
-        34.0,
-        120.0,
-    )
-    packet_size_px = clamp(
-        float(
-            morphology_state.get(
-                "packet_size_px",
-                52.0
-                + (
-                    10.0
-                    if style == "plate_dominant"
-                    else (-9.0 if style == "lath_dominant" else 0.0)
-                )
-                - 10.0 * cool_idx,
-            )
-        ),
-        18.0,
-        88.0,
-    )
-    elong = (
-        1.18
-        if style == "lath_dominant"
-        else (1.42 if style == "mixed_lath_plate" else 1.72)
-    )
-    prior = _grain_map(
-        size=size,
-        seed=seed_split["seed_topology"],
-        mean_grain_size_px=prior_grain_scale,
-    )
-    packets = _grain_map(
-        size=size,
-        seed=seed_split["seed_boundary"],
-        mean_grain_size_px=packet_size_px,
-        elongation=elong,
-    )
-    prior_bound = boundary_mask_from_labels(prior["labels"], width=2)
-    packet_bound = boundary_mask_from_labels(packets["labels"], width=2)
-    dist = distance_to_mask(packet_bound | prior_bound)
-    boundary_pref = normalize01(
-        np.exp(-dist / clamp(3.2 + 0.9 * (1.0 - cool_idx), 1.4, 5.0)).astype(np.float32)
-    )
-
-    h, w = size
-    yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
-    rng = np.random.default_rng(seed_split["seed_lamella"])
-    packet_count = int(packets["labels"].max()) + 1
-    theta = rng.uniform(0.0, math.pi, size=packet_count).astype(np.float32)
-    phase = rng.uniform(0.0, 2.0 * math.pi, size=packet_count).astype(np.float32)
-    spacing_base = (
-        3.6
-        if style == "lath_dominant"
-        else (5.6 if style == "mixed_lath_plate" else 8.4)
-    )
-    spacing = np.clip(
-        rng.normal(
-            spacing_base, 0.55 if style == "lath_dominant" else 0.95, size=packet_count
-        ),
-        2.0,
-        14.0,
-    ).astype(np.float32)
-    proj = xx * np.cos(theta[packets["labels"]]) + yy * np.sin(theta[packets["labels"]])
-    curvature = (
-        (
-            multiscale_noise(
-                size=size,
-                seed=seed_split["seed_noise"],
-                scales=((18.0, 0.6), (5.0, 0.4)),
-            )
-            - 0.5
-        )
-        * spacing_base
-        * 0.7
-    )
-    band = np.sin(
-        (2.0 * math.pi / spacing[packets["labels"]]) * (proj + curvature)
-        + phase[packets["labels"]]
-    )
-    lath_energy = normalize01(np.abs(band))
-    edge_energy = normalize01(1.0 - np.abs(band))
-    packet_variation = rng.normal(0.0, 1.0, size=packet_count).astype(np.float32)
-    packet_variation = packet_variation[packets["labels"]]
-    packet_variation = normalize01(packet_variation) - 0.5
-
-    recovery = float(
-        precipitation_state.get(
-            "recovery_level",
-            {
-                "martensite": 0.08,
-                "martensite_tetragonal": 0.04,
-                "martensite_cubic": 0.12,
-                "troostite_quench": 0.32,
-                "sorbite_quench": 0.46,
-                "bainite": 0.42,
-                "tempered_low": 0.36,
-                "troostite_temper": 0.56,
-                "tempered_medium": 0.62,
-                "sorbite_temper": 0.78,
-                "tempered_high": 0.88,
-            }.get(stage, 0.28),
-        )
-    )
-    carbide_scale_px = clamp(
-        float(
-            precipitation_state.get(
-                "carbide_scale_px", 1.2 + 2.3 * recovery + max(0.0, c_wt - 0.3)
-            )
-        ),
-        1.0,
-        5.8,
-    )
-    lath_contrast = 30.0 * (1.0 - 0.55 * recovery)
-    matrix = (
-        134.0
-        + packet_variation * 16.0
-        + (
-            multiscale_noise(
-                size=size,
-                seed=seed_split["seed_particles"],
-                scales=((22.0, 0.68), (4.0, 0.32)),
-            )
-            - 0.5
-        )
-        * 12.0
-    )
-    image = (
-        matrix
-        + band * lath_contrast
-        - edge_energy * (12.0 + 16.0 * min(1.0, recovery + 0.1))
-    )
-    image[packet_bound] -= 13.0
-    image[prior_bound] -= 8.0
-
-    recovered_grain = _grain_map(
-        size=size,
-        seed=seed_split["seed_particles"] + 101,
-        mean_grain_size_px=clamp(packet_size_px * 1.18, 22.0, 96.0),
-    )
-    recovered_img = recovered_grain["image"].astype(np.float32) * 0.18 + 154.0
-    recovered_img[recovered_grain["boundaries"]] -= 10.0
-    image = image * (1.0 - 0.45 * recovery) + recovered_img * (0.45 * recovery)
-
-    dominant = _dominant_structure(phase_fractions)
-    # A8 — retained austenite localisation. Default weight 0.72 keeps
-    # the snapshot baseline byte-identical; presets that opt in via
-    # ``context.ra_boundary_strength`` push the films harder onto
-    # the inter-lath boundaries (typically 0.85-0.92).
-    _ra_strength = float(
-        getattr(context, "ra_boundary_strength", None) or 0.72
-    )
-    _ra_strength = max(0.0, min(0.95, _ra_strength))
-    _ra_noise_weight = max(0.05, 1.0 - _ra_strength)
-    ra_field = normalize01(
-        boundary_pref * _ra_strength
-        + multiscale_noise(
-            size=size,
-            seed=seed_split["seed_noise"] + 11,
-            scales=((9.0, 0.5), (2.0, 0.5)),
-        )
-        * _ra_noise_weight
-    )
-    carbide_field = normalize01(
-        edge_energy * 0.52
-        + boundary_pref * 0.22
-        + multiscale_noise(
-            size=size,
-            seed=seed_split["seed_noise"] + 27,
-            scales=((carbide_scale_px * 2.4, 0.35), (carbide_scale_px, 0.65)),
-        )
-        * 0.26
-    )
-    ferrite_field = normalize01(
-        low_frequency_field(
-            size=size, seed=seed_split["seed_particles"] + 33, sigma=24.0
-        )
-        * 0.74
-        + (1.0 - lath_energy) * 0.26
-    )
-    troostite_field = normalize01(
-        edge_energy * 0.45
-        + multiscale_noise(
-            size=size,
-            seed=seed_split["seed_particles"] + 61,
-            scales=((6.0, 0.55), (1.6, 0.45)),
-        )
-        * 0.55
-    )
-    sorbite_field = normalize01(
-        ferrite_field * 0.62
-        + multiscale_noise(
-            size=size,
-            seed=seed_split["seed_particles"] + 81,
-            scales=((10.0, 0.4), (2.5, 0.6)),
-        )
-        * 0.38
-    )
-    bainite_field = normalize01(
-        (band > 0).astype(np.float32) * 0.55
-        + edge_energy * 0.20
-        + multiscale_noise(
-            size=size,
-            seed=seed_split["seed_particles"] + 93,
-            scales=((12.0, 0.55), (3.2, 0.45)),
-        )
-        * 0.25
-    )
-    mart_field = normalize01(
-        lath_energy * 0.70 + (1.0 - recovery) * 0.20 + packet_variation * 0.10
-    )
-
-    ordered_fields: list[tuple[str, np.ndarray]] = []
-    if (
-        "AUSTENITE" in phase_fractions
-        and float(phase_fractions.get("AUSTENITE", 0.0)) > 0.0
-    ):
-        ordered_fields.append(("AUSTENITE", ra_field))
-    if (
-        "CEMENTITE" in phase_fractions
-        and float(phase_fractions.get("CEMENTITE", 0.0)) > 0.0
-    ):
-        ordered_fields.append(("CEMENTITE", carbide_field))
-    if (
-        "FERRITE" in phase_fractions
-        and float(phase_fractions.get("FERRITE", 0.0)) > 0.0
-    ):
-        ordered_fields.append(("FERRITE", ferrite_field))
-    if "TROOSTITE" in phase_fractions and dominant != "TROOSTITE":
-        ordered_fields.append(("TROOSTITE", troostite_field))
-    if "SORBITE" in phase_fractions and dominant != "SORBITE":
-        ordered_fields.append(("SORBITE", sorbite_field))
-    if "BAINITE" in phase_fractions and dominant != "BAINITE":
-        ordered_fields.append(("BAINITE", bainite_field))
-    for mart_name in ("MARTENSITE_TETRAGONAL", "MARTENSITE_CUBIC", "MARTENSITE"):
-        if mart_name in phase_fractions and dominant != mart_name:
-            ordered_fields.append((mart_name, mart_field))
-    if dominant not in {name for name, _ in ordered_fields}:
-        ordered_fields.append(
-            (
-                dominant,
-                mart_field
-                if dominant.startswith("MARTENSITE")
-                else (
-                    bainite_field
-                    if dominant == "BAINITE"
-                    else (
-                        troostite_field
-                        if dominant == "TROOSTITE"
-                        else (sorbite_field if dominant == "SORBITE" else ferrite_field)
-                    )
-                ),
-            )
-        )
-
-    phase_masks = allocate_phase_masks(
-        size=size,
-        phase_fractions=phase_fractions,
-        ordered_fields=ordered_fields,
-        remainder_name=dominant,
-    )
-
-    if "CEMENTITE" in phase_masks and np.any(phase_masks["CEMENTITE"] > 0):
-        image[phase_masks["CEMENTITE"] > 0] -= 22.0
-    if "AUSTENITE" in phase_masks and np.any(phase_masks["AUSTENITE"] > 0):
-        image[phase_masks["AUSTENITE"] > 0] += 12.0
-    if "FERRITE" in phase_masks and np.any(phase_masks["FERRITE"] > 0):
-        image[phase_masks["FERRITE"] > 0] = (
-            image[phase_masks["FERRITE"] > 0] * 0.68 + 164.0 * 0.32
-        )
-    if "SORBITE" in phase_masks and np.any(phase_masks["SORBITE"] > 0):
-        image[phase_masks["SORBITE"] > 0] = (
-            image[phase_masks["SORBITE"] > 0] * 0.72 + 150.0 * 0.28
-        )
-    if "TROOSTITE" in phase_masks and np.any(phase_masks["TROOSTITE"] > 0):
-        image[phase_masks["TROOSTITE"] > 0] = (
-            image[phase_masks["TROOSTITE"] > 0] * 0.74 + 142.0 * 0.26
-        )
-    if "BAINITE" in phase_masks and np.any(phase_masks["BAINITE"] > 0):
-        image[phase_masks["BAINITE"] > 0] = (
-            image[phase_masks["BAINITE"] > 0] * 0.76 + 136.0 * 0.24
-        )
-
-    image += (
-        multiscale_noise(
-            size=size,
-            seed=seed_split["seed_noise"] + 3,
-            scales=((10.0, 0.55), (2.6, 0.45)),
-        )
-        - 0.5
-    ) * 6.0
-    if ndimage is not None:
-        image = ndimage.gaussian_filter(image, sigma=0.4 + 0.45 * recovery)
-    image_gray = soft_unsharp(
-        _suppress_small_inclusions(rescale_to_u8(image, lo=35.0, hi=210.0)),
-        amount=max(0.16, 0.42 - 0.18 * recovery),
-    )
-
-    ra_bias = (
-        float(boundary_pref[phase_masks["AUSTENITE"] > 0].mean())
-        if ("AUSTENITE" in phase_masks and np.any(phase_masks["AUSTENITE"] > 0))
-        else 0.0
-    )
-    trace = {
-        "family": "martensitic_family",
-        "martensite_style": str(style),
-        "prior_austenite_grain_size_px": float(prior_grain_scale),
-        "packet_size_px": float(packet_size_px),
-        "band_spacing_px": float(spacing_base),
-        "retained_austenite_distribution": (
-            "boundary_films" if ra_bias > 0.5 else "mixed_films_islands"
-        ),
-        "retained_austenite_boundary_bias": float(ra_bias),
-        "carbide_scale_px": float(carbide_scale_px),
-        "temper_recovery_level": float(recovery),
-        "cooling_index": float(cool_idx),
-        "retained_austenite_used": float(retained_austenite_used),
-    }
-    return image_gray, phase_masks, trace
+# Phase 9 cleanup: _build_martensitic_render и _generic_render удалены.
+# См. core/metallography_v3/renderers/martensite.py (§2.1-2.4) +
+# renderers/tempered.py + renderers/quench_products.py.
 
 
-def _generic_render(
+_FALLBACK_PHASE_TONE: dict[str, float] = {
+    "FERRITE": 218.0,
+    "PEARLITE": 105.0,
+    "CEMENTITE": 235.0,
+    "AUSTENITE": 225.0,
+    "DELTA_FERRITE": 150.0,
+    "LIQUID": 225.0,
+    "MARTENSITE": 80.0,
+    "MARTENSITE_TETRAGONAL": 75.0,
+    "MARTENSITE_CUBIC": 88.0,
+    "TROOSTITE": 60.0,
+    "SORBITE": 115.0,
+    "BAINITE": 130.0,
+    "LEDEBURITE": 165.0,
+    "CEMENTITE_PRIMARY": 245.0,
+}
+
+
+def _fallback_render(
     *,
     context: SystemGenerationContext,
     stage: str,
     normalized_fractions: dict[str, float],
     seed_split: dict[str, int],
-) -> tuple[np.ndarray, dict[str, np.ndarray], list[str], int]:
-    labels, phase_names = _labels_from_fractions(
-        size=context.size,
-        seed=seed_split["seed_topology"],
+) -> tuple[np.ndarray, dict[str, np.ndarray], list[str], int, dict[str, Any]]:
+    """Safety-net для unknown/custom stages.
+
+    До Phase 9 эту роль играл ``_generic_render``. Новый минимализм:
+    аллоцируем phase_masks через ``_labels_from_fractions`` и заливаем
+    каждую фазу её tabular-тоном. Низкокачественный, но корректный
+    drop-in fallback — предотвращает silent downgrade в
+    ``generate_fe_c → run_phase_map_system`` при попадании
+    пользовательских/опечатанных stage names.
+    """
+    size = context.size
+    seed = int(seed_split.get("seed_noise", context.seed))
+
+    dominant = _dominant_structure(normalized_fractions)
+    # _labels_from_fractions возвращает tuple (labels_array, names_list).
+    label_arr, phase_names = _labels_from_fractions(
+        size=size,
+        seed=seed,
         fractions=normalized_fractions,
     )
-    h, w = context.size
-    fragment_area = max(140, min(22000, int((h * w) // 55)))
-    labels = _coarsen_phase_labels(labels, min_fragment_area=fragment_area)
-    textures = fe_c_texture_map()
 
+    canvas = np.full(size, 128.0, dtype=np.float32)
     phase_masks: dict[str, np.ndarray] = {}
-    rendered_layers: list[str] = []
-    canvas = np.zeros(context.size, dtype=np.float32)
-    for idx, phase_name in enumerate(phase_names):
-        mask = labels == idx
-        phase_masks[str(phase_name)] = mask.astype(np.uint8)
-        rendered_layers.append(str(phase_name))
-        texture = _texture_for_phase(
-            phase_name=phase_name,
-            stage_name=stage,
-            size=context.size,
-            seed=seed_split["seed_particles"] + idx * 37,
-            textures=textures,
-        )
-        canvas[mask] = texture[mask].astype(np.float32)
-
-    boundaries = _phase_boundaries(labels)
-    canvas[boundaries > 0] = np.clip(canvas[boundaries > 0] - 7.5, 0.0, 255.0)
-    noise = (
-        np.random.default_rng(seed_split["seed_noise"])
-        .normal(0.0, 1.0, size=context.size)
-        .astype(np.float32)
-    )
-    if ndimage is not None:
-        noise = ndimage.gaussian_filter(noise, sigma=1.0)
-    canvas += noise * 1.1
+    for idx, name in enumerate(phase_names):
+        mask = label_arr == idx
+        if not mask.any():
+            continue
+        phase_masks[name] = mask.astype(np.uint8)
+        tone = _FALLBACK_PHASE_TONE.get(_canon_phase_name(name), 128.0)
+        canvas[mask] = tone
+    # Лёгкая текстура + сглаживание краёв — избегаем сплошных блоков.
+    canvas += (
+        multiscale_noise(size=size, seed=seed + 11, scales=((12.0, 0.6), (4.0, 0.4)))
+        - 0.5
+    ) * 10.0
     image_gray = soft_unsharp(
-        _suppress_small_inclusions(ensure_u8(canvas)), amount=0.44
+        rescale_to_u8(np.clip(canvas, 0.0, 255.0), lo=20.0, hi=235.0),
+        amount=0.22,
     )
-    return image_gray, phase_masks, rendered_layers, int(fragment_area)
+
+    rendered_layers = list(phase_masks.keys()) or [dominant]
+    fragment_area = max(1, size[0] * size[1] // max(1, len(rendered_layers)))
+    morphology_trace: dict[str, Any] = {
+        "family": "fallback_generic",
+        "stage": stage,
+        "phase_count": len(rendered_layers),
+        "dominant_phase": dominant,
+    }
+    return image_gray, phase_masks, rendered_layers, fragment_area, morphology_trace
 
 
 def render_fe_c_unified(context: SystemGenerationContext) -> SystemGenerationResult:
@@ -1899,7 +1382,8 @@ def render_fe_c_unified(context: SystemGenerationContext) -> SystemGenerationRes
     rendered_layers: list[str] = list(normalized_fractions.keys())
     morphology_trace: dict[str, Any] = {"family": "generic"}
     fragment_area = max(1, int(context.size[0] * context.size[1] // 55))
-    if pure_iron_like:
+    if pure_iron_like or stage == "ferrite":
+        # Stage "ferrite" всегда — pure-ferrite Power Voronoi рендер.
         # Pass the pearlite fraction so near-pure compositions (C≈0.02-0.05%)
         # get a few dark pearlite spots instead of a hard visual switch.
         pearlite_frac_for_render = float(normalized_fractions.get("PEARLITE", 0.0))
@@ -1938,50 +1422,20 @@ def render_fe_c_unified(context: SystemGenerationContext) -> SystemGenerationRes
         fragment_area = int(
             max(48, morphology_trace.get("colony_size_px", 64.0) ** 2 * 0.14)
         )
-    elif stage in _SPECIALIZED_MARTENSITIC_STAGES:
-        image_gray, phase_masks, morphology_trace = _build_martensitic_render(
-            context=context,
-            stage=stage,
-            phase_fractions=normalized_fractions,
-            seed_split=seed_split,
-            retained_austenite_used=retained_austenite_used,
-        )
-        rendered_layers = sorted(list(phase_masks.keys()))
-        fragment_area = int(
-            max(36, morphology_trace.get("packet_size_px", 40.0) ** 2 * 0.18)
-        )
-    elif stage in _SPECIALIZED_CAST_IRON_STAGES:
-        (
-            image_gray,
-            phase_masks,
-            rendered_layers,
-            fragment_area,
-            morphology_trace,
-        ) = _build_white_cast_iron_render(
-            context=context,
-            stage=stage,
-            phase_fractions=normalized_fractions,
-            seed_split=seed_split,
-        )
-    elif stage in _SPECIALIZED_BAINITIC_STAGES:
-        (
-            image_gray,
-            phase_masks,
-            rendered_layers,
-            fragment_area,
-            morphology_trace,
-        ) = _build_bainitic_render_split(
-            context=context,
-            stage=stage,
-            phase_fractions=normalized_fractions,
-            seed_split=seed_split,
-        )
     else:
-        image_gray, phase_masks, rendered_layers, fragment_area = _generic_render(
-            context=context,
-            stage=stage,
-            normalized_fractions=normalized_fractions,
-            seed_split=seed_split,
+        # Phase 9 cleanup: safe-net для custom/opaque stage names
+        # (resolve_fe_c_stage пропускает требование unknown stage
+        # verbatim, и generate_fe_c не должен уходить в legacy
+        # run_phase_map_system silently). Минимальный рендер по
+        # нормализованным долям: aggregated tone field через
+        # allocate_phase_masks + per-phase заливка.
+        image_gray, phase_masks, rendered_layers, fragment_area, morphology_trace = (
+            _fallback_render(
+                context=context,
+                stage=stage,
+                normalized_fractions=normalized_fractions,
+                seed_split=seed_split,
+            )
         )
 
     if (

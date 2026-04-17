@@ -36,6 +36,7 @@ except Exception:  # pragma: no cover
 
 HANDLES_STAGES: frozenset[str] = frozenset(
     {
+        "bainite",  # generic bainite → делегируем в upper
         "bainite_upper",
         "bainite_lower",
         "carbide_free_bainite",
@@ -67,7 +68,9 @@ def render(
     phase_fractions: dict[str, float],
     seed_split: dict[str, int],
 ) -> RendererOutput:
-    if stage == "bainite_upper":
+    if stage == "bainite_upper" or stage == "bainite":
+        # Generic `bainite` stage → делегируем в upper-bainite (feathery)
+        # как наиболее распространённую форму эвтектоидного бейнита.
         return _render_upper(context=context, seed_split=seed_split)
     if stage == "bainite_lower":
         return _render_lower(context=context, seed_split=seed_split)
