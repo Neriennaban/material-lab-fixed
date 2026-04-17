@@ -1,0 +1,35 @@
+{
+  "id": "martensite_mixed",
+  "name_ru": "Смешанный мартенсит (C = 0.6–1.0%)",
+  "name_en": "Mixed lath/plate martensite",
+  "reference_section": "§2.3",
+  "reference_sources": [
+    "Krauss G. Steels: Processing, Structure, and Performance. ASM Int., 2015"
+  ],
+  "phase_composition": { "MARTENSITE": 0.85, "CEMENTITE": 0.05, "AUSTENITE": 0.10 },
+  "rgb_tones": {
+    "nital": {
+      "laths": [80, 68, 60],
+      "plate_body": [75, 62, 55],
+      "midrib": [30, 22, 18],
+      "boundaries": [30, 25, 22],
+      "retained_austenite": [225, 220, 210]
+    }
+  },
+  "morphology": {
+    "plate_fraction_formula": "clip((C - 0.4) / 0.6, 0, 1)",
+    "plate_fraction_at_c_0_8": 0.67,
+    "lath_width_um": { "mean": 0.4, "min": 0.2, "max": 1.0 },
+    "plate_length_um": { "mean": 40, "min": 10, "max": 100 },
+    "block_width_um": { "mean": 3.0 },
+    "retained_austenite_fraction": { "min": 0.02, "max": 0.25 },
+    "notes": "Гибрид lath+plate: сначала пластины, остаток — реечная структура с уменьшенными параметрами."
+  },
+  "composition_triggers": {
+    "c_wt_range": [0.6, 1.0],
+    "ms_range_c": [150, 300]
+  },
+  "generation_hints": {
+    "plate_fraction_formula": "clip((c_wt - 0.4) / 0.6, 0, 1)"
+  }
+}
