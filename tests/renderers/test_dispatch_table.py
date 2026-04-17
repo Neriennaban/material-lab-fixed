@@ -116,47 +116,52 @@ class DispatchTableTests(unittest.TestCase):
             f"{sorted(s for s in set(all_stages) if all_stages.count(s) > 1)}",
         )
 
-    def test_unimplemented_stubs_raise_not_implemented(self) -> None:
-        """Модули-семейства, ещё не реализованные в Phase 2-4, должны
-        бросать NotImplementedError при вызове render() (заглушка).
-
-        По мере активации Phase 5-8 этот тест будет переключаться на
-        следующий stub-модуль; когда все реализованы — тест удаляется.
+    def test_all_renderers_implemented(self) -> None:
+        """Phase 8 завершена — все 9 renderer-модулей семейств должны
+        выполнять render() без NotImplementedError.
         """
-        # Phase 5-8 остаётся: bainite, tempered, quench_products,
-        # widmanstatten, surface_layers, granular_pearlite.
-        # Здесь тестируем widmanstatten (Phase 8, самый отложенный).
-        from core.metallography_v3.renderers import widmanstatten
+        from core.metallography_v3.renderers import (
+            bainite, granular_pearlite, high_temp_phases, martensite,
+            quench_products, surface_layers, tempered, white_cast_iron,
+            widmanstatten,
+        )
         from core.metallography_v3.system_generators.base import (
             SystemGenerationContext,
         )
         from core.contracts_v2 import ProcessingState
 
-        ctx = SystemGenerationContext(
-            size=(64, 64),
-            seed=1,
-            inferred_system="fe-c",
-            stage="widmanstatten_ferrite",
-            phase_fractions={"FERRITE": 0.5, "PEARLITE": 0.5},
-            composition_wt={"Fe": 99.7, "C": 0.3},
-            processing=ProcessingState(
-                temperature_c=800.0,
-                cooling_mode="air_cool",
-            ),
-        )
-        with self.assertRaises(NotImplementedError):
-            widmanstatten.render(
-                context=ctx,
-                stage="widmanstatten_ferrite",
-                phase_fractions={"FERRITE": 0.5, "PEARLITE": 0.5},
-                seed_split={
-                    "seed_topology": 1,
-                    "seed_boundary": 2,
-                    "seed_particles": 3,
-                    "seed_lamella": 4,
-                    "seed_noise": 5,
-                },
-            )
+        modules_with_sample_stage = [
+            (high_temp_phases, "austenite", {"AUSTENITE": 1.0}),
+            (white_cast_iron, "ledeburite", {"PEARLITE": 0.5, "CEMENTITE": 0.5}),
+            (martensite, "martensite_cubic", {"MARTENSITE_CUBIC": 1.0}),
+            (bainite, "bainite_upper", {"BAINITE": 0.78, "CEMENTITE": 0.22}),
+            (quench_products, "troostite_quench", {"TROOSTITE": 0.88, "CEMENTITE": 0.12}),
+            (tempered, "tempered_high", {"SORBITE": 0.42, "FERRITE": 0.40, "CEMENTITE": 0.18}),
+            (widmanstatten, "widmanstatten_ferrite", {"FERRITE": 0.5, "PEARLITE": 0.5}),
+            (surface_layers, "decarburized_layer", {"FERRITE": 0.7, "PEARLITE": 0.3}),
+            (granular_pearlite, "granular_pearlite", {"FERRITE": 0.85, "CEMENTITE": 0.15}),
+        ]
+        seed_split = {
+            "seed_topology": 1, "seed_boundary": 2, "seed_particles": 3,
+            "seed_lamella": 4, "seed_noise": 5,
+        }
+        for mod, stage, fractions in modules_with_sample_stage:
+            with self.subTest(module=mod.__name__.split(".")[-1]):
+                ctx = SystemGenerationContext(
+                    size=(64, 64),
+                    seed=1,
+                    inferred_system="fe-c",
+                    stage=stage,
+                    phase_fractions=fractions,
+                    composition_wt={"Fe": 99.7, "C": 0.3},
+                    processing=ProcessingState(temperature_c=20.0, cooling_mode="air"),
+                )
+                # Не должен бросить NotImplementedError.
+                out = mod.render(
+                    context=ctx, stage=stage, phase_fractions=fractions,
+                    seed_split=seed_split,
+                )
+                self.assertIsNotNone(out.image_gray)
 
 
 if __name__ == "__main__":

@@ -1,0 +1,53 @@
+{
+  "id": "carburized_layer",
+  "name_ru": "Цементированный слой",
+  "name_en": "Carburized surface layer",
+  "reference_section": "§3.3",
+  "reference_sources": [
+    "Гуляев А.П. Металловедение. 1986",
+    "ISO 2639 Case Depth"
+  ],
+  "phase_composition": {
+    "MARTENSITE": 0.35,
+    "PEARLITE": 0.30,
+    "FERRITE": 0.20,
+    "CEMENTITE": 0.10,
+    "AUSTENITE": 0.05
+  },
+  "rgb_tones": {
+    "nital": {
+      "surface_plate_martensite": [55, 45, 42],
+      "subsurface_lath_martensite": [80, 68, 60],
+      "eutectoid_pearlite": [105, 95, 85],
+      "core_ferrite_pearlite": [165, 150, 135],
+      "pag_boundaries": [50, 40, 35]
+    }
+  },
+  "morphology": {
+    "depth_profile_formula": "C(y) = C_surface * erfc(y / CD_eff)",
+    "c_surface_wt_pct": { "min": 0.8, "max": 1.2 },
+    "c_core_wt_pct": { "min": 0.15, "max": 0.25 },
+    "cd_eff_um_depth": { "shallow": [300, 600], "typical": [800, 1500], "deep": [1500, 3000] },
+    "zones_from_surface": [
+      "hypereutectoid + cementite network",
+      "eutectoid_pearlite",
+      "hypoeutectoid",
+      "core_alpha_pearlite"
+    ],
+    "hv_gradient": { "surface": 700, "depth_1mm": 550, "core": 350 },
+    "retained_austenite_on_surface": 0.15,
+    "notes": "После закалки+низкого отпуска. Тёмный у поверхности (мартенсит), светлеет вглубь."
+  },
+  "composition_triggers": {
+    "c_wt_range": [0.15, 0.25],
+    "carburize_temperature_c_range": [880, 950],
+    "quench_after_carburize": true
+  },
+  "generation_hints": {
+    "row_wise_composition": true,
+    "surface_tone": 60,
+    "core_tone": 160,
+    "erfc_transition": true,
+    "transition_smoothing_sigma_px": 18
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "id": "widmanstatten_ferrite",
+  "name_ru": "Видманштеттов феррит",
+  "name_en": "Widmanstätten ferrite",
+  "reference_section": "§2.10",
+  "reference_sources": [
+    "Гуляев А.П. Металловедение. 1986",
+    "Bhadeshia H.K.D.H. Bainite in Steels. IoM, 2001",
+    "Dubé C.A. classification of proeutectoid ferrite morphologies"
+  ],
+  "phase_composition": { "FERRITE": 0.50, "PEARLITE": 0.50 },
+  "rgb_tones": {
+    "nital": {
+      "ferrite_needles": [225, 220, 205],
+      "pearlite_matrix": [110, 95, 85],
+      "pag_boundaries": [40, 30, 25]
+    },
+    "beraha": {
+      "ferrite_needles": [130, 150, 200]
+    }
+  },
+  "morphology": {
+    "needle_length_um": { "min": 50, "max": 500, "mean": 150 },
+    "needle_width_um": { "min": 2, "max": 20, "mean": 8 },
+    "aspect_ratio": { "mean": 20, "min": 10, "max": 50 },
+    "needle_angles_deg": [0.0, 60.0, 120.0],
+    "allotriomorph_boundary_width_um": { "min": 1, "max": 3 },
+    "pag_size_um": { "min": 60, "max": 200 },
+    "notes": "Иглы растут вдоль {111}γ из границ PAG в 2-3 дискретных направлениях под 60°/120°. Морозный узор. Характерно для крупного γ-зерна + средние скорости охлаждения (1-100°C/с)."
+  },
+  "composition_triggers": {
+    "c_wt_range": [0.1, 0.5],
+    "pag_size_min_um": 60,
+    "cooling_rate_c_per_s_range": [1, 100]
+  },
+  "generation_hints": {
+    "directions": [0.0, 60.0, 120.0],
+    "needle_poisson_density_per_boundary_px": 0.1,
+    "ferrite_on_pag_dilate_px": 2,
+    "pearlite_fallback": true
+  }
+}
