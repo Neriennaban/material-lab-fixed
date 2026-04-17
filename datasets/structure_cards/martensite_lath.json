@@ -1,0 +1,66 @@
+{
+  "id": "martensite_lath",
+  "name_ru": "Реечный мартенсит",
+  "name_en": "Lath martensite",
+  "reference_section": "§2.1",
+  "reference_sources": [
+    "Krauss G. Steels: Processing, Structure, and Performance. ASM Int., 2015",
+    "Bhadeshia H.K.D.H. Bainite in Steels. IoM, 2001",
+    "ASM Handbook Vol.9 Metallography and Microstructures"
+  ],
+  "reference_images": [
+    {
+      "path": "tests/fixtures/reference_images/martensite_lath_aisi4140_500x_asm09.png",
+      "source": "ASM Handbook Vol.9 Fig. 4-12 (заглушка: файл подобрать в Phase 4 sub-plan'е)",
+      "magnification": 500,
+      "etchant": "nital_3"
+    }
+  ],
+  "phase_composition": {
+    "MARTENSITE": 0.94,
+    "CEMENTITE": 0.06
+  },
+  "rgb_tones": {
+    "nital": {
+      "laths": [70, 60, 55],
+      "boundaries": [25, 20, 18],
+      "retained_austenite": [225, 220, 210]
+    },
+    "picral": {
+      "laths": [90, 80, 72],
+      "boundaries": [40, 35, 30],
+      "retained_austenite": [230, 225, 215]
+    },
+    "klemm_1": {
+      "laths_variant_a": [100, 80, 120],
+      "laths_variant_b": [120, 90, 60],
+      "retained_austenite": [245, 240, 220]
+    }
+  },
+  "morphology": {
+    "grain_size_um": { "mean": 50, "min": 20, "max": 80, "note": "prior austenite grain (PAG)" },
+    "packet_count_per_pag": { "min": 3, "max": 4 },
+    "block_width_um": { "mean": 7.0, "sigma": 2.0 },
+    "subblock_size_um": { "min": 0.5, "max": 5.0 },
+    "lath_width_um": { "mean": 0.8, "min": 0.2, "max": 2.0 },
+    "lath_length_um": { "mean": 20, "min": 5, "max": 50 },
+    "aspect_ratio": { "mean": 25, "min": 15, "max": 50 },
+    "anisotropy_ratio": 10.0,
+    "midrib_present": false,
+    "retained_austenite_fraction": { "min": 0.0, "max": 0.05 },
+    "notes": "При C>0.3% появляются тонкие плёнки γост между рейками (5-30 нм, оптически не разрешаются). Соседние пакеты ориентированы под 30°-90° друг к другу."
+  },
+  "composition_triggers": {
+    "c_wt_range": [0.02, 0.6],
+    "ms_range_c": [300, 500],
+    "cooling_rate_c_per_s_range": [50, 10000]
+  },
+  "generation_hints": {
+    "nested_voronoi_levels": ["PAG", "packet", "block", "subblock"],
+    "anisotropic_stretch": 3.0,
+    "perlin_scale_long_px": 300,
+    "perlin_scale_trans_px": 30,
+    "octaves": 3,
+    "orientation_sampling": "Kurdjumov-Sachs (24 variants, {111}γ || {110}α)"
+  }
+}

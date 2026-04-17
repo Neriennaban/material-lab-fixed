@@ -47,6 +47,44 @@ from .fe_c_textures import (
     texture_troostite_temper,
 )
 
+# Phase 1 редизайна (см. docs/plans/whimsical-wandering-dawn.md):
+# модульные renderer'ы семейств микроструктур зарегистрированы в
+# таблице диспетчера _STAGE_TO_RENDERER. На Phase 1 они НЕ подключены
+# в основной runtime-путь render_fe_c_unified — старые _build_*_render
+# работают как прежде, визуальный drift = 0. Подключение по семействам
+# начиная с Phase 2.
+from core.metallography_v3.renderers import (  # noqa: E402
+    bainite as _r_bainite,
+    granular_pearlite as _r_granular_pearlite,
+    high_temp_phases as _r_high_temp_phases,
+    martensite as _r_martensite,
+    quench_products as _r_quench_products,
+    surface_layers as _r_surface_layers,
+    tempered as _r_tempered,
+    white_cast_iron as _r_white_cast_iron,
+    widmanstatten as _r_widmanstatten,
+)
+
+_RENDERER_MODULES = (
+    _r_martensite,
+    _r_bainite,
+    _r_tempered,
+    _r_quench_products,
+    _r_white_cast_iron,
+    _r_high_temp_phases,
+    _r_widmanstatten,
+    _r_surface_layers,
+    _r_granular_pearlite,
+)
+
+# Раскладка stage -> модуль. Валидируется в
+# tests/renderers/test_dispatch_table.py.
+_STAGE_TO_RENDERER: dict[str, Any] = {
+    stage: mod
+    for mod in _RENDERER_MODULES
+    for stage in mod.HANDLES_STAGES
+}
+
 _PHASE_ALIASES: dict[str, str] = {
     "L": "LIQUID",
     "LIQUID": "LIQUID",
@@ -798,6 +836,7 @@ def _pearlite_image(
     colony_size_px: float,
     ferrite_tone: float = 184.0,
     cementite_tone: float = 82.0,
+    render_ferrite_lamellae: bool = True,
 ) -> tuple[np.ndarray, dict[str, Any]]:
     h, w = labels.shape
     proj, theta_map, phase_map, spacing_factor, _ = _phase_field_from_labels(
@@ -820,7 +859,8 @@ def _pearlite_image(
     ferritic_lamellae = wave < -0.70
 
     image = np.full((h, w), 105.0, dtype=np.float32)
-    image[ferritic_lamellae] = ferrite_tone
+    if render_ferrite_lamellae:
+        image[ferritic_lamellae] = ferrite_tone
     image[cementite] = cementite_tone
     image += (
         multiscale_noise(
@@ -1073,6 +1113,11 @@ def _build_pearlitic_render(
         seed=seed_split["seed_lamella"],
         lamella_period_px=lamella_period,
         colony_size_px=colony_size_px,
+        # alpha_pearlite: ферритные ламели внутри перлита визуально
+        # сливаются с матрицей чистого феррита ("двуслойный" эффект) —
+        # оставляем только тёмные цементитные полосы, pearlite читается
+        # как равномерно-тёмное пятно (~90) по §1.3 справочника.
+        render_ferrite_lamellae=(stage != "alpha_pearlite"),
     )
     # Use the same Power Voronoi ferrite renderer as _pure_ferrite_render
     # so the ferrite grains look identical regardless of whether the
