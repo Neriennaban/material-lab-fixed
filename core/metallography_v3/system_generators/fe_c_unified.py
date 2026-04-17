@@ -93,10 +93,12 @@ _STAGE_TO_RENDERER: dict[str, Any] = {
 _PHASE2_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_high_temp_phases.HANDLES_STAGES)
 _PHASE3_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_white_cast_iron.HANDLES_STAGES)
 _PHASE4_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_martensite.HANDLES_STAGES)
+_PHASE5_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_bainite.HANDLES_STAGES)
 _ACTIVATED_RENDERER_STAGES: frozenset[str] = (
     _PHASE2_ACTIVATED_STAGES
     | _PHASE3_ACTIVATED_STAGES
     | _PHASE4_ACTIVATED_STAGES
+    | _PHASE5_ACTIVATED_STAGES
 )
 
 _PHASE_ALIASES: dict[str, str] = {
@@ -163,6 +165,13 @@ _STAGE_DEFAULT_FRACTIONS: dict[str, dict[str, float]] = {
     # Lower bainite (200-350 °C): needle-like ferrite with Fe3C precipitates
     # inside the laths at ~55-60°. Finer, harder, less free cementite.
     "bainite_lower": {"BAINITE": 0.85, "CEMENTITE": 0.15},
+    # Phase 5 — безкарбидный бейнит §2.7 (TRIP/nanobainite, Si≥1.5%):
+    # 60-85% αb + 10-30% γR + 0-15% мартенсит.
+    "carbide_free_bainite": {
+        "BAINITE": 0.70,
+        "AUSTENITE": 0.25,
+        "MARTENSITE": 0.05,
+    },
     "tempered_low": {"MARTENSITE": 0.6, "TROOSTITE": 0.2, "CEMENTITE": 0.2},
     "tempered_medium": {
         "TROOSTITE": 0.5,
@@ -189,6 +198,7 @@ _TRANSITION_STAGES: set[str] = {
     "bainite",
     "bainite_upper",
     "bainite_lower",
+    "carbide_free_bainite",
     "tempered_low",
     "tempered_medium",
     "tempered_high",

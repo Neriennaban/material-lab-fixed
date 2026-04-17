@@ -1,0 +1,43 @@
+{
+  "id": "bainite_lower",
+  "name_ru": "Нижний бейнит",
+  "name_en": "Lower bainite",
+  "reference_section": "§2.6",
+  "reference_sources": [
+    "Bhadeshia H.K.D.H. Bainite in Steels. IoM, 2001",
+    "Krauss G. Steels: Processing, Structure, and Performance. ASM Int., 2015"
+  ],
+  "phase_composition": { "BAINITE": 0.85, "CEMENTITE": 0.15 },
+  "rgb_tones": {
+    "nital": {
+      "matrix": [90, 75, 65],
+      "hatch": [35, 25, 20],
+      "background": [120, 110, 105]
+    },
+    "picral": {
+      "hatch": [20, 15, 10]
+    },
+    "lepera": {
+      "matrix": [80, 60, 40]
+    }
+  },
+  "morphology": {
+    "needle_length_um": { "min": 20, "max": 80, "mean": 40 },
+    "needle_width_um": { "min": 1, "max": 3, "mean": 2 },
+    "aspect_ratio": { "min": 20, "max": 50, "mean": 30 },
+    "intra_needle_carbide_angle_deg": 60,
+    "carbide_single_orientation_per_needle": true,
+    "carbide_density_per_um2": { "min": 1, "max": 5 },
+    "carbide_size_nm": { "min": 10, "max": 100 },
+    "notes": "Ключ §2.6: ОДНО направление карбидов в игле (отличие от отпущенного мартенсита с многонаправленными 60°/120°). Hatch под 55-65° к оси иглы."
+  },
+  "composition_triggers": {
+    "c_wt_range": [0.3, 1.0],
+    "isothermal_hold_c_range": [250, 400]
+  },
+  "generation_hints": {
+    "needle_poisson_density_per_px2": 0.002,
+    "hatch_step_px": 3.5,
+    "hatch_width_px": 1.0
+  }
+}

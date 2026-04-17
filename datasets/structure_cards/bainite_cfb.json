@@ -1,0 +1,42 @@
+{
+  "id": "bainite_cfb",
+  "name_ru": "Безкарбидный бейнит (нанобейнит / TRIP)",
+  "name_en": "Carbide-free bainite (nanobainite / TRIP)",
+  "reference_section": "§2.7",
+  "reference_sources": [
+    "Caballero F.G., Bhadeshia H.K.D.H. Acta Mater. 52 (2004)",
+    "Krauss G. Steels: Processing, Structure, and Performance. ASM Int., 2015"
+  ],
+  "phase_composition": { "BAINITE": 0.70, "AUSTENITE": 0.25, "MARTENSITE": 0.05 },
+  "rgb_tones": {
+    "nital": {
+      "matrix": [85, 75, 70],
+      "retained_austenite_blocks": [230, 225, 210],
+      "martensite_cores": [80, 60, 40]
+    },
+    "lepera": {
+      "matrix": [120, 85, 60],
+      "retained_austenite_blocks": [230, 235, 240]
+    }
+  },
+  "morphology": {
+    "lath_width_nm": { "min": 20, "max": 200, "note": "оптически не разрешаются → бархатная текстура" },
+    "ra_film_thickness_nm": { "min": 20, "max": 100 },
+    "ra_block_size_um": { "min": 0.5, "max": 5.0, "mean": 2.0 },
+    "ma_fraction_in_ra_blocks": 0.30,
+    "anisotropy_ratio": 10.0,
+    "notes": "КРИТИЧНО: НЕТ точечных карбидов (отличие от нижнего бейнита). Si≥1.5 wt% подавляет Fe₃C. HV до 700 при σв 2500 МПа и δ=5-30%."
+  },
+  "composition_triggers": {
+    "si_wt_min": 1.5,
+    "isothermal_hold_c_range": [125, 400]
+  },
+  "generation_hints": {
+    "anisotropic_noise_scale_long_px": 20,
+    "anisotropic_noise_scale_trans_px": 2,
+    "octaves": 5,
+    "persistence": 0.6,
+    "ra_block_poisson_density_per_um2": 0.01,
+    "ma_in_block_probability": 0.30
+  }
+}

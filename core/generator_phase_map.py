@@ -46,6 +46,7 @@ SYSTEM_STAGE_ORDER: dict[str, list[str]] = {
         "bainite",
         "bainite_upper",
         "bainite_lower",
+        "carbide_free_bainite",
         "tempered_low",
         "tempered_medium",
         "tempered_high",
