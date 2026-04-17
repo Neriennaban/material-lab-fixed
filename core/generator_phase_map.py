@@ -50,6 +50,10 @@ SYSTEM_STAGE_ORDER: dict[str, list[str]] = {
         "tempered_low",
         "tempered_medium",
         "tempered_high",
+        "widmanstatten_ferrite",
+        "decarburized_layer",
+        "carburized_layer",
+        "granular_pearlite",
     ],
     "al-si": [
         "liquid",

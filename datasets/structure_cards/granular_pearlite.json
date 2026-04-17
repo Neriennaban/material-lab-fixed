@@ -1,0 +1,44 @@
+{
+  "id": "granular_pearlite",
+  "name_ru": "Зернистый перлит (сфероидизированный)",
+  "name_en": "Granular (spheroidized) pearlite",
+  "reference_section": "§1.9",
+  "reference_sources": [
+    "Гуляев А.П. Металловедение. 1986",
+    "ГОСТ 801-78 — шкала ШХ15"
+  ],
+  "phase_composition": { "FERRITE": 0.85, "CEMENTITE": 0.15 },
+  "rgb_tones": {
+    "nital": {
+      "ferrite_matrix": [215, 210, 200],
+      "cementite_globules": [240, 237, 230],
+      "grain_boundaries": [110, 100, 90]
+    },
+    "alkaline_picrate_na": {
+      "cementite_globules": [40, 30, 25],
+      "ferrite_matrix": [180, 160, 130]
+    }
+  },
+  "morphology": {
+    "ferrite_grain_size_um": { "min": 5, "max": 20, "mean": 10 },
+    "cementite_globule_size_um": { "min": 0.1, "max": 2.0, "mean": 0.5 },
+    "cementite_globule_density_per_um2": { "min": 0.2, "max": 0.6 },
+    "cementite_size_distribution": "lognormal(mu=log(0.5), sigma=0.3)",
+    "cementite_fraction": { "min": 0.10, "max": 0.20 },
+    "boundary_bias": 0.55,
+    "notes": "Состояние поставки ШХ15 после сфероидизации (780°C, 3ч + 15°C/ч). Максимальная пластичность для высокоуглеродистых сталей. HB 150-200."
+  },
+  "composition_triggers": {
+    "c_wt_range": [0.4, 1.4],
+    "spheroidize_temperature_c_range": [680, 720],
+    "cooling_rate_c_per_h_range": [5, 30]
+  },
+  "generation_hints": {
+    "ferrite_mean_eq_d_px": 12,
+    "globule_poisson_density_per_px2": 0.035,
+    "globule_lognormal_mu": 0.5,
+    "globule_lognormal_sigma": 0.3,
+    "globule_clip_px": [0.7, 4.0],
+    "boundary_bias": 0.55
+  }
+}

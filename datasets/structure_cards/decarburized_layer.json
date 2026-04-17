@@ -1,0 +1,38 @@
+{
+  "id": "decarburized_layer",
+  "name_ru": "Обезуглероженный слой",
+  "name_en": "Decarburized surface layer",
+  "reference_section": "§3.2",
+  "reference_sources": [
+    "Гуляев А.П. Металловедение. 1986",
+    "ASTM E1077 Decarburization Depth"
+  ],
+  "phase_composition": { "FERRITE": 0.70, "PEARLITE": 0.30 },
+  "rgb_tones": {
+    "nital": {
+      "ffd_ferrite": [228, 222, 215],
+      "mad_mixed": [175, 160, 140],
+      "core_alpha_pearlite": [140, 125, 110],
+      "pag_boundaries": [70, 60, 55]
+    }
+  },
+  "morphology": {
+    "depth_profile_formula": "C(y) = C_core * (1 - erfc(y / depth_eff))",
+    "ffd_depth_um": { "min": 50, "max": 200, "note": "полностью обезуглероженная зона — чистый феррит" },
+    "mad_depth_um": { "min": 100, "max": 500, "note": "частично обезуглероженная" },
+    "typical_total_depth_um": { "air_furnace_2h_1200c": [500, 2000], "spring_unprotected": [50, 300], "vacuum": 0 },
+    "blur_boundary_px": { "min": 10, "max": 30 },
+    "notes": "Вертикальный градиент: самый светлый у поверхности (ferrite) → темнеет вглубь по мере восстановления C."
+  },
+  "composition_triggers": {
+    "c_wt_range": [0.3, 1.4],
+    "exposure_temperature_c_range": [800, 1300],
+    "atmosphere": "oxidizing"
+  },
+  "generation_hints": {
+    "row_wise_composition": true,
+    "ferrite_fraction_at_y0": 1.0,
+    "pearlite_fraction_at_core": 0.3,
+    "transition_smoothing_sigma_px": 20
+  }
+}

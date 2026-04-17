@@ -96,6 +96,11 @@ _PHASE4_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_martensite.HANDLES_STAGE
 _PHASE5_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_bainite.HANDLES_STAGES)
 _PHASE6_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_quench_products.HANDLES_STAGES)
 _PHASE7_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_tempered.HANDLES_STAGES)
+_PHASE8_ACTIVATED_STAGES: frozenset[str] = (
+    frozenset(_r_widmanstatten.HANDLES_STAGES)
+    | frozenset(_r_surface_layers.HANDLES_STAGES)
+    | frozenset(_r_granular_pearlite.HANDLES_STAGES)
+)
 _ACTIVATED_RENDERER_STAGES: frozenset[str] = (
     _PHASE2_ACTIVATED_STAGES
     | _PHASE3_ACTIVATED_STAGES
@@ -103,6 +108,7 @@ _ACTIVATED_RENDERER_STAGES: frozenset[str] = (
     | _PHASE5_ACTIVATED_STAGES
     | _PHASE6_ACTIVATED_STAGES
     | _PHASE7_ACTIVATED_STAGES
+    | _PHASE8_ACTIVATED_STAGES
 )
 
 _PHASE_ALIASES: dict[str, str] = {
@@ -176,6 +182,17 @@ _STAGE_DEFAULT_FRACTIONS: dict[str, dict[str, float]] = {
         "AUSTENITE": 0.25,
         "MARTENSITE": 0.05,
     },
+    # Phase 8 — новые стадии §2.10, §3.2-3.3, §1.9.
+    "widmanstatten_ferrite": {"FERRITE": 0.50, "PEARLITE": 0.50},
+    "decarburized_layer": {"FERRITE": 0.70, "PEARLITE": 0.30},
+    "carburized_layer": {
+        "MARTENSITE": 0.35,
+        "PEARLITE": 0.30,
+        "FERRITE": 0.20,
+        "CEMENTITE": 0.10,
+        "AUSTENITE": 0.05,
+    },
+    "granular_pearlite": {"FERRITE": 0.85, "CEMENTITE": 0.15},
     "tempered_low": {"MARTENSITE": 0.6, "TROOSTITE": 0.2, "CEMENTITE": 0.2},
     "tempered_medium": {
         "TROOSTITE": 0.5,
@@ -206,6 +223,11 @@ _TRANSITION_STAGES: set[str] = {
     "tempered_low",
     "tempered_medium",
     "tempered_high",
+    # Phase 8 additions
+    "widmanstatten_ferrite",
+    "decarburized_layer",
+    "carburized_layer",
+    "granular_pearlite",
 }
 
 _SPECIALIZED_PEARLITIC_STAGES = {"alpha_pearlite", "pearlite", "pearlite_cementite"}

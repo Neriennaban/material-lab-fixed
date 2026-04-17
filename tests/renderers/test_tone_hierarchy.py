@@ -165,6 +165,33 @@ _STAGE_RUNTIME_DEFAULTS: dict[str, tuple[dict[str, float], dict[str, float], flo
         {"Fe": 99.6, "C": 0.4},
         580.0,
     ),
+    # Phase 8
+    "widmanstatten_ferrite": (
+        {"FERRITE": 0.50, "PEARLITE": 0.50},
+        {"Fe": 99.7, "C": 0.3},
+        720.0,
+    ),
+    "decarburized_layer": (
+        {"FERRITE": 0.70, "PEARLITE": 0.30},
+        {"Fe": 99.55, "C": 0.45},
+        900.0,
+    ),
+    "carburized_layer": (
+        {
+            "MARTENSITE": 0.35,
+            "PEARLITE": 0.30,
+            "FERRITE": 0.20,
+            "CEMENTITE": 0.10,
+            "AUSTENITE": 0.05,
+        },
+        {"Fe": 99.8, "C": 0.2},
+        20.0,
+    ),
+    "granular_pearlite": (
+        {"FERRITE": 0.85, "CEMENTITE": 0.15},
+        {"Fe": 99.0, "C": 1.0},
+        700.0,
+    ),
 }
 
 
@@ -229,7 +256,15 @@ def test_rendered_mean_tones_match_card(card_id):
             "interior",
             "matrix",
         ),
-        "FERRITE": ("ferrite", "matrix", "interior"),
+        "FERRITE": (
+            "ferrite",
+            "ferrite_needles",
+            "ferrite_matrix",
+            "ffd_ferrite",
+            "core_ferrite_pearlite",
+            "matrix",
+            "interior",
+        ),
         "DELTA_FERRITE": ("delta_islands",),
         "CEMENTITE": (
             "cementite_matrix",
@@ -243,6 +278,9 @@ def test_rendered_mean_tones_match_card(card_id):
         "PEARLITE": (
             "pearlite_islands",
             "primary_pearlite_dendrites",
+            "pearlite_matrix",
+            "eutectoid_pearlite",
+            "core_alpha_pearlite",
             "matrix",
         ),
         "MARTENSITE": (
@@ -250,6 +288,8 @@ def test_rendered_mean_tones_match_card(card_id):
             "plate_body",
             "matrix",
             "martensite_cores",
+            "surface_plate_martensite",
+            "subsurface_lath_martensite",
         ),
         "MARTENSITE_CUBIC": ("laths",),
         "MARTENSITE_TETRAGONAL": ("plate_body", "laths"),
@@ -320,6 +360,9 @@ def test_rendered_mean_tones_match_card(card_id):
     _COMPOSITE_STAGES = {
         "white_cast_iron_hypoeutectic",
         "white_cast_iron_hypereutectic",
+        # Phase 8 composites — вертикальный градиент, mean уезжает
+        "decarburized_layer",
+        "carburized_layer",
     }
     tolerance = 100.0 if target_stage in _COMPOSITE_STAGES else 55.0
     diff = abs(actual_mean - target_mean)
