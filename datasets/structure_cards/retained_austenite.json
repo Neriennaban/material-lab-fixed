@@ -1,0 +1,44 @@
+{
+  "id": "retained_austenite",
+  "name_ru": "Остаточный аустенит (γост)",
+  "name_en": "Retained austenite",
+  "reference_section": "§2.4",
+  "reference_sources": [
+    "Koistinen D.P., Marburger R.E. Acta Metall. 7 (1959)",
+    "Krauss G. Steels. ASM Int., 2015"
+  ],
+  "phase_composition": { "AUSTENITE": 1.0 },
+  "rgb_tones": {
+    "nital": {
+      "interior": [230, 225, 215]
+    },
+    "lepera": {
+      "interior": [250, 240, 215]
+    },
+    "klemm_1": {
+      "interior": [245, 240, 220]
+    }
+  },
+  "morphology": {
+    "film_thickness_nm": { "min": 5, "max": 30, "note": "inter-lath, не разрешается оптически" },
+    "blocky_size_um": { "mean": 3.0, "min": 0.5, "max": 10.0 },
+    "fraction_formula": "Koistinen-Marburger: f_gamma = exp(-0.011*(Ms - T))",
+    "examples": {
+      "c_0_2": 0.005,
+      "c_0_5": 0.035,
+      "c_0_8": 0.125,
+      "c_1_0": 0.20,
+      "c_1_2": 0.30,
+      "c_1_4": 0.40
+    },
+    "notes": "Практически не травится — зеркально-гладкий блеск в рендере. В Phase 4 RA инжектится post-process'ом в render_fe_c_unified (не задача martensite.py renderer'а)."
+  },
+  "composition_triggers": {
+    "c_wt_range": [0.2, 1.4]
+  },
+  "generation_hints": {
+    "blocky_poisson_density_per_um2": 0.01,
+    "film_edge_antialiasing_px": 0.1,
+    "surface_reflect_mode": "mirror"
+  }
+}

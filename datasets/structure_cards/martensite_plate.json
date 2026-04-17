@@ -1,0 +1,54 @@
+{
+  "id": "martensite_plate",
+  "name_ru": "Пластинчатый (линзовидный) мартенсит",
+  "name_en": "Plate / lenticular martensite",
+  "reference_section": "§2.2",
+  "reference_sources": [
+    "Krauss G. Steels: Processing, Structure, and Performance. ASM Int., 2015",
+    "Bhadeshia H.K.D.H. Bainite in Steels. IoM, 2001"
+  ],
+  "phase_composition": {
+    "MARTENSITE_TETRAGONAL": 0.82,
+    "CEMENTITE": 0.05,
+    "AUSTENITE": 0.13
+  },
+  "rgb_tones": {
+    "nital": {
+      "plate_body": [75, 62, 55],
+      "midrib": [25, 18, 15],
+      "dislocation_halo": [95, 80, 72],
+      "retained_austenite": [230, 225, 215],
+      "microcracks": [10, 8, 8]
+    },
+    "picral": {
+      "plate_body": [110, 95, 80],
+      "midrib": [40, 30, 22]
+    },
+    "klemm_1": {
+      "plate_body": [110, 70, 140]
+    }
+  },
+  "morphology": {
+    "grain_size_um": { "mean": 80, "min": 50, "max": 100, "note": "prior austenite" },
+    "plate_length_um": { "mean": 60, "min": 10, "max": 200 },
+    "plate_width_um": { "mean": 4.0, "min": 1.0, "max": 10.0 },
+    "aspect_ratio": { "mean": 15, "min": 10, "max": 30 },
+    "midrib_present": true,
+    "midrib_thickness_um": { "min": 0.1, "max": 1.0 },
+    "midrib_delta_rgb": 48,
+    "needle_angles_deg": [0.0, 60.0, 90.0, 120.0],
+    "retained_austenite_fraction": { "min": 0.05, "max": 0.40 },
+    "notes": "Двояковыпуклые линзы с midrib посередине. Первая игла пересекает зерно целиком (~80μm), мелкие прилипают к её концам под 60°/120°/90°. Углы рождаются кристаллографической симметрией {259}γ."
+  },
+  "composition_triggers": {
+    "c_wt_range": [1.0, 1.4],
+    "ms_range_c": [20, 150]
+  },
+  "generation_hints": {
+    "needle_count_poisson_mean": 10,
+    "length_decay_per_needle": 0.55,
+    "direction_weights": [0.35, 0.20, 0.20, 0.10, 0.10, 0.05],
+    "midrib_line_width_px": 1.0,
+    "plate_body_noise_amplitude_rgb": 12
+  }
+}

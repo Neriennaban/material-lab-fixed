@@ -116,9 +116,17 @@ class DispatchTableTests(unittest.TestCase):
             f"{sorted(s for s in set(all_stages) if all_stages.count(s) > 1)}",
         )
 
-    def test_stubs_raise_not_implemented(self) -> None:
-        """Phase 1: все render() должны бросать NotImplementedError."""
-        from core.metallography_v3.renderers import martensite
+    def test_unimplemented_stubs_raise_not_implemented(self) -> None:
+        """Модули-семейства, ещё не реализованные в Phase 2-4, должны
+        бросать NotImplementedError при вызове render() (заглушка).
+
+        По мере активации Phase 5-8 этот тест будет переключаться на
+        следующий stub-модуль; когда все реализованы — тест удаляется.
+        """
+        # Phase 5-8 остаётся: bainite, tempered, quench_products,
+        # widmanstatten, surface_layers, granular_pearlite.
+        # Здесь тестируем widmanstatten (Phase 8, самый отложенный).
+        from core.metallography_v3.renderers import widmanstatten
         from core.metallography_v3.system_generators.base import (
             SystemGenerationContext,
         )
@@ -128,19 +136,19 @@ class DispatchTableTests(unittest.TestCase):
             size=(64, 64),
             seed=1,
             inferred_system="fe-c",
-            stage="martensite",
-            phase_fractions={"MARTENSITE": 1.0},
-            composition_wt={"Fe": 99.6, "C": 0.4},
+            stage="widmanstatten_ferrite",
+            phase_fractions={"FERRITE": 0.5, "PEARLITE": 0.5},
+            composition_wt={"Fe": 99.7, "C": 0.3},
             processing=ProcessingState(
-                temperature_c=20.0,
-                cooling_mode="quench_water",
+                temperature_c=800.0,
+                cooling_mode="air_cool",
             ),
         )
         with self.assertRaises(NotImplementedError):
-            martensite.render(
+            widmanstatten.render(
                 context=ctx,
-                stage="martensite",
-                phase_fractions={"MARTENSITE": 1.0},
+                stage="widmanstatten_ferrite",
+                phase_fractions={"FERRITE": 0.5, "PEARLITE": 0.5},
                 seed_split={
                     "seed_topology": 1,
                     "seed_boundary": 2,

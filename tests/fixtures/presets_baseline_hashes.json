@@ -345,13 +345,13 @@
       "std": 48.66432665279193
     },
     "steel_45_quenched_water_v3": {
-      "mean": 122.93017578125,
-      "sha256_gray": "ba2a0e0dbe90e3aec20788c7f2e3683f7dbe588eeb6e5f2d872174b571ad0773",
+      "mean": 42.715576171875,
+      "sha256_gray": "5be2cebe5177ffb4866bb4098a7d391b1c9098549bbdab21ff75cfa627d4b4b2",
       "shape": [
         128,
         128
       ],
-      "std": 12.6627638549277
+      "std": 19.752992172470535
     },
     "steel_45_upper_bainite_klemm_v3": {
       "mean": 22.49859619140625,

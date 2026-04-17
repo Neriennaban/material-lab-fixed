@@ -24,9 +24,11 @@ from core.metallography_v3.system_generators.fe_c_unified import (
 # Минимальный маппинг id карточки -> stage, который она калибрует.
 # Расширяется по мере роста множества карточек.
 _CARD_TO_STAGE: dict[str, str] = {
+    # Phase 4 martensite cards
     "martensite_lath": "martensite_cubic",
     "martensite_plate": "martensite_tetragonal",
     "martensite_mixed": "martensite",
+    "retained_austenite": None,  # post-process phase; not directly rendered
     "bainite_upper": "bainite_upper",
     "bainite_lower": "bainite_lower",
     "bainite_cfb": "carbide_free_bainite",
@@ -104,6 +106,22 @@ _STAGE_RUNTIME_DEFAULTS: dict[str, tuple[dict[str, float], dict[str, float], flo
         {"Fe": 94.5, "C": 5.5},
         20.0,
     ),
+    # Phase 4
+    "martensite_cubic": (
+        {"MARTENSITE_CUBIC": 0.94, "CEMENTITE": 0.06},
+        {"Fe": 99.7, "C": 0.3},
+        20.0,
+    ),
+    "martensite_tetragonal": (
+        {"MARTENSITE_TETRAGONAL": 0.82, "CEMENTITE": 0.05, "AUSTENITE": 0.13},
+        {"Fe": 98.8, "C": 1.2},
+        20.0,
+    ),
+    "martensite": (
+        {"MARTENSITE": 0.85, "CEMENTITE": 0.05, "AUSTENITE": 0.10},
+        {"Fe": 99.2, "C": 0.8},
+        20.0,
+    ),
 }
 
 
@@ -125,8 +143,10 @@ def test_card_rgb_tones_within_sane_range(card_id):
 def test_card_stage_is_registered_or_skipped(card_id):
     """Карточка должна указывать на стадию, зарегистрированную в
     ``_STAGE_TO_RENDERER``."""
-    target_stage = _CARD_TO_STAGE.get(card_id)
+    target_stage = _CARD_TO_STAGE.get(card_id, "__missing__")
     if target_stage is None:
+        pytest.skip(f"card {card_id} is an overlay/sub-phase, not a standalone stage")
+    if target_stage == "__missing__":
         pytest.skip(f"no stage mapping for card {card_id} yet")
     assert target_stage in _STAGE_TO_RENDERER, (
         f"card {card_id} references stage {target_stage!r} which is not "
@@ -142,8 +162,10 @@ def test_rendered_mean_tones_match_card(card_id):
     Для стадий вне ``_ACTIVE_STAGES`` — skip до активации renderer'а
     в соответствующем sub-plan'е.
     """
-    target_stage = _CARD_TO_STAGE.get(card_id)
+    target_stage = _CARD_TO_STAGE.get(card_id, "__missing__")
     if target_stage is None:
+        pytest.skip(f"card {card_id} is an overlay/sub-phase, not a standalone stage")
+    if target_stage == "__missing__":
         pytest.skip(f"no stage mapping for card {card_id} yet")
     if target_stage not in _ACTIVE_STAGES:
         pytest.skip(f"stage {target_stage!r} not yet activated (Phase 3-8 pending)")
@@ -174,7 +196,9 @@ def test_rendered_mean_tones_match_card(card_id):
             "primary_pearlite_dendrites",
             "matrix",
         ),
-        "MARTENSITE": ("laths", "matrix"),
+        "MARTENSITE": ("laths", "plate_body", "matrix"),
+        "MARTENSITE_CUBIC": ("laths",),
+        "MARTENSITE_TETRAGONAL": ("plate_body", "laths"),
         "BAINITE": ("matrix",),
     }
 

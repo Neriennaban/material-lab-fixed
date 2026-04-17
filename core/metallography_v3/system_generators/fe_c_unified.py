@@ -92,8 +92,11 @@ _STAGE_TO_RENDERER: dict[str, Any] = {
 # подключение — Phase 4-8.
 _PHASE2_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_high_temp_phases.HANDLES_STAGES)
 _PHASE3_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_white_cast_iron.HANDLES_STAGES)
+_PHASE4_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_martensite.HANDLES_STAGES)
 _ACTIVATED_RENDERER_STAGES: frozenset[str] = (
-    _PHASE2_ACTIVATED_STAGES | _PHASE3_ACTIVATED_STAGES
+    _PHASE2_ACTIVATED_STAGES
+    | _PHASE3_ACTIVATED_STAGES
+    | _PHASE4_ACTIVATED_STAGES
 )
 
 _PHASE_ALIASES: dict[str, str] = {
