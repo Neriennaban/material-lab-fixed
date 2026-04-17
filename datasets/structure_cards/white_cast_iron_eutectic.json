@@ -1,0 +1,29 @@
+{
+  "id": "white_cast_iron_eutectic",
+  "name_ru": "Белый чугун эвтектический (4.3%C)",
+  "name_en": "White cast iron (eutectic, 4.3%C)",
+  "reference_section": "§1.10б",
+  "reference_sources": [
+    "Гуляев А.П. Металловедение. 1986",
+    "ГОСТ 1585-85 (антифрикционные чугуны)"
+  ],
+  "phase_composition": { "PEARLITE": 0.49, "CEMENTITE": 0.51 },
+  "rgb_tones": {
+    "nital": {
+      "cementite_matrix": [240, 238, 230],
+      "pearlite_islands": [100, 100, 100]
+    }
+  },
+  "morphology": {
+    "pearlite_island_size_um": { "mean": 7, "min": 3, "max": 15 },
+    "eutectic_cell_size_um": { "mean": 120, "min": 50, "max": 300 },
+    "contrast_delta_r": 140,
+    "notes": "100% Ld′. HB 500-650, HV 600-750, HRC 55-62. σв 250-400 МПа."
+  },
+  "composition_triggers": {
+    "c_wt_range": [4.25, 4.35]
+  },
+  "generation_hints": {
+    "texture_method": "leopard_two_scale_noise"
+  }
+}

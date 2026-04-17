@@ -85,11 +85,16 @@ _STAGE_TO_RENDERER: dict[str, Any] = {
     for stage in mod.HANDLES_STAGES
 }
 
-# Phase 2 — активированы новые renderer'ы для high_temp_phases.
-# Остальные семейства (мартенсит/бейнит/чугуны/отпуски/видманштеттен/
+# Phase 2 — high_temp_phases (§1.4, §1.5, §3.1).
+# Phase 3 — white_cast_iron (§1.6, §1.10).
+# Остальные семейства (мартенсит/бейнит/отпуски/видманштеттен/
 # поверхностные слои/зернистый перлит) пока идут по старым путям;
-# подключение — Phase 3-8.
+# подключение — Phase 4-8.
 _PHASE2_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_high_temp_phases.HANDLES_STAGES)
+_PHASE3_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_white_cast_iron.HANDLES_STAGES)
+_ACTIVATED_RENDERER_STAGES: frozenset[str] = (
+    _PHASE2_ACTIVATED_STAGES | _PHASE3_ACTIVATED_STAGES
+)
 
 _PHASE_ALIASES: dict[str, str] = {
     "L": "LIQUID",
@@ -1866,10 +1871,12 @@ def render_fe_c_unified(context: SystemGenerationContext) -> SystemGenerationRes
                 pearlite_fraction=pearlite_frac_for_render,
             )
         )
-    elif stage in _PHASE2_ACTIVATED_STAGES and stage in _STAGE_TO_RENDERER:
-        # Phase 2 редизайна: high_temp_phases renderer обрабатывает
-        # austenite, delta_ferrite, alpha_gamma, gamma_cementite,
-        # liquid, liquid_gamma (см. docs/plans/phase2-high-temp-phases.md).
+    elif stage in _ACTIVATED_RENDERER_STAGES and stage in _STAGE_TO_RENDERER:
+        # Новые семейственные renderer'ы:
+        # Phase 2: high_temp_phases (austenite/δ/γ-cementite/liquid/…)
+        # Phase 3: white_cast_iron (ledeburite + 3 чугуна, §1.6/§1.10)
+        # Phase 4-8 добавят martensite/bainite/tempered/quench_products/
+        # widmanstatten/surface_layers/granular_pearlite.
         _r_out = _STAGE_TO_RENDERER[stage].render(
             context=context,
             stage=stage,
