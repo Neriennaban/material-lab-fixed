@@ -798,6 +798,7 @@ def _pearlite_image(
     colony_size_px: float,
     ferrite_tone: float = 184.0,
     cementite_tone: float = 82.0,
+    render_ferrite_lamellae: bool = True,
 ) -> tuple[np.ndarray, dict[str, Any]]:
     h, w = labels.shape
     proj, theta_map, phase_map, spacing_factor, _ = _phase_field_from_labels(
@@ -820,7 +821,8 @@ def _pearlite_image(
     ferritic_lamellae = wave < -0.70
 
     image = np.full((h, w), 105.0, dtype=np.float32)
-    image[ferritic_lamellae] = ferrite_tone
+    if render_ferrite_lamellae:
+        image[ferritic_lamellae] = ferrite_tone
     image[cementite] = cementite_tone
     image += (
         multiscale_noise(
@@ -1073,6 +1075,11 @@ def _build_pearlitic_render(
         seed=seed_split["seed_lamella"],
         lamella_period_px=lamella_period,
         colony_size_px=colony_size_px,
+        # alpha_pearlite: ферритные ламели внутри перлита визуально
+        # сливаются с матрицей чистого феррита ("двуслойный" эффект) —
+        # оставляем только тёмные цементитные полосы, pearlite читается
+        # как равномерно-тёмное пятно (~90) по §1.3 справочника.
+        render_ferrite_lamellae=(stage != "alpha_pearlite"),
     )
     # Use the same Power Voronoi ferrite renderer as _pure_ferrite_render
     # so the ferrite grains look identical regardless of whether the
