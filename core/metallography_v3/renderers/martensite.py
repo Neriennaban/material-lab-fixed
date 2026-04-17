@@ -187,6 +187,7 @@ def _render_lath(
 
     martensite_mask = np.ones(size, dtype=np.uint8)
     martensite_mask[boundaries > 0] = 0
+    c_wt_local = float((context.composition_wt or {}).get("C", 0.3))
     return RendererOutput(
         image_gray=image_gray,
         phase_masks={"MARTENSITE": martensite_mask},
@@ -197,6 +198,11 @@ def _render_lath(
             "anisotropy_ratio": 10.0,
             "scale_long_px": 80.0,
             "scale_trans_px": 8.0,
+            "martensite_style": "lath_dominant",
+            "band_spacing_px": _band_spacing_for_c(
+                c_wt_local,
+                max(0.0, min(1.0, (c_wt_local - 0.4) / 0.6)),
+            ),
         },
         rendered_layers=["MARTENSITE"],
         fragment_area=int(size[0] * size[1] // max(1, n_grains)),
@@ -293,6 +299,7 @@ def _render_plate(
     # Маска мартенсита = всё, кроме явно светлых RA-областей.
     plate_mask = (image_gray < 190).astype(np.uint8)
     plate_mask[boundaries > 0] = 0
+    c_wt_plate = float((context.composition_wt or {}).get("C", 1.2))
     return RendererOutput(
         image_gray=image_gray,
         phase_masks={
@@ -304,6 +311,11 @@ def _render_plate(
             "stage": "martensite_tetragonal",
             "prior_austenite_grain_count": n_grains,
             "midrib_present": True,
+            "martensite_style": "plate_dominant",
+            "band_spacing_px": _band_spacing_for_c(
+                c_wt_plate,
+                max(0.0, min(1.0, (c_wt_plate - 0.4) / 0.6)),
+            ),
         },
         rendered_layers=["MARTENSITE", "AUSTENITE"],
         fragment_area=int(size[0] * size[1] // max(1, n_grains * 4)),
@@ -373,6 +385,23 @@ def _draw_plate_with_midrib(
 # --- mixed (§2.3) ——————————————————————————————————————————————
 
 
+def _martensite_style_for_c(c_wt: float) -> str:
+    """§2.3 morphology classifier:
+    C<0.25 → lath_dominant, 0.25-0.55 → mixed, C>0.55 → plate_dominant."""
+    if c_wt < 0.25:
+        return "lath_dominant"
+    if c_wt < 0.55:
+        return "mixed_lath_plate"
+    return "plate_dominant"
+
+
+def _band_spacing_for_c(c_wt: float, plate_frac: float) -> float:
+    """Proxy band-spacing в px: реечные структуры дают мелкую ~1.5 px
+    sub-lath grid; пластинчатые дают более широкие ~8-10 px полосы.
+    Растёт с plate_frac монотонно."""
+    return 1.5 + 8.0 * plate_frac + 0.5 * max(0.0, c_wt - 0.5)
+
+
 def _render_mixed(
     *,
     context: SystemGenerationContext,
@@ -381,6 +410,8 @@ def _render_mixed(
     c_wt = float((context.composition_wt or {}).get("C", 0.8))
     # plate_fraction = clip((C - 0.4) / 0.6, 0, 1), §2.3.
     plate_frac = max(0.0, min(1.0, (c_wt - 0.4) / 0.6))
+    style = _martensite_style_for_c(c_wt)
+    band_spacing = _band_spacing_for_c(c_wt, plate_frac)
 
     # Сначала рендерим lath-фон.
     lath = _render_lath(context=context, seed_split=seed_split, base_grain_size_px=55.0)
@@ -392,6 +423,9 @@ def _render_mixed(
                 **lath.morphology_trace,
                 "family": "martensite_mixed",
                 "plate_fraction": plate_frac,
+                "martensite_style": style,
+                "band_spacing_px": band_spacing,
+                "c_wt": c_wt,
             },
             rendered_layers=lath.rendered_layers,
             fragment_area=lath.fragment_area,
@@ -422,6 +456,8 @@ def _render_mixed(
             "family": "martensite_mixed",
             "stage": "martensite",
             "plate_fraction": plate_frac,
+            "martensite_style": style,
+            "band_spacing_px": band_spacing,
             "c_wt": c_wt,
         },
         rendered_layers=["MARTENSITE"],
