@@ -122,21 +122,77 @@ class TemperedFamilyTests(unittest.TestCase):
             f"({dark_spots*100:.2f}%)",
         )
 
-    def test_aliases_render_identically(self) -> None:
-        """troostite_temper ≡ tempered_medium, sorbite_temper ≡ tempered_high."""
+    def test_medium_preserves_ferrite_fraction(self) -> None:
+        """PR #10 regression: tempered_medium / troostite_temper с
+        FERRITE fraction > 0 в phase_fractions должны выдавать
+        отдельную FERRITE-маску; TROOSTITE её исключает."""
+        for stage in ("tempered_medium", "troostite_temper"):
+            with self.subTest(stage=stage):
+                out = render_fe_c_unified(_make_ctx(stage))
+                self.assertIn(
+                    "FERRITE", out.phase_masks,
+                    f"{stage}: FERRITE mask missing despite fraction 0.10",
+                )
+                f_frac = float(out.phase_masks["FERRITE"].mean())
+                self.assertGreater(
+                    f_frac, 0.03,
+                    f"{stage}: FERRITE coverage too small ({f_frac*100:.2f}%)",
+                )
+                # Disjoint: TROOSTITE и FERRITE не пересекаются.
+                t_mask = out.phase_masks["TROOSTITE"] > 0
+                f_mask = out.phase_masks["FERRITE"] > 0
+                overlap = float((t_mask & f_mask).mean())
+                self.assertLess(
+                    overlap, 0.005,
+                    f"{stage}: TROOSTITE/FERRITE overlap "
+                    f"({overlap*100:.3f}%)",
+                )
+
+    def test_high_sorbite_and_ferrite_are_disjoint(self) -> None:
+        """PR #10 regression: tempered_high / sorbite_temper эмитят
+        SORBITE и FERRITE на disjoint pixel sets — не клонируются."""
+        for stage in ("tempered_high", "sorbite_temper"):
+            with self.subTest(stage=stage):
+                out = render_fe_c_unified(_make_ctx(stage))
+                self.assertIn("SORBITE", out.phase_masks)
+                self.assertIn("FERRITE", out.phase_masks)
+                s_mask = out.phase_masks["SORBITE"] > 0
+                f_mask = out.phase_masks["FERRITE"] > 0
+                overlap = float((s_mask & f_mask).mean())
+                self.assertLess(
+                    overlap, 0.005,
+                    f"{stage}: SORBITE≡FERRITE (overlap {overlap*100:.3f}%)",
+                )
+                # Sorbite area > 0 и ferrite area > 0 (обе фазы присутствуют).
+                self.assertGreater(float(s_mask.mean()), 0.15)
+                self.assertGreater(float(f_mask.mean()), 0.15)
+
+    def test_aliases_delegate_to_primary_renderer(self) -> None:
+        """troostite_temper → _render_medium, sorbite_temper → _render_high.
+
+        После фикса PR #10 алиасы получают собственные default фракции
+        (FERRITE доля отличается), поэтому pixel-identity не гарантируется.
+        Проверяем, что family trace совпадает с primary — семантически
+        алиас делегирует в тот же renderer.
+        """
         pairs = [
             ("troostite_temper", "tempered_medium"),
             ("sorbite_temper", "tempered_high"),
         ]
         for alias, primary in pairs:
             with self.subTest(pair=f"{alias} vs {primary}"):
-                a = render_fe_c_unified(_make_ctx(alias, seed=4242)).image_gray
-                b = render_fe_c_unified(_make_ctx(primary, seed=4242)).image_gray
-                # Алиасы должны выдать идентичную картинку при одинаковом seed.
-                diff = int(np.abs(a.astype(np.int16) - b.astype(np.int16)).max())
-                self.assertLess(
-                    diff, 3,
-                    f"{alias} and {primary} diverge (max pixel diff {diff})",
+                out_alias = render_fe_c_unified(_make_ctx(alias, seed=4242))
+                out_primary = render_fe_c_unified(_make_ctx(primary, seed=4242))
+                trace_a = out_alias.metadata.get("fe_c_phase_render", {}).get(
+                    "morphology_trace", {}
+                )
+                trace_p = out_primary.metadata.get("fe_c_phase_render", {}).get(
+                    "morphology_trace", {}
+                )
+                self.assertEqual(
+                    trace_a.get("family"), trace_p.get("family"),
+                    f"{alias} family {trace_a.get('family')!r} != "
+                    f"{primary} family {trace_p.get('family')!r}",
                 )
 
     def test_family_trace_strings(self) -> None:

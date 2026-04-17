@@ -64,16 +64,24 @@ def render(
 ) -> RendererOutput:
     # Aliases → primary:
     if stage == "troostite_temper":
-        return _render_medium(context=context, seed_split=seed_split)
+        return _render_medium(
+            context=context, seed_split=seed_split, phase_fractions=phase_fractions
+        )
     if stage == "sorbite_temper":
-        return _render_high(context=context, seed_split=seed_split)
+        return _render_high(
+            context=context, seed_split=seed_split, phase_fractions=phase_fractions
+        )
 
     if stage == "tempered_low":
         return _render_low(context=context, seed_split=seed_split)
     if stage == "tempered_medium":
-        return _render_medium(context=context, seed_split=seed_split)
+        return _render_medium(
+            context=context, seed_split=seed_split, phase_fractions=phase_fractions
+        )
     if stage == "tempered_high":
-        return _render_high(context=context, seed_split=seed_split)
+        return _render_high(
+            context=context, seed_split=seed_split, phase_fractions=phase_fractions
+        )
     raise ValueError(f"tempered renderer has no branch for stage {stage!r}")
 
 
@@ -142,7 +150,10 @@ def _render_low(
 
 
 def _render_medium(
-    *, context: SystemGenerationContext, seed_split: dict[str, int]
+    *,
+    context: SystemGenerationContext,
+    seed_split: dict[str, int],
+    phase_fractions: dict[str, float] | None = None,
 ) -> RendererOutput:
     # Реечная база → размытие (имитация рекристаллизации).
     base = _r_martensite._render_lath(
@@ -201,17 +212,42 @@ def _render_medium(
         cementite_mask[y0:y1, x0:x1] |= disk
     img[cementite_mask] = _TONE_MEDIUM_CARBIDE
 
+    # §2.12: при 350-500°C часть матрицы рекристаллизована в полигональный
+    # феррит (карточка tempered_medium: FERRITE 10%). Вырезаем блочную
+    # ферритную маску через multiscale_noise threshold — светлые
+    # «острова» поверх троостит-фона, исключающие карбиды.
+    phase_fractions = phase_fractions or {}
+    ferrite_frac = float(phase_fractions.get("FERRITE", 0.10))
+    ferrite_mask = np.zeros(size, dtype=bool)
+    if ferrite_frac > 0.0:
+        frac = float(max(0.005, min(0.45, ferrite_frac)))
+        ferrite_field = multiscale_noise(
+            size=size, seed=seed + 73, scales=((18.0, 0.65), (6.0, 0.35))
+        )
+        threshold = float(np.quantile(ferrite_field, 1.0 - frac))
+        ferrite_mask = (ferrite_field >= threshold) & ~cementite_mask
+        if ndimage is not None:
+            ferrite_mask = ndimage.binary_opening(ferrite_mask, iterations=1)
+        # Более светлый тон — полигональный α-феррит.
+        img[ferrite_mask] = _TONE_MEDIUM_INTERIOR + 25.0
+
     image_gray = rescale_to_u8(np.clip(img, 0.0, 255.0), lo=15.0, hi=220.0)
     image_gray = soft_unsharp(image_gray, amount=0.18)
 
     troostite_mask = np.ones(size, dtype=np.uint8)
     troostite_mask[cementite_mask] = 0
+    troostite_mask[ferrite_mask] = 0
+    phase_masks: dict[str, np.ndarray] = {
+        "TROOSTITE": troostite_mask,
+        "CEMENTITE": cementite_mask.astype(np.uint8),
+    }
+    rendered_layers = ["TROOSTITE", "CEMENTITE"]
+    if ferrite_frac > 0.0:
+        phase_masks["FERRITE"] = ferrite_mask.astype(np.uint8)
+        rendered_layers.append("FERRITE")
     return RendererOutput(
         image_gray=image_gray,
-        phase_masks={
-            "TROOSTITE": troostite_mask,
-            "CEMENTITE": cementite_mask.astype(np.uint8),
-        },
+        phase_masks=phase_masks,
         morphology_trace={
             "family": "tempered_medium",
             "stage": "tempered_medium",
@@ -219,8 +255,10 @@ def _render_medium(
             "high_freq_perlin_amplitude_rgb": 15.0,
             "carbide_on_former_lath_boundary_probability": 0.60,
             "n_carbides": n_carbides,
+            "ferrite_fraction_target": ferrite_frac,
+            "ferrite_fraction_actual": float(ferrite_mask.mean()),
         },
-        rendered_layers=["TROOSTITE", "CEMENTITE"],
+        rendered_layers=rendered_layers,
         fragment_area=int(h * w // 200),
     )
 
@@ -229,11 +267,25 @@ def _render_medium(
 
 
 def _render_high(
-    *, context: SystemGenerationContext, seed_split: dict[str, int]
+    *,
+    context: SystemGenerationContext,
+    seed_split: dict[str, int],
+    phase_fractions: dict[str, float] | None = None,
 ) -> RendererOutput:
     size = context.size
     h, w = size
     seed = int(seed_split.get("seed_topology", context.seed))
+    phase_fractions = phase_fractions or {}
+    # §2.13 Q+T: фазовые доли SORBITE + FERRITE + CEMENTITE.
+    # SORBITE — области с плотным peppering карбидов;
+    # FERRITE — полигональный феррит без карбидов.
+    sorbite_target = float(phase_fractions.get("SORBITE", 0.42))
+    ferrite_target = float(phase_fractions.get("FERRITE", 0.40))
+    denom = sorbite_target + ferrite_target
+    if denom <= 1e-6:
+        sorbite_share = 0.5
+    else:
+        sorbite_share = sorbite_target / denom
 
     # Полигональный феррит 3-6 px (2-10 μm по §2.13).
     labels = generate_grain_structure(
@@ -260,20 +312,44 @@ def _render_high(
     # Границы зёрен.
     img = np.where(boundaries > 0, _TONE_HIGH_BOUNDARY, img)
 
-    # Poisson-карбиды Fe₃C: 70% на границах, 30% внутри. Радиус
-    # lognormal(~0.4 μm) ≈ lognormal(1.5 px).
+    # Per-grain assignment: sorbite-зёрна (с плотными карбидами) vs
+    # ferrite-зёрна (полигональный α без карбидов). Соотношение из
+    # phase_fractions с нормализацией.
+    is_sorbite_grain = rng.random(n_grains) < sorbite_share
+    sorbite_pixel_mask = is_sorbite_grain[labels] & (boundaries == 0)
+    ferrite_pixel_mask = (~is_sorbite_grain[labels]) & (boundaries == 0)
+
+    # Ferrite-зёрна слегка светлее (меньше травления Fe₃C peppering).
+    img[ferrite_pixel_mask] += 8.0
+
+    # Poisson-карбиды Fe₃C: только внутри sorbite-зёрен + на их границах
+    # (70% на границах / 30% внутри sorbite-зёрен). Радиус lognormal.
     ys_b, xs_b = np.where(boundaries)
     n_carbides = max(150, int(0.012 * h * w))
     cementite_mask = np.zeros(size, dtype=bool)
     halo_mask = np.zeros(size, dtype=bool)
     for _ in range(n_carbides):
-        if rng.random() < 0.70 and len(xs_b) > 0:
-            idx = int(rng.integers(0, len(xs_b)))
-            cy = int(ys_b[idx])
-            cx = int(xs_b[idx])
-        else:
-            cy = int(rng.integers(0, h))
-            cx = int(rng.integers(0, w))
+        placed = False
+        for _try in range(6):
+            if rng.random() < 0.70 and len(xs_b) > 0:
+                idx = int(rng.integers(0, len(xs_b)))
+                cy = int(ys_b[idx])
+                cx = int(xs_b[idx])
+                # Boundary-карбид разрешён только рядом с sorbite-зерном.
+                # Проверяем 3×3 окно.
+                ymin, ymax = max(0, cy - 1), min(h, cy + 2)
+                xmin, xmax = max(0, cx - 1), min(w, cx + 2)
+                if sorbite_pixel_mask[ymin:ymax, xmin:xmax].any():
+                    placed = True
+                    break
+            else:
+                cy = int(rng.integers(0, h))
+                cx = int(rng.integers(0, w))
+                if sorbite_pixel_mask[cy, cx]:
+                    placed = True
+                    break
+        if not placed:
+            continue
         r = float(rng.lognormal(mean=math.log(1.3), sigma=0.35))
         r = max(0.9, min(3.0, r))
         r_int = int(math.ceil(r))
@@ -296,20 +372,24 @@ def _render_high(
     image_gray = rescale_to_u8(np.clip(img, 0.0, 255.0), lo=20.0, hi=230.0)
     image_gray = soft_unsharp(image_gray, amount=0.22)
 
-    ferrite_mask = np.ones(size, dtype=np.uint8)
-    ferrite_mask[cementite_mask] = 0
-    ferrite_mask[boundaries > 0] = 0
+    # Disjoint masks: SORBITE, FERRITE, CEMENTITE — без перекрытий.
+    sorbite_mask_u8 = (sorbite_pixel_mask & ~cementite_mask).astype(np.uint8)
+    ferrite_mask_u8 = (ferrite_pixel_mask & ~cementite_mask).astype(np.uint8)
+    cementite_mask_u8 = cementite_mask.astype(np.uint8)
     return RendererOutput(
         image_gray=image_gray,
         phase_masks={
-            "FERRITE": ferrite_mask,
-            "CEMENTITE": cementite_mask.astype(np.uint8),
-            "SORBITE": ferrite_mask,
+            "SORBITE": sorbite_mask_u8,
+            "FERRITE": ferrite_mask_u8,
+            "CEMENTITE": cementite_mask_u8,
         },
         morphology_trace={
             "family": "tempered_high",
             "stage": "tempered_high",
             "polygonal_ferrite_grain_count": n_grains,
+            "sorbite_grain_count": int(is_sorbite_grain.sum()),
+            "ferrite_grain_count": int((~is_sorbite_grain).sum()),
+            "sorbite_share_target": sorbite_share,
             "boundary_bias": 0.70,
             "no_lath_geometry": True,
             "no_retained_austenite": True,
