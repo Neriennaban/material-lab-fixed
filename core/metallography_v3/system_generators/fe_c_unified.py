@@ -85,6 +85,12 @@ _STAGE_TO_RENDERER: dict[str, Any] = {
     for stage in mod.HANDLES_STAGES
 }
 
+# Phase 2 — активированы новые renderer'ы для high_temp_phases.
+# Остальные семейства (мартенсит/бейнит/чугуны/отпуски/видманштеттен/
+# поверхностные слои/зернистый перлит) пока идут по старым путям;
+# подключение — Phase 3-8.
+_PHASE2_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_high_temp_phases.HANDLES_STAGES)
+
 _PHASE_ALIASES: dict[str, str] = {
     "L": "LIQUID",
     "LIQUID": "LIQUID",
@@ -1860,6 +1866,21 @@ def render_fe_c_unified(context: SystemGenerationContext) -> SystemGenerationRes
                 pearlite_fraction=pearlite_frac_for_render,
             )
         )
+    elif stage in _PHASE2_ACTIVATED_STAGES and stage in _STAGE_TO_RENDERER:
+        # Phase 2 редизайна: high_temp_phases renderer обрабатывает
+        # austenite, delta_ferrite, alpha_gamma, gamma_cementite,
+        # liquid, liquid_gamma (см. docs/plans/phase2-high-temp-phases.md).
+        _r_out = _STAGE_TO_RENDERER[stage].render(
+            context=context,
+            stage=stage,
+            phase_fractions=normalized_fractions,
+            seed_split=seed_split,
+        )
+        image_gray = _r_out.image_gray
+        phase_masks = {k: np.asarray(v, dtype=np.uint8) for k, v in _r_out.phase_masks.items()}
+        morphology_trace = dict(_r_out.morphology_trace)
+        rendered_layers = list(_r_out.rendered_layers) or sorted(list(phase_masks.keys()))
+        fragment_area = int(_r_out.fragment_area or 0)
     elif stage in _SPECIALIZED_PEARLITIC_STAGES:
         image_gray, phase_masks, morphology_trace = _build_pearlitic_render(
             context=context,

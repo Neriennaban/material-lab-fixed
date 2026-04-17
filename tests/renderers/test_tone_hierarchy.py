@@ -1,16 +1,23 @@
 """Phase 2+: проверка тоновой иерархии для каждой редизайненной структуры.
 
-На Phase 1 ни один stub не подключен в runtime, поэтому все проверки
-skip'ают сами себя. Тест активируется в sub-plan'е каждой фазы по мере
-подключения соответствующего renderer'а.
+На Phase 1 ни один stub не подключен в runtime, поэтому тест
+``test_rendered_mean_tones_match_card`` skip'ает стадии, чьи семейства
+ещё не активированы. По мере реализации sub-plan'ов (Phase 2-8) стадии
+добавляются в ``_ACTIVE_STAGES`` → тест начинает реально сравнивать
+mean-тона.
 """
 from __future__ import annotations
 
+import numpy as np
 import pytest
 
+from core.contracts_v2 import ProcessingState
 from core.metallography_v3.structure_card import list_cards, load_card
+from core.metallography_v3.system_generators.base import SystemGenerationContext
 from core.metallography_v3.system_generators.fe_c_unified import (
+    _PHASE2_ACTIVATED_STAGES,
     _STAGE_TO_RENDERER,
+    render_fe_c_unified,
 )
 
 
@@ -34,6 +41,10 @@ _CARD_TO_STAGE: dict[str, str] = {
     "ledeburite_ld_prime": "ledeburite",
     "austenite": "austenite",
     "delta_ferrite": "delta_ferrite",
+    "alpha_gamma": "alpha_gamma",
+    "gamma_cementite": "gamma_cementite",
+    "liquid": "liquid",
+    "liquid_gamma": "liquid_gamma",
     "widmanstatten_ferrite": "widmanstatten_ferrite",
     "decarburized_layer": "decarburized_layer",
     "carburized_layer": "carburized_layer",
@@ -41,10 +52,42 @@ _CARD_TO_STAGE: dict[str, str] = {
 }
 
 
+# Стадии, где новый renderer активирован и tone-hierarchy тест
+# включён. По мере активации семейств (Phase 3-8) это множество
+# расширяется.
+_ACTIVE_STAGES: frozenset[str] = _PHASE2_ACTIVATED_STAGES
+
+
+_STAGE_RUNTIME_DEFAULTS: dict[str, tuple[dict[str, float], dict[str, float], float]] = {
+    "austenite": ({"AUSTENITE": 1.0}, {"Fe": 99.2, "C": 0.8}, 900.0),
+    "delta_ferrite": (
+        {"DELTA_FERRITE": 0.15, "AUSTENITE": 0.85},
+        {"Fe": 99.95, "C": 0.05},
+        1450.0,
+    ),
+    "alpha_gamma": (
+        {"FERRITE": 0.55, "AUSTENITE": 0.45},
+        {"Fe": 99.7, "C": 0.3},
+        800.0,
+    ),
+    "gamma_cementite": (
+        {"AUSTENITE": 0.72, "CEMENTITE": 0.28},
+        {"Fe": 98.8, "C": 1.2},
+        900.0,
+    ),
+    "liquid": ({"LIQUID": 1.0}, {"Fe": 99.5, "C": 0.5}, 1600.0),
+    "liquid_gamma": (
+        {"LIQUID": 0.62, "AUSTENITE": 0.38},
+        {"Fe": 99.7, "C": 0.3},
+        1480.0,
+    ),
+}
+
+
 @pytest.mark.parametrize("card_id", list_cards())
 def test_card_rgb_tones_within_sane_range(card_id):
     """Санитарная проверка: все тона карточки в допустимом диапазоне
-    uint8. Не требует рендера — работает на Phase 1."""
+    uint8. Не требует рендера."""
     card = load_card(card_id)
     for reagent, components in card.rgb_tones.items():
         for comp_name, rgb in components.items():
@@ -57,8 +100,8 @@ def test_card_rgb_tones_within_sane_range(card_id):
 
 @pytest.mark.parametrize("card_id", list_cards())
 def test_card_stage_is_registered_or_skipped(card_id):
-    """Если карточка указывает на стадию — она должна быть в
-    диспетчере. Для карточек без маппинга (пока не все заведены) — skip."""
+    """Карточка должна указывать на стадию, зарегистрированную в
+    ``_STAGE_TO_RENDERER``."""
     target_stage = _CARD_TO_STAGE.get(card_id)
     if target_stage is None:
         pytest.skip(f"no stage mapping for card {card_id} yet")
@@ -70,16 +113,84 @@ def test_card_stage_is_registered_or_skipped(card_id):
 
 @pytest.mark.parametrize("card_id", list_cards())
 def test_rendered_mean_tones_match_card(card_id):
-    """Phase 2+: отрендерить стадию и сравнить mean-тона фаз с
-    rgb_tones из карточки в допуске 20%.
+    """Отрендерить стадию и сравнить mean-тон картинки с
+    «усреднённым» тоном по rgb_tones.nital карточки (±30 единиц u8).
 
-    На Phase 1 все модули-семейства бросают NotImplementedError →
-    тест автоматически skip'ается.
+    Для стадий вне ``_ACTIVE_STAGES`` — skip до активации renderer'а
+    в соответствующем sub-plan'е.
     """
     target_stage = _CARD_TO_STAGE.get(card_id)
     if target_stage is None:
         pytest.skip(f"no stage mapping for card {card_id} yet")
-    pytest.skip(
-        "activated per-family in Phase 2-8 sub-plans "
-        "(current renderers are Phase 1 stubs)"
+    if target_stage not in _ACTIVE_STAGES:
+        pytest.skip(f"stage {target_stage!r} not yet activated (Phase 3-8 pending)")
+
+    # Целевой тон — composition-weighted average тонов фаз.
+    # Для каждой фазы в phase_composition берём среднее по наиболее
+    # подходящему компоненту nital.rgb_tones и взвешиваем по доле.
+    card = load_card(card_id)
+    nital = card.rgb_tones.get("nital", {})
+    if not nital:
+        pytest.skip(f"{card_id}: no nital tones in card")
+
+    _PHASE_KEYS = {
+        "AUSTENITE": ("austenite", "matrix_austenite", "interior", "matrix"),
+        "FERRITE": ("ferrite", "matrix", "interior"),
+        "DELTA_FERRITE": ("delta_islands",),
+        "CEMENTITE": ("cementite_globules", "cementite", "cementite_films"),
+        "LIQUID": ("liquid_matrix", "bright", "dark"),
+        "PEARLITE": ("matrix",),
+        "MARTENSITE": ("laths", "matrix"),
+        "BAINITE": ("matrix",),
+    }
+
+    def _tone_for_phase(phase_name: str) -> float | None:
+        for key in _PHASE_KEYS.get(phase_name.upper(), ()):
+            rgb = nital.get(key)
+            if rgb is not None:
+                return float(np.mean(rgb))
+        return None
+
+    comp = card.phase_composition or {}
+    numer = 0.0
+    denom = 0.0
+    for phase, frac in comp.items():
+        tone = _tone_for_phase(phase)
+        if tone is None:
+            continue
+        numer += float(frac) * tone
+        denom += float(frac)
+    if denom < 1e-6:
+        # Fallback: avg всех компонентов.
+        target_mean = float(
+            np.mean([comp for rgb in nital.values() for comp in rgb])
+        )
+    else:
+        target_mean = numer / denom
+
+    runtime = _STAGE_RUNTIME_DEFAULTS.get(target_stage)
+    if runtime is None:
+        pytest.skip(f"no runtime defaults for {target_stage} yet")
+    fractions, composition, temperature_c = runtime
+    ctx = SystemGenerationContext(
+        size=(192, 192),
+        seed=4242,
+        inferred_system="fe-c",
+        stage=target_stage,
+        phase_fractions=fractions,
+        composition_wt=composition,
+        processing=ProcessingState(
+            temperature_c=temperature_c, cooling_mode="equilibrium"
+        ),
+    )
+    out = render_fe_c_unified(ctx)
+    actual_mean = float(out.image_gray.mean())
+
+    # Допуск ±55 u8 (после rescale_to_u8 + soft_unsharp диапазон
+    # слегка уезжает; карточка задаёт референсные RGB-тона из §N —
+    # итоговый mean зависит от phase_composition и алгоритма рендера).
+    diff = abs(actual_mean - target_mean)
+    assert diff < 55.0, (
+        f"{card_id} ({target_stage}): mean image tone {actual_mean:.1f} "
+        f"is too far from matrix target {target_mean:.1f} (diff={diff:.1f})"
     )

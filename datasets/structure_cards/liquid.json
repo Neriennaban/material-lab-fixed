@@ -1,0 +1,29 @@
+{
+  "id": "liquid",
+  "name_ru": "Жидкая фаза",
+  "name_en": "Liquid (L)",
+  "reference_section": "§3.1",
+  "reference_sources": [
+    "Гуляев А.П. Металловедение. 1986"
+  ],
+  "phase_composition": { "LIQUID": 1.0 },
+  "rgb_tones": {
+    "nital": {
+      "bright": [245, 240, 230],
+      "dark": [210, 205, 195]
+    }
+  },
+  "morphology": {
+    "grain_size_um": null,
+    "notes": "Расплав — гомогенное поле без границ зёрен. Для визуализации на микрошлифе используется слегка варьированный градиент яркости (low-frequency noise), имитирующий термическую непрерывность."
+  },
+  "composition_triggers": {
+    "temperature_c_range": [1493, 1800]
+  },
+  "generation_hints": {
+    "texture_method": "low_frequency_gradient",
+    "sigma": 24.0,
+    "multiscale_scales": [[40.0, 0.6], [12.0, 0.4]],
+    "amplitude_rgb": 20
+  }
+}

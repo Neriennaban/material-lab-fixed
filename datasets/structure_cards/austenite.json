@@ -1,0 +1,36 @@
+{
+  "id": "austenite",
+  "name_ru": "Аустенит",
+  "name_en": "Austenite (γ-Fe)",
+  "reference_section": "§1.4",
+  "reference_sources": [
+    "Гуляев А.П. Металловедение. 1986",
+    "Krauss G. Steels: Processing, Structure, and Performance. ASM Int., 2015"
+  ],
+  "phase_composition": { "AUSTENITE": 1.0 },
+  "rgb_tones": {
+    "nital": {
+      "interior": [230, 228, 222],
+      "boundaries": [90, 85, 80],
+      "twins": [200, 200, 195]
+    },
+    "picral": {
+      "interior": [235, 232, 225]
+    }
+  },
+  "morphology": {
+    "grain_size_um": { "mean": 40, "min": 20, "max": 100 },
+    "triple_junction_angle_deg": 120,
+    "twin_probability": 0.45,
+    "twin_width_um": { "min": 1.0, "max": 5.0 },
+    "notes": "Равноосные полиэдры с тройными стыками ≈120°. Двойники отжига — параллельные прямые полосы 1-5 μm, пересекающие зерно насквозь."
+  },
+  "composition_triggers": {
+    "c_wt_range": [0.0, 2.14],
+    "temperature_c_range": [727, 1493]
+  },
+  "generation_hints": {
+    "voronoi_relax_iter": 4,
+    "twin_density_per_grain": { "min": 1, "max": 3 }
+  }
+}
