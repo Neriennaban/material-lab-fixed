@@ -1,0 +1,31 @@
+{
+  "id": "white_cast_iron_hypoeutectic",
+  "name_ru": "Белый чугун доэвтектический (2.14-4.3%C)",
+  "name_en": "White cast iron (hypoeutectic)",
+  "reference_section": "§1.10а",
+  "reference_sources": [
+    "Гуляев А.П. Металловедение. 1986",
+    "Kurz W., Fisher D.J. Fundamentals of Solidification. 1984"
+  ],
+  "phase_composition": { "PEARLITE": 0.30, "CEMENTITE": 0.35, "LEDEBURITE": 0.35 },
+  "rgb_tones": {
+    "nital": {
+      "primary_pearlite_dendrites": [90, 88, 85],
+      "cementite_matrix": [240, 238, 230],
+      "pearlite_islands": [100, 100, 100]
+    }
+  },
+  "morphology": {
+    "primary_dendrite_fraction": { "min": 0.10, "max": 0.45 },
+    "sdas_um": { "formula": "40.7 * cooling_rate_c_per_s ** (-1/3)", "typical_range_um": [10, 90] },
+    "pearlite_island_size_um": { "mean": 7, "min": 3, "max": 15 },
+    "eutectic_cell_size_um": { "mean": 120, "min": 50, "max": 300 },
+    "notes": "Первичные γ-дендриты (превращаются в перлит при охлаждении) на фоне эвтектического Ld′."
+  },
+  "composition_triggers": {
+    "c_wt_range": [2.14, 4.3]
+  },
+  "generation_hints": {
+    "texture_method": "leopard_plus_austenite_dendrites"
+  }
+}

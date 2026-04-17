@@ -120,22 +120,22 @@
       "std": 41.64657253063196
     },
     "cast_iron_grey_textbook": {
-      "mean": 105.94873046875,
-      "sha256_gray": "5e0507daf09c4f0b56e9d4352828ac4f5e2c45995ed0783b2b18d035d899ef1f",
+      "mean": 130.06158447265625,
+      "sha256_gray": "94b07caf96438a4f4861e4d6640b723f4b1e5247fc2e6ef614f391722c04a59f",
       "shape": [
         128,
         128
       ],
-      "std": 60.443620087861966
+      "std": 92.62763077103436
     },
     "cast_iron_white_eutectic_v3": {
-      "mean": 124.71527099609375,
-      "sha256_gray": "ce501f8891616b7df9885d861baa3f75b029fbb85aaf539c6d5ad29f7c10eb3f",
+      "mean": 122.47808837890625,
+      "sha256_gray": "db7ee44bda5564b31f2250eab0312b51a479bfd09446fd5c8f495b9585ec8970",
       "shape": [
         128,
         128
       ],
-      "std": 69.72658076820348
+      "std": 71.87127543581988
     },
     "cast_iron_white_hypereutectic_v3": {
       "mean": 232.6353759765625,

@@ -1,0 +1,42 @@
+{
+  "id": "ledeburite_ld_prime",
+  "name_ru": "Ледебурит Ld′ (превращённый, 20°C)",
+  "name_en": "Ledeburite Ld' (transformed, 20°C)",
+  "reference_section": "§1.6",
+  "reference_sources": [
+    "Гуляев А.П. Металловедение. 1986",
+    "ГОСТ 3443-87 (шкалы микроструктур)"
+  ],
+  "phase_composition": { "PEARLITE": 0.49, "CEMENTITE": 0.51 },
+  "rgb_tones": {
+    "nital": {
+      "cementite_matrix": [240, 238, 230],
+      "pearlite_islands": [100, 100, 100]
+    },
+    "picral": {
+      "cementite_matrix": [245, 243, 235]
+    },
+    "alkaline_picrate_na": {
+      "cementite_matrix": [40, 30, 25],
+      "pearlite_islands": [200, 180, 150]
+    }
+  },
+  "morphology": {
+    "pearlite_island_size_um": { "mean": 7, "min": 3, "max": 15 },
+    "eutectic_cell_size_um": { "mean": 120, "min": 50, "max": 300 },
+    "cementite_network_thickness_um": { "min": 1, "max": 5 },
+    "contrast_delta_r": 140,
+    "notes": "Леопардова шкура: тёмные округлые перлитные островки в непрерывной светлой матрице эвтектического цементита. HV 550-750 при 20°C."
+  },
+  "composition_triggers": {
+    "c_wt_range": [4.3, 4.3],
+    "temperature_c_range": [20, 727]
+  },
+  "generation_hints": {
+    "texture_method": "leopard_two_scale_noise",
+    "matrix_tone": 218,
+    "island_tone": 60,
+    "blob_smooth_sigmas": [4.5, 9.0],
+    "threshold_quantile": 0.55
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "id": "white_cast_iron_hypereutectic",
+  "name_ru": "Белый чугун заэвтектический (>4.3%C)",
+  "name_en": "White cast iron (hypereutectic)",
+  "reference_section": "§1.10в",
+  "reference_sources": [
+    "Гуляев А.П. Металловедение. 1986"
+  ],
+  "phase_composition": { "CEMENTITE": 0.60, "PEARLITE": 0.25, "LEDEBURITE": 0.15 },
+  "rgb_tones": {
+    "nital": {
+      "primary_cementite_plates": [248, 245, 238],
+      "cementite_matrix": [240, 238, 230],
+      "pearlite_islands": [100, 100, 100]
+    },
+    "alkaline_picrate_na": {
+      "primary_cementite_plates": [35, 25, 20]
+    }
+  },
+  "morphology": {
+    "primary_fe3c_plate_width_um": { "min": 20, "max": 100, "mean": 55 },
+    "primary_fe3c_plate_length_um": { "min": 200, "max": 2000, "mean": 800 },
+    "primary_fraction": {
+      "formula": "(C - 4.3) / 2.37",
+      "example_5wt_c": 0.295
+    },
+    "parallelism_deg": { "max_deviation": 10 },
+    "notes": "Длинные прямые белые пластины-«ножи» первичного Fe₃C_I через всё поле, почти параллельные внутри зон затвердевания. HB 550-700, HV 650-800, HRC 58-65."
+  },
+  "composition_triggers": {
+    "c_wt_range": [4.3, 6.67]
+  },
+  "generation_hints": {
+    "texture_method": "leopard_plus_primary_cementite_plates"
+  }
+}
