@@ -191,42 +191,6 @@
       ],
       "std": 17.13093785109337
     },
-    "fe_c_eutectoid_pro_realistic": {
-      "mean": 142.903564453125,
-      "sha256_gray": "f009a428c84267ff75b5cca58919125854ea03cf8de36223c8ec7e66bb764fd5",
-      "shape": [
-        128,
-        128
-      ],
-      "std": 61.29590895069221
-    },
-    "fe_c_eutectoid_research_optics_bessel": {
-      "mean": 142.370849609375,
-      "sha256_gray": "fc6b4a00353e30896be5d472a548c9c99202d54e648ebb92a37aab42ff551728",
-      "shape": [
-        128,
-        128
-      ],
-      "std": 60.70558971718318
-    },
-    "fe_c_eutectoid_research_optics_hybrid": {
-      "mean": 143.000732421875,
-      "sha256_gray": "fc31b1ceeb227e790bdda5afcb30866761eacbc0bf3dc2b512815e0a58113040",
-      "shape": [
-        128,
-        128
-      ],
-      "std": 60.77930989392943
-    },
-    "fe_c_eutectoid_research_optics_stir": {
-      "mean": 140.845947265625,
-      "sha256_gray": "b6f312412d10434dde1bd13bd7f8c6e3d762da39f97f88ddd69241655461d961",
-      "shape": [
-        128,
-        128
-      ],
-      "std": 60.705570841823025
-    },
     "fe_c_eutectoid_textbook": {
       "mean": 74.09600830078125,
       "sha256_gray": "719b91bac87837f6c9487e9ded0719b7d81018b55bb0ff4c2eb3b30a61e37e45",
@@ -236,15 +200,6 @@
       ],
       "std": 17.395846551128226
     },
-    "fe_c_hypereutectoid_pro_realistic": {
-      "mean": 161.80499267578125,
-      "sha256_gray": "b9fdc4e8b27e4167b13561fbb82612b355053675fb03a4733095211f5e61dd79",
-      "shape": [
-        128,
-        128
-      ],
-      "std": 54.86924596091404
-    },
     "fe_c_hypereutectoid_textbook": {
       "mean": 111.4713134765625,
       "sha256_gray": "73106527a0706fde34c31b5ba96fdbcc7d718d944ebbea1e34f8548f517071c3",
@@ -253,15 +208,6 @@
         128
       ],
       "std": 44.522424096132426
-    },
-    "fe_c_hypoeutectoid_pro_realistic": {
-      "mean": 149.5089111328125,
-      "sha256_gray": "48a18c563735547c2b42ab0935a3c8334d25ed58d773de7a63cec0839b81b66c",
-      "shape": [
-        128,
-        128
-      ],
-      "std": 64.9450407577762
     },
     "fe_c_hypoeutectoid_textbook": {
       "mean": 133.98846435546875,

@@ -281,7 +281,7 @@ class SynthesisProfileV3:
     boundary_sharpness: float = 1.0
     artifact_level: float = 0.35
     composition_sensitivity_mode: str = "realistic"
-    generation_mode: str = "edu_engineering"  # realistic_visual | edu_engineering | pro_realistic
+    generation_mode: str = "edu_engineering"  # edu_engineering | realistic_visual
     phase_emphasis_style: str = "contrast_texture"  # contrast_texture | max_contrast | morphology_only
     phase_fraction_tolerance_pct: float = 20.0
     # A10.0 — colour mode selects the downstream palette that the
@@ -289,8 +289,7 @@ class SynthesisProfileV3:
     # Default ``"grayscale_nital"`` preserves the legacy one-channel
     # output; other values (``nital_warm``, ``dic_polarized``,
     # ``tint_etch_blue_yellow``) switch on RGB rendering in
-    # ``fe_c_color_palette.apply_color_palette``. Not supported when
-    # ``generation_mode == "pro_realistic"``.
+    # ``fe_c_color_palette.apply_color_palette``.
     color_mode: str = "grayscale_nital"
 
     @classmethod

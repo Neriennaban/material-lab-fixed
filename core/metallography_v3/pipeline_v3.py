@@ -29,10 +29,10 @@ from core.materials_hybrid import (
     supports_hybrid_properties,
     validate_expected_properties,
 )
-from core.metallography_pro.pipeline_pro import (
-    generate_pro_realistic_fe_c,
-    supports_pro_realistic_fe_c_stage,
-)
+# PRO-realistic mode removed for educational image generation scope.
+# Все стадии теперь идут через единый edu-engineering путь
+# ``generate_phase_topology → render_fe_c_unified`` с модульными
+# renderer'ами в core/metallography_v3/renderers/.
 from core.metallography_v3.etch_simulator import apply_etch
 from core.metallography_v3.microstructure_state import build_microstructure_state
 from core.metallography_v3.morphology_engine import generate_phase_topology
@@ -698,56 +698,10 @@ class MetallographyPipelineV3:
                 profiles_root=self.profiles_dir,
             )
 
-        use_pro_realistic = (
-            str(request.synthesis_profile.generation_mode).strip().lower()
-            == "pro_realistic"
-            and str(phase_bundle.system).strip().lower() == "fe-c"
-            and supports_pro_realistic_fe_c_stage(str(phase_bundle.stage))
-        )
-
-        if use_pro_realistic:
-            morph = generate_pro_realistic_fe_c(
-                size=internal_resolution,
-                seed=request.seed,
-                stage=str(phase_bundle.stage),
-                phase_fractions=dict(phase_bundle.phase_fractions),
-                composition_wt=composition_norm,
-                processing=final_processing,
-                prep_route=request.prep_route,
-                etch_profile=request.etch_profile,
-                synthesis_profile=request.synthesis_profile,
-                microscope_profile=dict(request.microscope_profile),
-                thermal_summary=thermal_summary,
-                quench_summary=quench_summary,
-                phase_fraction_source=str(
-                    phase_bundle.phase_model_report.get(
-                        "fraction_source", "default_formula"
-                    )
-                ),
-                phase_calibration_mode=str(
-                    phase_bundle.phase_model_report.get(
-                        "calibration_mode", "default_formula"
-                    )
-                ),
-            )
-            prep = {
-                "prep_maps": dict(morph["prep_maps"]),
-                "prep_timeline": list(morph.get("prep_timeline", [])),
-                "prep_summary": dict(morph.get("prep_summary", {})),
-            }
-            etched = {
-                "image_gray": np.asarray(morph["image_gray"], dtype=np.uint8),
-                "etch_maps": dict(morph.get("etch_maps", {})),
-                "etch_rate_map": np.asarray(
-                    dict(morph.get("etch_maps", {})).get(
-                        "etch_rate", np.zeros(internal_resolution, dtype=np.uint8)
-                    ),
-                    dtype=np.uint8,
-                ),
-                "etch_summary": dict(morph.get("etch_summary", {})),
-                "etch_concentration": dict(morph.get("etch_concentration", {})),
-            }
-        else:
+        # PRO-realistic mode removed — все стадии идут через единый
+        # edu-engineering путь (generate_phase_topology → render_fe_c_unified).
+        use_pro_realistic = False  # deprecated flag, kept for downstream reads.
+        if True:
             morph = generate_phase_topology(
                 size=internal_resolution,
                 seed=request.seed,

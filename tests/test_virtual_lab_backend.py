@@ -159,36 +159,8 @@ class VirtualLabBackendTests(unittest.TestCase):
         self.assertGreater(float(__import__("numpy").quantile(arr, 0.01)), 108.0)
         self.assertGreater(float(__import__("numpy").quantile(arr, 0.05)), 128.0)
 
-    def test_render_frame_keeps_pro_realistic_ferrite_bright_with_empty_prep(
-        self,
-    ) -> None:
-        slide = self.backend.generate_slide(
-            {
-                "sample_id": "pure_pro_backend",
-                "composition_wt": {"Fe": 100.0, "C": 0.0},
-                "resolution": [256, 256],
-                "seed": 42,
-                "synthesis_profile": {
-                    "profile_id": "textbook_steel_bw",
-                    "generation_mode": "pro_realistic",
-                    "composition_sensitivity_mode": "realistic",
-                    "contrast_target": 1.2,
-                    "boundary_sharpness": 1.2,
-                    "artifact_level": 0.2,
-                    "phase_emphasis_style": "contrast_texture",
-                },
-            }
-        )
-        frame, meta = self.backend.render_microscope_frame(
-            slide,
-            MicroscopeState(
-                objective=200, stage_x=0.5, stage_y=0.5, output_size=(256, 256)
-            ),
-        )
-        arr = frame.astype(np.float32)
-        self.assertTrue(bool(meta.get("pure_iron_baseline_applied", False)))
-        self.assertGreater(float(arr.mean()), 170.0)
-        self.assertGreater(float(np.quantile(arr, 0.05)), 110.0)
+    # PRO-realistic mode removed. Baseline ferrite brightness validated
+    # через test_render_frame_propagates_pure_iron_baseline_metadata (edu path).
 
     def test_higher_objective_gives_smaller_crop(self) -> None:
         _frame_a, meta_a = self.backend.render_microscope_frame(

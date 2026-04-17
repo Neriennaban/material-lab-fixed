@@ -88,55 +88,8 @@ class PureIronRealismV3Tests(unittest.TestCase):
             float(qc.get("unexpected_dark_spot_largest_component_px", 0.0)), 28.0
         )
 
-    def test_pro_realistic_ferrite_empty_prep_uses_bright_negative_control(
-        self,
-    ) -> None:
-        req = MetallographyRequestV3(
-            sample_id="pure_pro_ferrite",
-            composition_wt={"Fe": 100.0, "C": 0.0},
-            synthesis_profile=SynthesisProfileV3(
-                profile_id="textbook_steel_bw",
-                generation_mode="pro_realistic",
-                composition_sensitivity_mode="realistic",
-                contrast_target=1.2,
-                boundary_sharpness=1.2,
-                artifact_level=0.2,
-                phase_emphasis_style="contrast_texture",
-            ),
-            resolution=(512, 512),
-            seed=42,
-        )
-        out = self.pipeline.generate(req)
-        img = out.image_gray.astype(np.float32)
-        pure = dict(out.metadata.get("pure_iron_baseline", {}))
-        prep = dict(out.metadata.get("prep_summary", {}))
-        qc = dict(out.metadata.get("quality_metrics", {}))
-
-        self.assertEqual(
-            str(out.metadata.get("engineering_trace", {}).get("backend", "")),
-            "pro_realistic_fe_c_v1",
-        )
-        self.assertTrue(bool(pure.get("applied", False)))
-        self.assertTrue(bool(prep.get("implicit_baseline_route_applied", False)))
-        self.assertGreater(float(img.mean()), 176.0)
-        self.assertGreater(float(np.quantile(img, 0.01)), 70.0)
-        self.assertGreater(float(np.quantile(img, 0.05)), 100.0)
-        self.assertEqual(
-            str(
-                out.metadata.get("spatial_morphology_state", {})
-                .get("pure_ferrite_generator", {})
-                .get("generator", "")
-            ),
-            "pure_ferrite_power_voronoi_v1",
-        )
-        self.assertTrue(bool(out.metadata.get("single_phase_negative_control", False)))
-        self.assertFalse(
-            bool(out.metadata.get("multiphase_separability_applicable", True))
-        )
-        self.assertTrue(
-            bool(out.metadata.get("textbook_profile", {}).get("pass", False))
-        )
-        self.assertTrue(bool(qc.get("passed", False)))
+    # PRO-realistic mode removed — test удалён. Чистый ferrite render
+    # с empty prep проверяется test_textbook_steel_bw_prep_keeps_baseline_bright выше.
 
     def test_aggressive_pure_iron_route_raises_artifacts_vs_baseline(self) -> None:
         baseline_payload = self.pipeline.load_preset("fe_pure_brightfield_v3")
