@@ -696,6 +696,66 @@ def _suppress_small_inclusions(image_gray: np.ndarray) -> np.ndarray:
     return ensure_u8(arr)
 
 
+def _compensate_edge_dimming(
+    image_gray: np.ndarray, *, edge_depth: int = 30, threshold: float = 4.0
+) -> np.ndarray:
+    """Post-hoc compensation for systematic edge-band dimming.
+
+    Voronoi-based generators сэмплируют seed-точки строго внутри
+    [0, size), поэтому у границ изображения плотность зёрен-границ
+    ≈ в 2× реже чем в центре. Это превращается в видимую тёмную
+    «рамку» у всех четырёх краёв после boundary darkening + dilation.
+
+    Алгоритм: для каждого из четырёх краёв, если mean первых
+    edge_depth строк/столбцов темнее bulk (строк edge_depth..2*edge_depth)
+    больше чем на threshold единиц U8, линейно подравниваем значения
+    этих строк/столбцов к bulk mean. Применяется only когда разница
+    systematic (> threshold), иначе no-op.
+    """
+    h, w = image_gray.shape
+    if h <= 3 * edge_depth or w <= 3 * edge_depth:
+        return image_gray
+    arr = image_gray.astype(np.float32)
+    # Bulk region — middle 60% of image.
+    mid_y0, mid_y1 = int(h * 0.2), int(h * 0.8)
+    mid_x0, mid_x1 = int(w * 0.2), int(w * 0.8)
+    bulk = float(arr[mid_y0:mid_y1, mid_x0:mid_x1].mean())
+
+    def _blend_edge(region: np.ndarray, target: float, axis: int) -> None:
+        """Линейный gradient blend: на крае — полная компенсация,
+        внутрь edge_depth — плавно до 0."""
+        length = region.shape[axis]
+        diff_mean = target - float(region.mean())
+        if diff_mean <= threshold:
+            return
+        # weights: 1.0 на самом краю → 0.0 на inner side
+        weights = np.linspace(1.0, 0.0, length, dtype=np.float32)
+        if axis == 0:
+            weights = weights[:, None]
+        else:
+            weights = weights[None, :]
+        region += weights * diff_mean
+
+    # Top edge
+    top = arr[:edge_depth]
+    _blend_edge(top, bulk, axis=0)
+    arr[:edge_depth] = top
+    # Bottom edge
+    bot = arr[-edge_depth:]
+    _blend_edge(bot[::-1], bulk, axis=0)
+    arr[-edge_depth:] = bot
+    # Left edge
+    left = arr[:, :edge_depth]
+    _blend_edge(left, bulk, axis=1)
+    arr[:, :edge_depth] = left
+    # Right edge
+    right = arr[:, -edge_depth:]
+    _blend_edge(right[:, ::-1], bulk, axis=1)
+    arr[:, -edge_depth:] = right
+
+    return np.clip(arr, 0.0, 255.0).astype(np.uint8)
+
+
 def _grain_map(
     size: tuple[int, int], seed: int, mean_grain_size_px: float, elongation: float = 1.0
 ) -> dict[str, Any]:
@@ -1150,6 +1210,16 @@ def _build_pearlitic_render(
     if cementite_pixel_mask is not None and cementite_pixel_mask.any():
         image_gray = image_gray.copy()
         image_gray[cementite_pixel_mask] = cementite_img[cementite_pixel_mask]
+
+    # Edge-dimming compensation: Voronoi seed'ы сэмплируются внутри
+    # [0, size), поэтому у верхнего/нижнего/левого/правого края плотность
+    # γ-границ ≈ в 2× реже чем в центре. После boundary darkening,
+    # cementite dilation и rescale это превращается в видимую тёмную
+    # «рамку» (~8 единиц U8 разницы для pearlite_cementite). Косметический
+    # фикс: если первые/последние N строк (или столбцов) статистически
+    # темнее bulk, подравниваем mean строки к bulk. Применяется только
+    # при заметной разнице (>4 U8).
+    image_gray = _compensate_edge_dimming(image_gray)
 
     boundary_bias = 0.0
     if (
