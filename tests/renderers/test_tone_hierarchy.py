@@ -149,6 +149,22 @@ _STAGE_RUNTIME_DEFAULTS: dict[str, tuple[dict[str, float], dict[str, float], flo
         {"Fe": 99.45, "C": 0.55},
         620.0,
     ),
+    # Phase 7
+    "tempered_low": (
+        {"MARTENSITE": 0.92, "CEMENTITE": 0.08},
+        {"Fe": 99.55, "C": 0.45},
+        220.0,
+    ),
+    "tempered_medium": (
+        {"TROOSTITE": 0.70, "CEMENTITE": 0.20, "FERRITE": 0.10},
+        {"Fe": 99.55, "C": 0.45},
+        420.0,
+    ),
+    "tempered_high": (
+        {"SORBITE": 0.42, "FERRITE": 0.40, "CEMENTITE": 0.18},
+        {"Fe": 99.6, "C": 0.4},
+        580.0,
+    ),
 }
 
 

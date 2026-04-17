@@ -95,12 +95,14 @@ _PHASE3_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_white_cast_iron.HANDLES_
 _PHASE4_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_martensite.HANDLES_STAGES)
 _PHASE5_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_bainite.HANDLES_STAGES)
 _PHASE6_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_quench_products.HANDLES_STAGES)
+_PHASE7_ACTIVATED_STAGES: frozenset[str] = frozenset(_r_tempered.HANDLES_STAGES)
 _ACTIVATED_RENDERER_STAGES: frozenset[str] = (
     _PHASE2_ACTIVATED_STAGES
     | _PHASE3_ACTIVATED_STAGES
     | _PHASE4_ACTIVATED_STAGES
     | _PHASE5_ACTIVATED_STAGES
     | _PHASE6_ACTIVATED_STAGES
+    | _PHASE7_ACTIVATED_STAGES
 )
 
 _PHASE_ALIASES: dict[str, str] = {
