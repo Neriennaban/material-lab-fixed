@@ -93,6 +93,59 @@ class QuenchProductsFamilyTests(unittest.TestCase):
             f"sorbite quench: lamella contrast too weak (std={std:.1f})",
         )
 
+    def test_injected_austenite_fraction_is_honored(self) -> None:
+        """PR #9 regression: при phase_fractions["AUSTENITE"] > 0
+        (RA-инжекция от render_fe_c_unified) renderer обязан создать
+        AUSTENITE маску, её площадь ≈ target ±50% относит., и
+        phase_masks должны быть согласованы — остальные фазы
+        исключают γост из своих масок."""
+        for stage in ("troostite_quench", "sorbite_quench"):
+            with self.subTest(stage=stage):
+                fractions, composition, temp_c = _STAGE_DEFAULTS[stage]
+                fractions_with_ra = dict(fractions)
+                # Убавляем основную фазу на 0.15 и переносим в AUSTENITE.
+                main_key = "TROOSTITE" if stage == "troostite_quench" else "SORBITE"
+                fractions_with_ra[main_key] = max(0.1, fractions[main_key] - 0.15)
+                fractions_with_ra["AUSTENITE"] = 0.15
+                ctx = SystemGenerationContext(
+                    size=(192, 192),
+                    seed=8888,
+                    inferred_system="fe-c",
+                    stage=stage,
+                    phase_fractions=fractions_with_ra,
+                    composition_wt=composition,
+                    processing=ProcessingState(
+                        temperature_c=temp_c,
+                        cooling_mode="quench_oil",
+                    ),
+                    thermal_summary={"max_effective_cooling_rate_c_per_s": 100.0},
+                )
+                out = render_fe_c_unified(ctx)
+                self.assertIn(
+                    "AUSTENITE", out.phase_masks,
+                    f"{stage}: AUSTENITE mask missing despite fraction=0.15",
+                )
+                ra_actual = float(out.phase_masks["AUSTENITE"].mean())
+                self.assertGreater(
+                    ra_actual, 0.05,
+                    f"{stage}: RA mask coverage too small ({ra_actual*100:.1f}%)",
+                )
+                self.assertLess(
+                    ra_actual, 0.30,
+                    f"{stage}: RA mask coverage too large ({ra_actual*100:.1f}%)",
+                )
+                # Остальные маски не должны дублировать γост-пиксели.
+                ra_bool = out.phase_masks["AUSTENITE"] > 0
+                for other, other_mask in out.phase_masks.items():
+                    if other == "AUSTENITE":
+                        continue
+                    overlap = float(((other_mask > 0) & ra_bool).mean())
+                    self.assertLess(
+                        overlap, 0.02,
+                        f"{stage}: {other} overlaps γост region "
+                        f"({overlap*100:.2f}%)",
+                    )
+
     def test_family_trace_strings(self) -> None:
         expected = {
             "troostite_quench": "troostite_quench",

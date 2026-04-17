@@ -56,23 +56,61 @@ def render(
     seed_split: dict[str, int],
 ) -> RendererOutput:
     if stage == "troostite_quench":
-        return _render_troostite(context=context, seed_split=seed_split)
+        return _render_troostite(
+            context=context,
+            seed_split=seed_split,
+            phase_fractions=phase_fractions,
+        )
     if stage == "sorbite_quench":
-        return _render_sorbite(context=context, seed_split=seed_split)
+        return _render_sorbite(
+            context=context,
+            seed_split=seed_split,
+            phase_fractions=phase_fractions,
+        )
     raise ValueError(
         f"quench_products renderer has no branch for stage {stage!r}"
     )
+
+
+def _make_retained_austenite_mask(
+    *,
+    size: tuple[int, int],
+    seed: int,
+    target_fraction: float,
+) -> np.ndarray:
+    """Строит блочную маску γост на основе multiscale_noise threshold.
+
+    Используется в обоих quench renderer'ах при
+    ``phase_fractions["AUSTENITE"] > 0`` (RA-инжекция из
+    ``render_fe_c_unified``).
+    """
+    if target_fraction <= 0.0:
+        return np.zeros(size, dtype=bool)
+    frac = float(max(0.005, min(0.45, target_fraction)))
+    field = multiscale_noise(
+        size=size, seed=int(seed), scales=((22.0, 0.65), (8.0, 0.35))
+    )
+    threshold = float(np.quantile(field, 1.0 - frac))
+    mask = field >= threshold
+    if ndimage is not None:
+        mask = ndimage.binary_opening(mask, iterations=1)
+    return mask
 
 
 # --- troostite quench (§2.8) ————————————————————————————————————
 
 
 def _render_troostite(
-    *, context: SystemGenerationContext, seed_split: dict[str, int]
+    *,
+    context: SystemGenerationContext,
+    seed_split: dict[str, int],
+    phase_fractions: dict[str, float] | None = None,
 ) -> RendererOutput:
     size = context.size
     h, w = size
     seed = int(seed_split.get("seed_topology", context.seed))
+    phase_fractions = phase_fractions or {}
+    ra_target = float(phase_fractions.get("AUSTENITE", 0.0))
 
     # Фон — средне-тёмный, изотропный.
     img = np.full(size, _TONE_TROOSTITE_BG, dtype=np.float32)
@@ -126,25 +164,43 @@ def _render_troostite(
         - 0.5
     ) * 6.0
 
+    # Если phase_orchestrator инжектирует γост (RA fraction > 0),
+    # карвим блочную маску и заливаем её светлым тоном (§2.4). Mask
+    # возвращается из renderer'а, чтобы phase_visibility_report
+    # отчитывал реальное покрытие.
+    ra_mask = _make_retained_austenite_mask(
+        size=size, seed=seed + 97, target_fraction=ra_target
+    )
+    if ra_mask.any():
+        img[ra_mask] = 225.0  # RA bright tone по §2.4
+
     image_gray = rescale_to_u8(np.clip(img, 0.0, 255.0), lo=15.0, hi=230.0)
     image_gray = soft_unsharp(image_gray, amount=0.18)
 
-    troostite_mask = (image_gray <= 100).astype(np.uint8)
-    cementite_mask = (image_gray <= 55).astype(np.uint8)
+    troostite_mask = ((image_gray <= 100) & ~ra_mask).astype(np.uint8)
+    cementite_mask = ((image_gray <= 55) & ~ra_mask).astype(np.uint8)
+    ra_mask_u8 = ra_mask.astype(np.uint8)
+    phase_masks: dict[str, np.ndarray] = {
+        "TROOSTITE": troostite_mask,
+        "CEMENTITE": cementite_mask,
+    }
+    rendered_layers = ["TROOSTITE", "CEMENTITE"]
+    if ra_target > 0.0:
+        phase_masks["AUSTENITE"] = ra_mask_u8
+        rendered_layers.append("AUSTENITE")
     return RendererOutput(
         image_gray=image_gray,
-        phase_masks={
-            "TROOSTITE": troostite_mask,
-            "CEMENTITE": cementite_mask,
-        },
+        phase_masks=phase_masks,
         morphology_trace={
             "family": "troostite_quench",
             "stage": "troostite_quench",
             "n_boundary_blobs": n_boundary_blobs,
             "n_interior_blobs": n_interior_blobs,
             "anisotropy_present": False,
+            "retained_austenite_fraction_target": ra_target,
+            "retained_austenite_fraction_actual": float(ra_mask.mean()),
         },
-        rendered_layers=["TROOSTITE", "CEMENTITE"],
+        rendered_layers=rendered_layers,
         fragment_area=25,
     )
 
@@ -176,11 +232,16 @@ def _paint_blob(
 
 
 def _render_sorbite(
-    *, context: SystemGenerationContext, seed_split: dict[str, int]
+    *,
+    context: SystemGenerationContext,
+    seed_split: dict[str, int],
+    phase_fractions: dict[str, float] | None = None,
 ) -> RendererOutput:
     size = context.size
     h, w = size
     seed = int(seed_split.get("seed_topology", context.seed))
+    phase_fractions = phase_fractions or {}
+    ra_target = float(phase_fractions.get("AUSTENITE", 0.0))
 
     # Voronoi колоний 5-20 μm ≈ 12 px среднее.
     labels = generate_grain_structure(
@@ -226,24 +287,40 @@ def _render_sorbite(
         - 0.5
     ) * 10.0
 
+    # γост инжекция (как в troostite). Блочные светлые пятна поверх
+    # штриховки, маска возвращается отдельно для phase_visibility_report.
+    ra_mask = _make_retained_austenite_mask(
+        size=size, seed=seed + 103, target_fraction=ra_target
+    )
+    if ra_mask.any():
+        img[ra_mask] = 225.0
+
     image_gray = rescale_to_u8(np.clip(img, 0.0, 255.0), lo=20.0, hi=230.0)
     image_gray = soft_unsharp(image_gray, amount=0.22)
 
-    sorbite_mask = np.ones(size, dtype=np.uint8)
-    cementite_mask = (image_gray <= 85).astype(np.uint8)
+    sorbite_mask = (~ra_mask).astype(np.uint8)
+    cementite_mask = ((image_gray <= 85) & ~ra_mask).astype(np.uint8)
+    ra_mask_u8 = ra_mask.astype(np.uint8)
+    phase_masks: dict[str, np.ndarray] = {
+        "SORBITE": sorbite_mask,
+        "CEMENTITE": cementite_mask,
+    }
+    rendered_layers = ["SORBITE", "CEMENTITE"]
+    if ra_target > 0.0:
+        phase_masks["AUSTENITE"] = ra_mask_u8
+        rendered_layers.append("AUSTENITE")
     return RendererOutput(
         image_gray=image_gray,
-        phase_masks={
-            "SORBITE": sorbite_mask,
-            "CEMENTITE": cementite_mask,
-        },
+        phase_masks=phase_masks,
         morphology_trace={
             "family": "sorbite_quench",
             "stage": "sorbite_quench",
             "colony_count": n_colonies,
             "period_px_mean": float(local_period.mean()),
             "per_colony_orientation": True,
+            "retained_austenite_fraction_target": ra_target,
+            "retained_austenite_fraction_actual": float(ra_mask.mean()),
         },
-        rendered_layers=["SORBITE", "CEMENTITE"],
+        rendered_layers=rendered_layers,
         fragment_area=int(h * w // max(1, n_colonies)),
     )
