@@ -697,7 +697,7 @@ def _suppress_small_inclusions(image_gray: np.ndarray) -> np.ndarray:
 
 
 def _compensate_edge_dimming(
-    image_gray: np.ndarray, *, edge_depth: int = 30, threshold: float = 4.0
+    image_gray: np.ndarray, *, edge_depth_frac: float = 0.18, threshold: float = 2.0
 ) -> np.ndarray:
     """Post-hoc compensation for systematic edge-band dimming.
 
@@ -706,68 +706,183 @@ def _compensate_edge_dimming(
     ≈ в 2× реже чем в центре. Это превращается в видимую тёмную
     «рамку» у всех четырёх краёв после boundary darkening + dilation.
 
-    Алгоритм: для каждого из четырёх краёв, если mean первых
-    edge_depth строк/столбцов темнее bulk (строк edge_depth..2*edge_depth)
-    больше чем на threshold единиц U8, линейно подравниваем значения
-    этих строк/столбцов к bulk mean. Применяется only когда разница
-    systematic (> threshold), иначе no-op.
+    Алгоритм: для каждого из четырёх краёв считаем per-row (per-col)
+    smoothed deficit относительно bulk mean; прибавляем дефицит с
+    **smoothstep**-весами (cubic ease-in-out от 1 на краю до 0 в
+    глубине edge_depth = 12% от размера). Smoothstep избегает видимых
+    «швов», характерных для линейного blend.
+
+    Per-row (вместо глобального) адаптация важна: у некоторых seeds
+    только top темнее, у других — только bottom. Глобальное среднее
+    по band даёт недо-компенсацию локальных провалов.
     """
     h, w = image_gray.shape
+    edge_depth = max(16, int(round(min(h, w) * edge_depth_frac)))
     if h <= 3 * edge_depth or w <= 3 * edge_depth:
         return image_gray
     arr = image_gray.astype(np.float32)
-    # Bulk region — middle 60% of image.
-    mid_y0, mid_y1 = int(h * 0.2), int(h * 0.8)
-    mid_x0, mid_x1 = int(w * 0.2), int(w * 0.8)
+    # Bulk region — middle 50% of image.
+    mid_y0, mid_y1 = int(h * 0.25), int(h * 0.75)
+    mid_x0, mid_x1 = int(w * 0.25), int(w * 0.75)
     bulk = float(arr[mid_y0:mid_y1, mid_x0:mid_x1].mean())
 
-    def _blend_edge(region: np.ndarray, target: float, axis: int) -> None:
-        """Линейный gradient blend: на крае — полная компенсация,
-        внутрь edge_depth — плавно до 0."""
-        length = region.shape[axis]
-        diff_mean = target - float(region.mean())
-        if diff_mean <= threshold:
-            return
-        # weights: 1.0 на самом краю → 0.0 на inner side
-        weights = np.linspace(1.0, 0.0, length, dtype=np.float32)
+    # Smoothstep weights: 3t² − 2t³, t = 1 на краю → 0 в глубину
+    # edge_depth. Derivative = 0 в обеих точках → нет видимых швов.
+    t = np.linspace(1.0, 0.0, edge_depth, dtype=np.float32)
+    weights = 3.0 * t * t - 2.0 * t * t * t
+
+    def _compensate(
+        band: np.ndarray, inner_band: np.ndarray, axis: int
+    ) -> np.ndarray:
+        """Per-line deficit compensation на одной границе.
+
+        band: edge region (edge_depth × W или H × edge_depth).
+        inner_band: соседний inner region того же размера для сравнения.
+        axis: ось вдоль edge (0 = rows, 1 = columns).
+        """
+        # mean along the "orthogonal" axis (across the band width).
+        band_means = band.mean(axis=1 - axis, keepdims=True).astype(np.float32)
+        deficit = bulk - band_means  # positive if band is darker
+        deficit_clipped = np.maximum(0.0, deficit - threshold) + threshold * (
+            deficit > threshold
+        )
+        # No compensation where deficit ≤ threshold.
+        deficit_clipped = np.where(deficit > threshold, deficit, 0.0)
+        w_shape = [1, 1]
+        w_shape[axis] = edge_depth
+        w = weights.reshape(w_shape)
         if axis == 0:
-            weights = weights[:, None]
+            # top edge: weights high at y=0, fading at y=edge_depth.
+            # For bottom edge caller passes band reversed.
+            adjustment = w * deficit_clipped  # (edge_depth, W) broadcast
         else:
-            weights = weights[None, :]
-        region += weights * diff_mean
+            adjustment = w * deficit_clipped  # (H, edge_depth) broadcast
+        return band + adjustment
 
-    # Top edge
-    top = arr[:edge_depth]
-    _blend_edge(top, bulk, axis=0)
-    arr[:edge_depth] = top
-    # Bottom edge
-    bot = arr[-edge_depth:]
-    _blend_edge(bot[::-1], bulk, axis=0)
-    arr[-edge_depth:] = bot
-    # Left edge
-    left = arr[:, :edge_depth]
-    _blend_edge(left, bulk, axis=1)
-    arr[:, :edge_depth] = left
-    # Right edge
-    right = arr[:, -edge_depth:]
-    _blend_edge(right[:, ::-1], bulk, axis=1)
-    arr[:, -edge_depth:] = right
+    # Строим полное adjustment-поле (без модификации arr), затем
+    # размываем его для беcшовного перехода.
+    adjust = np.zeros_like(arr)
+    # Top edge.
+    top_src = arr[:edge_depth]
+    top_band_means = top_src.mean(axis=1, keepdims=True)
+    top_deficit = np.where(bulk - top_band_means > threshold, bulk - top_band_means, 0.0)
+    top_w = weights.reshape(-1, 1)
+    adjust[:edge_depth] += top_w * top_deficit
+    # Bottom edge.
+    bot_src = arr[-edge_depth:]
+    bot_band_means = bot_src.mean(axis=1, keepdims=True)
+    bot_deficit = np.where(bulk - bot_band_means > threshold, bulk - bot_band_means, 0.0)
+    bot_w = weights[::-1].reshape(-1, 1)
+    adjust[-edge_depth:] += bot_w * bot_deficit
+    # Left edge.
+    left_src = arr[:, :edge_depth]
+    left_band_means = left_src.mean(axis=0, keepdims=True)
+    left_deficit = np.where(bulk - left_band_means > threshold, bulk - left_band_means, 0.0)
+    left_w = weights.reshape(1, -1)
+    adjust[:, :edge_depth] += left_w * left_deficit
+    # Right edge.
+    right_src = arr[:, -edge_depth:]
+    right_band_means = right_src.mean(axis=0, keepdims=True)
+    right_deficit = np.where(
+        bulk - right_band_means > threshold, bulk - right_band_means, 0.0
+    )
+    right_w = weights[::-1].reshape(1, -1)
+    adjust[:, -edge_depth:] += right_w * right_deficit
 
-    return np.clip(arr, 0.0, 255.0).astype(np.uint8)
+    # Гауссово размытие adjustment-поля устраняет visible seams между
+    # скомпенсированной и бульк зонами.
+    if ndimage is not None:
+        adjust = ndimage.gaussian_filter(adjust, sigma=max(4.0, edge_depth * 0.25))
+
+    return np.clip(arr + adjust, 0.0, 255.0).astype(np.uint8)
 
 
 def _grain_map(
     size: tuple[int, int], seed: int, mean_grain_size_px: float, elongation: float = 1.0
 ) -> dict[str, Any]:
-    return generate_grain_structure(
-        size=size,
-        seed=seed,
-        mean_grain_size_px=max(18.0, float(mean_grain_size_px)),
-        grain_size_jitter=0.22,
-        boundary_width_px=1,
-        boundary_contrast=0.0,
-        elongation=max(0.85, float(elongation)),
-    )
+    """Edge-clean Voronoi labels.
+
+    ``generate_grain_structure`` сэмплирует seed-точки внутри
+    ``[0, size)``, поэтому у четырёх краёв изображения Voronoi ячейки
+    обрезаны → плотность границ у edge ≈ в 2× реже, чем в центре.
+    После boundary darkening + cementite dilation возникает
+    видимая тёмная «рамка» (особенно полоса сверху).
+
+    Решение: добавляем «phantom» seed-точки В ПАДДИНГ-ОБЛАСТИ ВОКРУГ
+    изображения. Они не создают новых grains внутри size, но
+    обрезают периферийные grains **симметрично** — как если бы
+    изображение было вырезано из большей композиции. Labels
+    остаются в диапазоне [0, grain_count-1] → не ломают
+    ``boundary_phase_bias`` тесты.
+    """
+    height, width = size
+    mean_size = max(18.0, float(mean_grain_size_px))
+    rng = np.random.default_rng(int(seed))
+
+    # Внутренние grain seeds: как в generate_grain_structure.
+    grain_area = max(64.0, mean_size * mean_size)
+    inner_count = int(max(16, (height * width) / grain_area))
+    inner_points = np.column_stack(
+        (
+            rng.uniform(0, height - 1, size=inner_count),
+            rng.uniform(0, width - 1, size=inner_count),
+        )
+    ).astype(np.float32)
+    jitter = 0.22
+    inner_points += rng.normal(0.0, mean_size * 0.2 * jitter, size=inner_points.shape).astype(np.float32)
+    inner_points[:, 0] = np.clip(inner_points[:, 0], 0, height - 1)
+    inner_points[:, 1] = np.clip(inner_points[:, 1], 0, width - 1)
+
+    # Phantom seeds в padding-поясах за пределами image — плотность та же.
+    pad = max(int(mean_size * 1.2), 16)
+    padded_h, padded_w = height + 2 * pad, width + 2 * pad
+    padded_count_total = int(max(16, (padded_h * padded_w) / grain_area))
+    phantom_count = max(0, padded_count_total - inner_count)
+    if phantom_count > 0:
+        # Sample uniformly in padded area, reject those inside original image.
+        phantom = np.empty((0, 2), dtype=np.float32)
+        attempts = 0
+        while phantom.shape[0] < phantom_count and attempts < 8:
+            batch = np.column_stack(
+                (
+                    rng.uniform(-pad, height + pad - 1, size=phantom_count * 2),
+                    rng.uniform(-pad, width + pad - 1, size=phantom_count * 2),
+                )
+            ).astype(np.float32)
+            outside = (
+                (batch[:, 0] < 0) | (batch[:, 0] > height - 1)
+                | (batch[:, 1] < 0) | (batch[:, 1] > width - 1)
+            )
+            phantom = np.vstack([phantom, batch[outside]])
+            attempts += 1
+        phantom = phantom[:phantom_count]
+        all_points = np.vstack([inner_points, phantom])
+    else:
+        all_points = inner_points
+
+    # Voronoi labels на target-size. Phantom seeds получают свои id'ы,
+    # но они появятся только у границ image (как «соседи снаружи»).
+    from core.voronoi import generate_voronoi_labels
+
+    labels_raw = generate_voronoi_labels(size=size, points=all_points)
+    # Compact label numbering (remove gaps from phantom seeds that touch image).
+    unique_vals, inverse = np.unique(labels_raw, return_inverse=True)
+    labels = inverse.reshape(size).astype(np.int32)
+    # Compute boundary mask.
+    borders = np.zeros(size, dtype=bool)
+    borders[:-1, :] |= labels[:-1, :] != labels[1:, :]
+    borders[:, :-1] |= labels[:, :-1] != labels[:, 1:]
+    return {
+        "labels": labels,
+        "boundaries": borders,
+        "image": None,
+        "metadata": {
+            "grain_count": int(unique_vals.size),
+            "mean_grain_size_px": mean_size,
+            "inner_seeds": inner_count,
+            "phantom_seeds": int(all_points.shape[0] - inner_count),
+        },
+    }
 
 
 def _phase_field_from_labels(
@@ -1211,14 +1326,11 @@ def _build_pearlitic_render(
         image_gray = image_gray.copy()
         image_gray[cementite_pixel_mask] = cementite_img[cementite_pixel_mask]
 
-    # Edge-dimming compensation: Voronoi seed'ы сэмплируются внутри
-    # [0, size), поэтому у верхнего/нижнего/левого/правого края плотность
-    # γ-границ ≈ в 2× реже чем в центре. После boundary darkening,
-    # cementite dilation и rescale это превращается в видимую тёмную
-    # «рамку» (~8 единиц U8 разницы для pearlite_cementite). Косметический
-    # фикс: если первые/последние N строк (или столбцов) статистически
-    # темнее bulk, подравниваем mean строки к bulk. Применяется только
-    # при заметной разнице (>4 U8).
+    # Edge-compensation: phantom Voronoi seeds (см. _grain_map) устраняет
+    # большую часть edge-dimming артефакта, но остаётся остаточный
+    # градиент center→edge из-за ``boundary_pref`` поля (distance-to-
+    # boundary ниже у центра, где grains плотнее). Плавная
+    # smoothstep-compensation убирает видимую «рамку» на PNG.
     image_gray = _compensate_edge_dimming(image_gray)
 
     boundary_bias = 0.0
