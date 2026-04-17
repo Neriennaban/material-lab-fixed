@@ -122,6 +122,22 @@ _STAGE_RUNTIME_DEFAULTS: dict[str, tuple[dict[str, float], dict[str, float], flo
         {"Fe": 99.2, "C": 0.8},
         20.0,
     ),
+    # Phase 5
+    "bainite_upper": (
+        {"BAINITE": 0.78, "CEMENTITE": 0.22},
+        {"Fe": 99.55, "C": 0.45},
+        480.0,
+    ),
+    "bainite_lower": (
+        {"BAINITE": 0.85, "CEMENTITE": 0.15},
+        {"Fe": 99.3, "C": 0.7},
+        320.0,
+    ),
+    "carbide_free_bainite": (
+        {"BAINITE": 0.70, "AUSTENITE": 0.25, "MARTENSITE": 0.05},
+        {"Fe": 97.6, "C": 0.4, "Si": 1.8},
+        300.0,
+    ),
 }
 
 
@@ -179,7 +195,13 @@ def test_rendered_mean_tones_match_card(card_id):
         pytest.skip(f"{card_id}: no nital tones in card")
 
     _PHASE_KEYS = {
-        "AUSTENITE": ("austenite", "matrix_austenite", "interior", "matrix"),
+        "AUSTENITE": (
+            "austenite",
+            "matrix_austenite",
+            "retained_austenite_blocks",
+            "interior",
+            "matrix",
+        ),
         "FERRITE": ("ferrite", "matrix", "interior"),
         "DELTA_FERRITE": ("delta_islands",),
         "CEMENTITE": (
@@ -196,10 +218,17 @@ def test_rendered_mean_tones_match_card(card_id):
             "primary_pearlite_dendrites",
             "matrix",
         ),
-        "MARTENSITE": ("laths", "plate_body", "matrix"),
+        "MARTENSITE": (
+            "laths",
+            "plate_body",
+            "matrix",
+            "martensite_cores",
+        ),
         "MARTENSITE_CUBIC": ("laths",),
         "MARTENSITE_TETRAGONAL": ("plate_body", "laths"),
         "BAINITE": ("matrix",),
+        "BAINITE_UPPER": ("matrix",),
+        "BAINITE_LOWER": ("matrix", "background"),
     }
 
     def _tone_for_phase(phase_name: str) -> float | None:
