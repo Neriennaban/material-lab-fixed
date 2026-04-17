@@ -138,6 +138,17 @@ _STAGE_RUNTIME_DEFAULTS: dict[str, tuple[dict[str, float], dict[str, float], flo
         {"Fe": 97.6, "C": 0.4, "Si": 1.8},
         300.0,
     ),
+    # Phase 6
+    "troostite_quench": (
+        {"TROOSTITE": 0.88, "CEMENTITE": 0.12},
+        {"Fe": 99.4, "C": 0.6},
+        550.0,
+    ),
+    "sorbite_quench": (
+        {"SORBITE": 0.84, "CEMENTITE": 0.16},
+        {"Fe": 99.45, "C": 0.55},
+        620.0,
+    ),
 }
 
 
@@ -229,6 +240,8 @@ def test_rendered_mean_tones_match_card(card_id):
         "BAINITE": ("matrix",),
         "BAINITE_UPPER": ("matrix",),
         "BAINITE_LOWER": ("matrix", "background"),
+        "TROOSTITE": ("matrix", "background"),
+        "SORBITE": ("colony_mean", "ferrite_lamellae"),
     }
 
     def _tone_for_phase(phase_name: str) -> float | None:

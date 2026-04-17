@@ -1,0 +1,41 @@
+{
+  "id": "sorbite_quench",
+  "name_ru": "Сорбит закалки",
+  "name_en": "Quench sorbite (normalizing product)",
+  "reference_section": "§2.9",
+  "reference_sources": [
+    "Гуляев А.П. Металловедение. 1986"
+  ],
+  "phase_composition": { "SORBITE": 0.84, "CEMENTITE": 0.16 },
+  "rgb_tones": {
+    "nital": {
+      "ferrite_lamellae": [190, 180, 165],
+      "cementite_lamellae": [80, 65, 55],
+      "colony_mean": [115, 100, 90]
+    },
+    "picral": {
+      "cementite_lamellae": [55, 45, 35]
+    },
+    "beraha": {
+      "ferrite_lamellae": [150, 115, 75]
+    }
+  },
+  "morphology": {
+    "colony_size_um": { "mean": 12, "min": 5, "max": 20 },
+    "interlamellar_spacing_um": { "mean": 0.25, "min": 0.2, "max": 0.3 },
+    "colony_orientation": "random_per_colony",
+    "phase_noise_amplitude": 0.3,
+    "phase_noise_scale_um": 5,
+    "notes": "Паркет со штриховкой — колонии с разной ориентацией, каждая имеет параллельную штриховку. Типичный результат нормализации среднеуглеродистых сталей. HV 250-350, HRC 25-35."
+  },
+  "composition_triggers": {
+    "c_wt_range": [0.4, 1.0],
+    "ttt_perlit_nose_temp_c_range": [600, 650]
+  },
+  "generation_hints": {
+    "pattern_formula": "0.5 + 0.5*sin(2*pi/p * (x*cos(theta) + y*sin(theta)) + phi(x,y))",
+    "phi_noise_perlin_scale_um": 5,
+    "phi_noise_amplitude_rad": 0.3,
+    "colony_voronoi_relax_iter": 2
+  }
+}

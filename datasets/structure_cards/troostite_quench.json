@@ -1,0 +1,39 @@
+{
+  "id": "troostite_quench",
+  "name_ru": "Троостит закалки",
+  "name_en": "Quench troostite (fine pearlite)",
+  "reference_section": "§2.8",
+  "reference_sources": [
+    "Гуляев А.П. Металловедение. 1986",
+    "Krauss G. Steels: Processing, Structure, and Performance. ASM Int., 2015"
+  ],
+  "phase_composition": { "TROOSTITE": 0.88, "CEMENTITE": 0.12 },
+  "rgb_tones": {
+    "nital": {
+      "matrix": [55, 45, 40],
+      "background": [95, 80, 72]
+    },
+    "picral": {
+      "matrix": [35, 30, 25]
+    }
+  },
+  "morphology": {
+    "colony_size_um": { "mean": 5, "min": 2, "max": 10 },
+    "interlamellar_spacing_um": { "mean": 0.1, "note": "не разрешается оптически" },
+    "blob_falloff_sigma_um": { "min": 2, "max": 4 },
+    "nuclei_density_boundary_per_um2": 0.05,
+    "nuclei_density_interior_per_um2": 0.02,
+    "anisotropy_present": false,
+    "notes": "Чёрные кляксы (ink blots) с размытыми краями, часто кольцами вдоль PAG. HV 330-430, HRC 38-42."
+  },
+  "composition_triggers": {
+    "c_wt_range": [0.4, 1.0],
+    "ttt_perlit_nose_temp_c_range": [500, 600]
+  },
+  "generation_hints": {
+    "texture_method": "isotropic_poisson_blobs_with_gaussian_falloff",
+    "perlin_scale_px": 1.5,
+    "perlin_octaves": 2,
+    "perlin_amplitude_rgb": 6
+  }
+}
