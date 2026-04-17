@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "StructureCard",
+  "description": "Схема карточки микроструктуры Fe-C. Описывает физические параметры из §N металлографического справочника (Гуляев, Лахтин, Новиков, Bhadeshia, Krauss, Vander Voort, ASM Handbook Vol.9). Используется для калибровки renderer'ов в core/metallography_v3/renderers/.",
+  "type": "object",
+  "required": ["id", "name_ru", "reference_section", "rgb_tones", "morphology"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Уникальный идентификатор карточки, совпадает с именем файла (без .json)."
+    },
+    "name_ru": { "type": "string" },
+    "name_en": { "type": "string" },
+    "reference_section": {
+      "type": "string",
+      "description": "Ссылка на раздел справочника, например '§2.1'."
+    },
+    "reference_sources": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Список первичных источников (книги, статьи, ГОСТ)."
+    },
+    "reference_images": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "source"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "description": "Относительный путь к эталонному PNG (обычно tests/fixtures/reference_images/…)."
+          },
+          "source": { "type": "string" },
+          "magnification": { "type": "number" },
+          "etchant": { "type": "string" }
+        }
+      }
+    },
+    "phase_composition": {
+      "type": "object",
+      "description": "Справочные весовые/объёмные доли фаз в структуре (ключ — имя фазы заглавными: FERRITE, PEARLITE, MARTENSITE и т.п.)."
+    },
+    "rgb_tones": {
+      "type": "object",
+      "description": "RGB-кортежи [R,G,B] по реагентам (nital, picral, klemm_1, lepera, beraha). Внутри каждого реагента — словарь компонентов структуры.",
+      "properties": {
+        "nital": { "type": "object" },
+        "picral": { "type": "object" },
+        "klemm_1": { "type": "object" },
+        "lepera": { "type": "object" },
+        "beraha": { "type": "object" }
+      }
+    },
+    "morphology": {
+      "type": "object",
+      "description": "Морфологические параметры. Числовые поля допускают форму {mean, min, max, sigma} либо скаляр.",
+      "properties": {
+        "grain_size_um": {},
+        "lath_width_um": {},
+        "lath_length_um": {},
+        "aspect_ratio": {},
+        "packet_count_per_pag": {},
+        "block_width_um": {},
+        "needle_angles_deg": { "type": "array", "items": { "type": "number" } },
+        "carbide_density_per_um2": {},
+        "carbide_size_nm": {},
+        "retained_austenite_fraction": {},
+        "interlamellar_spacing_nm": {},
+        "anisotropy_ratio": {},
+        "midrib_present": { "type": "boolean" },
+        "midrib_delta_rgb": { "type": "number" }
+      }
+    },
+    "composition_triggers": {
+      "type": "object",
+      "description": "Условия активации структуры в phase_orchestrator.",
+      "properties": {
+        "c_wt_range": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "si_wt_min": { "type": "number" },
+        "cooling_rate_c_per_s_range": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "ms_range_c": {
+          "type": "array",
+          "items": { "type": "number" },
+          "minItems": 2,
+          "maxItems": 2
+        }
+      }
+    },
+    "generation_hints": {
+      "type": "object",
+      "description": "Свободные подсказки алгоритму рендера (scale_long, octaves, anisotropy и т.п.)."
+    }
+  }
+}

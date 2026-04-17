@@ -1,0 +1,66 @@
+{
+  "id": "bainite_upper",
+  "name_ru": "Верхний бейнит",
+  "name_en": "Upper bainite",
+  "reference_section": "§2.5",
+  "reference_sources": [
+    "Bhadeshia H.K.D.H. Bainite in Steels. IoM, 2001 (Chap. 3, 6)",
+    "Krauss G. Steels: Processing, Structure, and Performance. ASM Int., 2015",
+    "ASM Handbook Vol.9 Metallography and Microstructures"
+  ],
+  "reference_images": [
+    {
+      "path": "tests/fixtures/reference_images/bainite_upper_aisi4340_1000x_bhadeshia.png",
+      "source": "Bhadeshia 2001 Fig. 6.3 (заглушка: файл подобрать в Phase 5 sub-plan'е)",
+      "magnification": 1000,
+      "etchant": "nital_2"
+    }
+  ],
+  "phase_composition": {
+    "BAINITE": 0.78,
+    "CEMENTITE": 0.22
+  },
+  "rgb_tones": {
+    "nital": {
+      "matrix": [150, 130, 115],
+      "cementite_films": [70, 55, 45],
+      "inter_sheaf": [210, 205, 195]
+    },
+    "klemm_1": {
+      "matrix": [95, 105, 130]
+    },
+    "beraha": {
+      "ferrite_bainite": [110, 120, 150],
+      "cementite": [230, 228, 220]
+    }
+  },
+  "morphology": {
+    "grain_size_um": { "mean": 60, "min": 20, "max": 150, "note": "PAG — prior austenite grain" },
+    "subrail_width_um": { "mean": 0.2, "max": 0.4, "note": "TEM-level, not optically resolved" },
+    "lath_width_um": { "mean": 1.0, "min": 0.5, "max": 2.0 },
+    "lath_length_um": { "mean": 25, "min": 10, "max": 50 },
+    "sheaf_width_um": { "mean": 12, "min": 5, "max": 20 },
+    "sheaf_length_um": { "mean": 50, "min": 20, "max": 100 },
+    "cementite_film_length_um": { "min": 1, "max": 5 },
+    "cementite_film_thickness_um": { "min": 0.05, "max": 0.3 },
+    "cementite_orientation": "parallel_to_lath_axis",
+    "aspect_ratio": { "mean": 20, "min": 10, "max": 30, "note": "sheaf aspect" },
+    "anisotropy_ratio": 10.0,
+    "needle_angles_deg": [0.0, 60.0, 120.0],
+    "carbide_density_per_um2": { "mean": 0.5 },
+    "notes": "Перистый (feathery) узор — ключевая визуальная метка. Цементит — прерывистые плёнки между рейками, параллельные оси. Клиновидные пучки растут от границы PAG."
+  },
+  "composition_triggers": {
+    "c_wt_range": [0.1, 0.8],
+    "isothermal_hold_c_range": [400, 550]
+  },
+  "generation_hints": {
+    "anisotropy": "anisotropic_perlin",
+    "scale_long_px": 80,
+    "scale_trans_px": 8,
+    "anisotropy_ratio": 10.0,
+    "lath_period_px": 1.5,
+    "cementite_film_density": 0.3,
+    "orientation_sampling": "Kurdjumov-Sachs (sample 2-4 variants per PAG)"
+  }
+}

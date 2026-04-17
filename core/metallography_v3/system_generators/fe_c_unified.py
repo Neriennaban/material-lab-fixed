@@ -47,6 +47,44 @@ from .fe_c_textures import (
     texture_troostite_temper,
 )
 
+# Phase 1 редизайна (см. docs/plans/whimsical-wandering-dawn.md):
+# модульные renderer'ы семейств микроструктур зарегистрированы в
+# таблице диспетчера _STAGE_TO_RENDERER. На Phase 1 они НЕ подключены
+# в основной runtime-путь render_fe_c_unified — старые _build_*_render
+# работают как прежде, визуальный drift = 0. Подключение по семействам
+# начиная с Phase 2.
+from core.metallography_v3.renderers import (  # noqa: E402
+    bainite as _r_bainite,
+    granular_pearlite as _r_granular_pearlite,
+    high_temp_phases as _r_high_temp_phases,
+    martensite as _r_martensite,
+    quench_products as _r_quench_products,
+    surface_layers as _r_surface_layers,
+    tempered as _r_tempered,
+    white_cast_iron as _r_white_cast_iron,
+    widmanstatten as _r_widmanstatten,
+)
+
+_RENDERER_MODULES = (
+    _r_martensite,
+    _r_bainite,
+    _r_tempered,
+    _r_quench_products,
+    _r_white_cast_iron,
+    _r_high_temp_phases,
+    _r_widmanstatten,
+    _r_surface_layers,
+    _r_granular_pearlite,
+)
+
+# Раскладка stage -> модуль. Валидируется в
+# tests/renderers/test_dispatch_table.py.
+_STAGE_TO_RENDERER: dict[str, Any] = {
+    stage: mod
+    for mod in _RENDERER_MODULES
+    for stage in mod.HANDLES_STAGES
+}
+
 _PHASE_ALIASES: dict[str, str] = {
     "L": "LIQUID",
     "LIQUID": "LIQUID",
